@@ -1,0 +1,59 @@
+"use client";
+
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Radar,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+
+interface DualRadarChartProps {
+  elementData: Array<{ axis: string; value: number }>;
+  psaData: Array<{ axis: string; value: number }>;
+}
+
+const AXES = ["혁신/목", "영향/화", "협업/토", "실행/금", "회복/수"];
+
+export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
+  // Merge into single data array for recharts
+  const data = AXES.map((axis) => {
+    const el = elementData.find((d) => d.axis === axis);
+    const psa = psaData.find((d) => d.axis === axis);
+    return {
+      axis,
+      element: el?.value ?? 0,
+      psa: psa?.value ?? 0,
+    };
+  });
+
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <RadarChart cx="50%" cy="50%" outerRadius={100} data={data}>
+        <PolarGrid stroke="rgba(255,255,255,0.1)" />
+        <PolarAngleAxis
+          dataKey="axis"
+          tick={{ fill: "rgba(255,255,255,0.6)", fontSize: 12 }}
+        />
+        <Radar
+          name="사주 오행 (선천)"
+          dataKey="element"
+          stroke="#a855f7"
+          fill="#a855f7"
+          fillOpacity={0.3}
+        />
+        <Radar
+          name="PSA 강점 (후천)"
+          dataKey="psa"
+          stroke="#06b6d4"
+          fill="#06b6d4"
+          fillOpacity={0.3}
+        />
+        <Legend
+          wrapperStyle={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}
+        />
+      </RadarChart>
+    </ResponsiveContainer>
+  );
+}
