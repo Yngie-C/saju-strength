@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "build:web": "NEXT_PUBLIC_BUILD_TARGET=web next build",
-    "build:toss": "bash -c 'mv app/p app/_p_excluded && trap \"mv app/_p_excluded app/p\" EXIT && NEXT_PUBLIC_BUILD_TARGET=toss next build'"
+    "build:toss": "bash -c 'mv app/p app/_p_excluded && trap \"mv app/_p_excluded app/p\" EXIT && NEXT_PUBLIC_BUILD_TARGET=toss next build'",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -34,11 +36,14 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^5.1.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "^14.2.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^3.2.4"
   }
 }
