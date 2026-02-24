@@ -11,7 +11,7 @@ export function TDSProvider({ children }: { children: ReactNode }) {
 
   // Dynamic require for toss builds only
   try {
-    const { TDSMobileAITProvider } = require('@toss/tds-mobile-ait');
+    const { TDSMobileAITProvider } = require(/* webpackIgnore: true */ '@toss/tds-mobile-ait');
     return <TDSMobileAITProvider>{children}</TDSMobileAITProvider>;
   } catch {
     return <>{children}</>;

@@ -18,7 +18,7 @@ const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 let TDSBottomCTA: any = null;
 if (IS_TOSS) {
   try {
-    TDSBottomCTA = require('@toss/tds-mobile').BottomCTA;
+    TDSBottomCTA = require(/* webpackIgnore: true */ '@toss/tds-mobile').BottomCTA;
   } catch {
     // Fallback to web version
   }

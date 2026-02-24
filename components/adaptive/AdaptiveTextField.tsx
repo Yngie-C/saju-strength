@@ -17,7 +17,7 @@ const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 let TDSTextField: any = null;
 if (IS_TOSS) {
   try {
-    TDSTextField = require('@toss/tds-mobile').TextField;
+    TDSTextField = require(/* webpackIgnore: true */ '@toss/tds-mobile').TextField;
   } catch {
     // Fallback to web version
   }

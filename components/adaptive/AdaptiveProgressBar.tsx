@@ -15,7 +15,7 @@ const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 let TDSProgressBar: any = null;
 if (IS_TOSS) {
   try {
-    TDSProgressBar = require('@toss/tds-mobile').ProgressBar;
+    TDSProgressBar = require(/* webpackIgnore: true */ '@toss/tds-mobile').ProgressBar;
   } catch {
     // Fallback to web version
   }

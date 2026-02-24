@@ -18,7 +18,7 @@ const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 let TDSButton: any = null;
 if (IS_TOSS) {
   try {
-    TDSButton = require('@toss/tds-mobile').Button;
+    TDSButton = require(/* webpackIgnore: true */ '@toss/tds-mobile').Button;
   } catch {
     // Fallback to web version
   }

@@ -15,7 +15,7 @@ const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 let TDSCheckbox: any = null;
 if (IS_TOSS) {
   try {
-    TDSCheckbox = require('@toss/tds-mobile').Checkbox;
+    TDSCheckbox = require(/* webpackIgnore: true */ '@toss/tds-mobile').Checkbox;
   } catch {
     // Fallback to web version
   }
