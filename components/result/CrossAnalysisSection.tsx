@@ -104,7 +104,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
 
   const psaData = AXES_ORDER.map((axis) => {
     const found = axes.find((a) => PSA_TO_AXIS[a.psaCategory] === axis);
-    return { axis, value: found ? found.psaRank * 20 : 0 };
+    return { axis, value: found ? rankToScore(found.psaRank) : 0 };
   });
 
   // Group by type
