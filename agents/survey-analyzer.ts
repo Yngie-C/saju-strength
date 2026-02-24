@@ -23,7 +23,7 @@ export class SurveyAnalyzerAgent extends BaseAgent<SurveyResponse, BriefAnalysis
   constructor() {
     super(
       'SurveyAnalyzerAgent',
-      `PSA 설문 분석가 (Template-based). 60개 응답(1-7, 역질문 포함) → 5개 카테고리 분석 → 템플릿 선택
+      `PSA 설문 분석가 (Template-based). 30/60개 응답(1-7, 역질문 포함) → 5개 카테고리 분석 → 템플릿 선택
 
 템플릿 시스템:
 - 30개 strengthsSummary 템플릿 (10 페르소나 × 3 variants: balanced/spiked/mixed)
@@ -45,15 +45,15 @@ export class SurveyAnalyzerAgent extends BaseAgent<SurveyResponse, BriefAnalysis
       console.log(`[SurveyAnalyzer] Analyzing survey for session: ${sessionId}`);
       console.log(`[SurveyAnalyzer] Total answers: ${answers.length}`);
 
-      // 1. Validate 60 answers
-      if (answers.length !== 60) {
-        return this.failure(`설문 응답이 60개가 아닙니다 (${answers.length}개)`);
+      // 1. Validate answers (30 basic or 60 full)
+      if (![30, 60].includes(answers.length)) {
+        return this.failure(`설문 응답이 30개 또는 60개여야 합니다 (${answers.length}개)`);
       }
 
       // 1.5. Get question metadata from context (for reverse scoring)
       const questions = context.data.questions as SurveyQuestion[];
-      if (!questions || questions.length !== 60) {
-        return this.failure('질문 메타데이터가 누락되었습니다');
+      if (!questions || ![30, 60].includes(questions.length)) {
+        return this.failure('질문 메타데이터가 누락되었거나 수가 올바르지 않습니다');
       }
 
       // 2. Calculate category scores (with reverse scoring)

@@ -3,6 +3,7 @@ import { SurveyCategory, SurveyQuestion } from '@/types/survey';
 export const SURVEY_QUESTIONS: SurveyQuestion[] = [
   // ==========================================
   // Innovation (혁신 사고) - 12 questions
+  // Basic: q1-q5, q7(R) | Premium: q6, q8-q12
   // ==========================================
   {
     id: 'q1',
@@ -11,6 +12,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '새로운 아이디어를 떠올리는 것이 즐겁다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q2',
@@ -19,6 +21,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '기존 방식에 의문을 제기하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q3',
@@ -27,6 +30,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '문제를 해결할 때 여러 가지 창의적인 방법을 시도한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q4',
@@ -35,6 +39,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '남들이 보지 못하는 가능성을 발견하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q5',
@@ -43,6 +48,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '새로운 기술이나 트렌드에 빠르게 관심을 갖는다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q6',
@@ -51,6 +57,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '아이디어가 많아서 어떤 것부터 실행할지 고민될 때가 많다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q7',
@@ -59,6 +66,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '나는 변화보다 안정된 환경을 선호한다.',
     version: 1,
     isReverseScored: true,
+    tier: 'basic',
   },
   {
     id: 'q8',
@@ -67,6 +75,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '실험적인 접근 방식을 시도할 때 두려움보다 기대감을 느낀다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q9',
@@ -75,6 +84,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다양한 분야에서 영감을 얻어 새로운 시각으로 문제를 본다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q10',
@@ -83,6 +93,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '주어진 조건 안에서만 생각하는 것이 더 편하다.',
     version: 1,
     isReverseScored: true,
+    tier: 'premium',
   },
   {
     id: 'q11',
@@ -91,6 +102,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '미래의 가능성을 상상하고 그에 맞게 행동하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q12',
@@ -99,10 +111,12 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '낯선 것을 접했을 때 불편함보다 호기심을 더 많이 느낀다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
 
   // ==========================================
   // Execution (철저 실행) - 12 questions
+  // Basic: q13-q17, q19(R) | Premium: q18, q20-q24
   // ==========================================
   {
     id: 'q13',
@@ -111,6 +125,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '한 번 맡은 일은 끝까지 완수하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q14',
@@ -119,6 +134,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '목표를 세우고 그것을 달성하기 위한 계획을 구체적으로 수립한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q15',
@@ -127,6 +143,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '마감 기한을 철저히 지키는 것이 중요하다고 생각한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q16',
@@ -135,6 +152,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '세부적인 사항까지 꼼꼼하게 챙기는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q17',
@@ -143,6 +161,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '업무를 처리할 때 체계적인 프로세스를 따른다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q18',
@@ -151,6 +170,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '결과물의 완성도를 높이기 위해 충분한 시간을 투자한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q19',
@@ -159,6 +179,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '할 일 목록을 만들고 우선순위에 따라 처리하는 것이 어렵다.',
     version: 1,
     isReverseScored: true,
+    tier: 'basic',
   },
   {
     id: 'q20',
@@ -167,6 +188,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '어려운 상황에서도 포기하지 않고 방법을 찾아낸다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q21',
@@ -175,6 +197,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '성과를 내기 위해 필요하다면 불편함을 감수할 수 있다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q22',
@@ -183,6 +206,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '일을 시작하는 것보다 마무리하는 것이 더 어렵다고 느낀다.',
     version: 1,
     isReverseScored: true,
+    tier: 'premium',
   },
   {
     id: 'q23',
@@ -191,6 +215,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '높은 기준을 설정하고 그것을 충족시키기 위해 노력한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q24',
@@ -199,10 +224,12 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '업무의 효율성을 높이기 위한 방법을 지속적으로 탐색한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
 
   // ==========================================
   // Influence (대인 영향) - 12 questions
+  // Basic: q25-q29, q31(R) | Premium: q30, q32-q36
   // ==========================================
   {
     id: 'q25',
@@ -211,6 +238,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다른 사람들이 내 의견을 따르는 경우가 많다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q26',
@@ -219,6 +247,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '내 생각을 설득력 있게 전달하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q27',
@@ -227,6 +256,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '사람들의 동기와 필요를 잘 파악하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q28',
@@ -235,6 +265,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '그룹에서 자연스럽게 리더 역할을 맡게 된다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q29',
@@ -243,6 +274,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '중요한 사안에 대해 내 입장을 명확히 표현한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q30',
@@ -251,6 +283,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '내 행동이 주변 사람들에게 긍정적인 영향을 미친다고 느낀다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q31',
@@ -259,6 +292,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '사람들 앞에서 발표하거나 의견을 제시하는 것이 불편하다.',
     version: 1,
     isReverseScored: true,
+    tier: 'basic',
   },
   {
     id: 'q32',
@@ -267,6 +301,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '협상이나 조율 상황에서 원하는 결과를 이끌어내는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q33',
@@ -275,6 +310,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다른 사람들이 최선을 다하도록 동기를 부여하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q34',
@@ -283,6 +319,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '내 의견이 조직이나 팀의 방향에 영향을 미친다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q35',
@@ -291,6 +328,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '혼자 결정하는 것보다 다른 사람에게 판단을 맡기는 것이 편하다.',
     version: 1,
     isReverseScored: true,
+    tier: 'premium',
   },
   {
     id: 'q36',
@@ -299,10 +337,12 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '내가 믿는 가치를 위해 목소리를 높이는 것을 두려워하지 않는다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
 
   // ==========================================
   // Collaboration (협업 공감) - 12 questions
+  // Basic: q37-q41, q44(R) | Premium: q42-q43, q45-q48
   // ==========================================
   {
     id: 'q37',
@@ -311,6 +351,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '팀원들의 감정과 상황을 잘 이해하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q38',
@@ -319,6 +360,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '혼자보다 함께 일할 때 더 좋은 결과가 나온다고 믿는다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q39',
@@ -327,6 +369,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '팀 내 갈등을 효과적으로 중재하고 해결하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q40',
@@ -335,6 +378,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다른 사람의 성공을 진심으로 응원하고 지원한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q41',
@@ -343,6 +387,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다양한 배경과 의견을 가진 사람들과 잘 어울린다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q42',
@@ -351,6 +396,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '나의 필요보다 팀의 목표를 우선시하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q43',
@@ -359,6 +405,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다른 사람의 아이디어에 귀 기울이고 그것을 발전시키는 것을 즐긴다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q44',
@@ -367,6 +414,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '협력보다 경쟁을 통해 더 좋은 결과를 만들 수 있다고 생각한다.',
     version: 1,
     isReverseScored: true,
+    tier: 'basic',
   },
   {
     id: 'q45',
@@ -375,6 +423,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '팀원이 어려울 때 기꺼이 도움을 제공한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q46',
@@ -383,6 +432,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '공동의 목표를 위해 내 방식을 조정하는 것이 어렵지 않다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q47',
@@ -391,6 +441,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '혼자 일하는 것이 팀으로 일하는 것보다 효율적이라고 느낀다.',
     version: 1,
     isReverseScored: true,
+    tier: 'premium',
   },
   {
     id: 'q48',
@@ -399,10 +450,12 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '다른 사람의 관점에서 상황을 이해하려고 노력한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
 
   // ==========================================
   // Resilience (상황 회복) - 12 questions
+  // Basic: q49-q53, q55(R) | Premium: q54, q56-q60
   // ==========================================
   {
     id: 'q49',
@@ -411,6 +464,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '실패나 역경을 겪어도 빠르게 회복하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q50',
@@ -419,6 +473,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '예상치 못한 변화에도 침착하게 대응하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q51',
@@ -427,6 +482,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '스트레스 상황에서도 명확한 판단력을 유지한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q52',
@@ -435,6 +491,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '어려운 상황을 성장의 기회로 바라보는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q53',
@@ -443,6 +500,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '비판이나 부정적인 피드백을 받아도 과도하게 위축되지 않는다.',
     version: 1,
     isReverseScored: false,
+    tier: 'basic',
   },
   {
     id: 'q54',
@@ -451,6 +509,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '장기적인 목표를 위해 단기적인 불편함을 견딜 수 있다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q55',
@@ -459,6 +518,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '일이 잘 풀리지 않을 때 쉽게 포기하고 싶어진다.',
     version: 1,
     isReverseScored: true,
+    tier: 'basic',
   },
   {
     id: 'q56',
@@ -467,6 +527,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '불확실한 상황에서도 낙관적인 태도를 유지한다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q57',
@@ -475,6 +536,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '과거의 실수에 오래 집착하기보다 앞으로 나아가는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q58',
@@ -483,6 +545,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '환경이 바뀌면 쉽게 적응하는 편이다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q59',
@@ -491,6 +554,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '압박이 심한 상황에서 오히려 더 집중력이 높아진다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
   {
     id: 'q60',
@@ -499,8 +563,19 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     questionText: '도전적인 목표가 있을 때 더 큰 동기를 느낀다.',
     version: 1,
     isReverseScored: false,
+    tier: 'premium',
   },
 ];
 
+/** @deprecated 하위 호환용 — 새 코드에서는 BASIC_QUESTIONS_PER_PAGE 사용 */
 export const QUESTIONS_PER_PAGE = 6;
+/** @deprecated 하위 호환용 — 새 코드에서는 BASIC_TOTAL_PAGES 사용 */
 export const TOTAL_PAGES = 10;
+
+// ==========================================
+// Tier-based exports (Basic 30 / Premium 30)
+// ==========================================
+export const BASIC_QUESTIONS: SurveyQuestion[] = SURVEY_QUESTIONS.filter(q => q.tier === 'basic');
+export const PREMIUM_QUESTIONS: SurveyQuestion[] = SURVEY_QUESTIONS.filter(q => q.tier === 'premium');
+export const BASIC_QUESTIONS_PER_PAGE = 6;
+export const BASIC_TOTAL_PAGES = 5;

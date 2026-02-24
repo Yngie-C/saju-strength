@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
       <div className={`${styles.container} space-y-8`}>
         {/* 뒤로가기 */}
         <Link
-          href="/birth-info"
+          href="/survey"
           className={`inline-flex items-center gap-2 text-sm transition-colors ${IS_TOSS ? 'text-tds-grey-500 hover:text-tds-grey-700' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
         >
           <ArrowLeft size={16} />
@@ -121,7 +121,7 @@ export default function PrivacyPolicyPage() {
         {/* 하단 */}
         <div className={`border-t pt-6 ${IS_TOSS ? 'border-tds-grey-200' : 'border-border'}`}>
           <Link
-            href="/birth-info"
+            href="/survey"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/20 text-primary font-medium text-sm hover:bg-primary/30 transition-colors"
           >
             <ArrowLeft size={16} />

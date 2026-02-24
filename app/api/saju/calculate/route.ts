@@ -5,7 +5,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { year, month, day, hour, gender, isLunar } = body;
+    const { year, month, day, hour, gender, isLunar, sessionId: clientSessionId } = body;
 
     // 입력 검증
     if (!year || !month || !day || !gender) {
@@ -17,7 +17,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '1900~2050년 사이만 지원됩니다.' }, { status: 400 });
     }
 
-    const sessionId = crypto.randomUUID();
+    // 클라이언트에서 전달된 sessionId 사용, 없으면 신규 생성
+    const sessionId = clientSessionId || crypto.randomUUID();
 
     const agent = new SajuAnalyzerAgent();
     const result = await agent.process(
@@ -41,7 +42,10 @@ export async function POST(request: Request) {
       const { fourPillars, dayMaster, elementDistribution, elementRanks } = result.data!;
 
       const supabase = getSupabaseAdmin();
-      await supabase.from('sessions').insert({ id: sessionId, status: 'birth_input' });
+      await supabase.from('sessions').upsert(
+        { id: sessionId, status: 'birth_input', updated_at: new Date().toISOString() },
+        { onConflict: 'id' }
+      );
 
       await supabase.from('saju_analyses').insert({
         id: crypto.randomUUID(),

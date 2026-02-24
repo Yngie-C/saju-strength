@@ -142,7 +142,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             나도 분석하기
             <ArrowRight size={18} />
           </Link>
-          <p className="text-xs text-white/30">100% 무료 · 5분 소요 · 즉시 결과</p>
+          <p className="text-xs text-white/30">100% 무료 · 3분 소요 · 즉시 결과</p>
         </div>
 
       </div>

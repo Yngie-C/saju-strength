@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
-import { SURVEY_QUESTIONS, QUESTIONS_PER_PAGE, TOTAL_PAGES } from '@/lib/survey-questions';
+import { BASIC_QUESTIONS, BASIC_QUESTIONS_PER_PAGE, BASIC_TOTAL_PAGES } from '@/lib/survey-questions';
 import { SurveyAnswer } from '@/types/survey';
 import { apiUrl } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
@@ -113,13 +113,13 @@ export default function SurveyPage() {
     sm.save('surveyPage', currentPage);
   }, [answers, currentPage]);
 
-  const currentQuestions = SURVEY_QUESTIONS.slice(
-    currentPage * QUESTIONS_PER_PAGE,
-    (currentPage + 1) * QUESTIONS_PER_PAGE
+  const currentQuestions = BASIC_QUESTIONS.slice(
+    currentPage * BASIC_QUESTIONS_PER_PAGE,
+    (currentPage + 1) * BASIC_QUESTIONS_PER_PAGE
   );
 
   const totalAnswered = Object.keys(answers).length;
-  const progress = (totalAnswered / SURVEY_QUESTIONS.length) * 100;
+  const progress = (totalAnswered / BASIC_QUESTIONS.length) * 100;
 
   const getMilestoneMessage = (pct: number): string | undefined => {
     if (pct >= 75 && pct < 80) return '거의 다 왔어요! 조금만 더 하면 결과를 확인할 수 있어요';
@@ -130,7 +130,7 @@ export default function SurveyPage() {
 
   const milestoneMessage = getMilestoneMessage(progress);
 
-  const estimatedMinutesLeft = Math.max(1, Math.ceil((SURVEY_QUESTIONS.length - totalAnswered) * 5 / 60));
+  const estimatedMinutesLeft = Math.max(1, Math.ceil((BASIC_QUESTIONS.length - totalAnswered) * 5 / 60));
 
   const currentPageAnswered = currentQuestions.every((q) => answers[q.id] !== undefined);
 
@@ -140,7 +140,7 @@ export default function SurveyPage() {
 
   const goToPage = useCallback(
     (newPage: number) => {
-      if (newPage < 0 || newPage >= TOTAL_PAGES) return;
+      if (newPage < 0 || newPage >= BASIC_TOTAL_PAGES) return;
       setDirection(newPage > currentPage ? 1 : -1);
       setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -149,7 +149,7 @@ export default function SurveyPage() {
   );
 
   const handleNext = useCallback(() => {
-    if (currentPage < TOTAL_PAGES - 1) {
+    if (currentPage < BASIC_TOTAL_PAGES - 1) {
       goToPage(currentPage + 1);
     }
   }, [currentPage, goToPage]);
@@ -168,7 +168,7 @@ export default function SurveyPage() {
   });
 
   const handleSubmit = async () => {
-    const allAnswered = SURVEY_QUESTIONS.every((q) => answers[q.id] !== undefined);
+    const allAnswered = BASIC_QUESTIONS.every((q) => answers[q.id] !== undefined);
     if (!allAnswered) {
       alert('모든 문항에 응답해 주세요.');
       return;
@@ -179,9 +179,11 @@ export default function SurveyPage() {
     try {
       const sessionId =
         sessionStorage.getItem(SESSION_ID_KEY) ||
-        `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        crypto.randomUUID();
+      // 생성된 sessionId를 즉시 저장 (전체 흐름에서 재사용)
+      sessionStorage.setItem(SESSION_ID_KEY, sessionId);
 
-      const formattedAnswers: SurveyAnswer[] = SURVEY_QUESTIONS.map((q) => ({
+      const formattedAnswers: SurveyAnswer[] = BASIC_QUESTIONS.map((q) => ({
         questionId: q.id,
         questionNumber: q.questionNumber,
         category: q.category,
@@ -213,7 +215,7 @@ export default function SurveyPage() {
       sm.remove('surveyAnswers');
       sm.remove('surveyPage');
 
-      router.push('/result');
+      router.push('/birth-info');
     } catch (error) {
       console.error('Survey submit error:', error);
       alert('제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
@@ -221,8 +223,8 @@ export default function SurveyPage() {
     }
   };
 
-  const isLastPage = currentPage === TOTAL_PAGES - 1;
-  const allAnswered = SURVEY_QUESTIONS.every((q) => answers[q.id] !== undefined);
+  const isLastPage = currentPage === BASIC_TOTAL_PAGES - 1;
+  const allAnswered = BASIC_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
   return (
     <div className={styles.page}>
@@ -235,14 +237,14 @@ export default function SurveyPage() {
               <span>남은 시간: 약 {estimatedMinutesLeft}분</span>
             </div>
             <span className={`text-sm ${styles.caption}`}>
-              {totalAnswered} / {SURVEY_QUESTIONS.length} 완료
+              {totalAnswered} / {BASIC_QUESTIONS.length} 완료
             </span>
           </div>
           {/* Progress bar */}
           <AdaptiveProgressBar progress={progress} milestoneMessage={milestoneMessage} />
           <div className="flex justify-between mt-1">
             <span className={styles.caption}>
-              {currentPage + 1} / {TOTAL_PAGES} 페이지
+              {currentPage + 1} / {BASIC_TOTAL_PAGES} 페이지
             </span>
             <span className={IS_TOSS ? 'text-st11 text-tds-blue-500 font-medium' : 'text-xs text-primary font-medium'}>
               {Math.round(progress)}%
@@ -274,7 +276,7 @@ export default function SurveyPage() {
             className="space-y-4"
           >
             {currentQuestions.map((question, idx) => {
-              const globalIdx = currentPage * QUESTIONS_PER_PAGE + idx + 1;
+              const globalIdx = currentPage * BASIC_QUESTIONS_PER_PAGE + idx + 1;
               const selectedValue = answers[question.id];
 
               return (
@@ -391,10 +393,10 @@ export default function SurveyPage() {
 
         {/* Page dots */}
         <div className="flex justify-center gap-1.5 mt-3">
-          {Array.from({ length: TOTAL_PAGES }).map((_, i) => {
-            const pageAnswered = SURVEY_QUESTIONS.slice(
-              i * QUESTIONS_PER_PAGE,
-              (i + 1) * QUESTIONS_PER_PAGE
+          {Array.from({ length: BASIC_TOTAL_PAGES }).map((_, i) => {
+            const pageAnswered = BASIC_QUESTIONS.slice(
+              i * BASIC_QUESTIONS_PER_PAGE,
+              (i + 1) * BASIC_QUESTIONS_PER_PAGE
             ).every((q) => answers[q.id] !== undefined);
             return (
               <button

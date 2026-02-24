@@ -78,7 +78,7 @@ export default function LandingPage() {
           <motion.button
             whileHover={IS_TOSS ? undefined : { scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => router.push("/birth-info")}
+            onClick={() => router.push("/survey")}
             className={`mt-2 inline-flex items-center gap-2 ${designTokens.primaryButton} px-8 py-4 font-bold text-lg shadow-lg shadow-primary/30 hover:opacity-90 transition-opacity`}
           >
             무료로 시작하기
@@ -87,7 +87,7 @@ export default function LandingPage() {
 
           {/* 무료 강조 */}
           <p className={`tracking-wide ${designTokens.textCaption}`}>
-            100% 무료 · 5분 소요 · 즉시 결과
+            100% 무료 · 3분 소요 · 즉시 결과
           </p>
         </motion.div>
       </section>
@@ -102,16 +102,16 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               {
-                icon: <Sparkles size={28} className="text-primary" />,
+                icon: <BarChart3 size={28} className="text-primary" />,
                 step: "01",
-                title: "사주 오행 분석",
-                desc: "생년월일시로 타고난 에너지 패턴 분석",
+                title: "Big5 강점 설문",
+                desc: "30문항으로 현재 발현 중인 강점 측정",
               },
               {
-                icon: <BarChart3 size={28} className="text-primary/80" />,
+                icon: <Sparkles size={28} className="text-primary/80" />,
                 step: "02",
-                title: "Big5 강점 설문",
-                desc: "60문항으로 현재 발현 중인 강점 측정",
+                title: "사주 오행 분석",
+                desc: "생년월일시로 타고난 에너지 패턴 분석",
               },
               {
                 icon: <GitMerge size={28} className="text-amber-400" />,
@@ -207,13 +207,13 @@ export default function LandingPage() {
             <motion.button
               whileHover={IS_TOSS ? undefined : { scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => router.push("/birth-info")}
+              onClick={() => router.push("/survey")}
               className={`inline-flex items-center gap-2 ${designTokens.primaryButton} px-8 py-4 font-bold text-lg shadow-lg shadow-primary/30`}
             >
               무료로 시작하기
               <ArrowRight size={20} />
             </motion.button>
-            <p className={`tracking-wide ${designTokens.textCaption}`}>100% 무료 · 5분 소요 · 즉시 결과</p>
+            <p className={`tracking-wide ${designTokens.textCaption}`}>100% 무료 · 3분 소요 · 즉시 결과</p>
           </div>
         </section>
       </SectionReveal>

@@ -128,7 +128,7 @@ export default function ResultPage() {
       setSajuResult(parsedSaju);
       setPsaResult(parsedPsa);
 
-      const sid = parsedSaju.sessionId ?? `session-${Date.now()}`;
+      const sid = parsedSaju.sessionId ?? crypto.randomUUID();
       setSessionId(sid);
 
       fetch(apiUrl("/api/combined/analyze"), {
@@ -200,10 +200,10 @@ export default function ResultPage() {
           <p className="text-4xl">⚠</p>
           <p className={styles.bodyText}>{error}</p>
           <button
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = "/survey")}
             className={`mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold ${IS_TOSS ? 'bg-tds-blue-500 text-white' : `${designTokens.primaryButton}`}`}
           >
-            처음으로
+            처음부터 시작하기
           </button>
         </div>
       </div>

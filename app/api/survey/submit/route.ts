@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SurveyAnalyzerAgent } from '@/agents/survey-analyzer';
-import { SURVEY_QUESTIONS } from '@/lib/survey-questions';
+import { SURVEY_QUESTIONS, BASIC_QUESTIONS } from '@/lib/survey-questions';
 import { SurveyAnswer, SurveyResponse } from '@/types/survey';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 
@@ -20,9 +20,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (answers.length !== 60) {
+    const validCounts = [30, 60];
+    if (!validCounts.includes(answers.length)) {
       return NextResponse.json(
-        { error: `설문 응답이 60개가 아닙니다 (${answers.length}개)` },
+        { error: `설문 응답이 30개 또는 60개여야 합니다 (${answers.length}개)` },
         { status: 400 }
       );
     }
@@ -34,11 +35,12 @@ export async function POST(request: Request) {
       completionTimeSeconds,
     };
 
+    const questions = answers.length === 30 ? BASIC_QUESTIONS : SURVEY_QUESTIONS;
     const agent = new SurveyAnalyzerAgent();
     const result = await agent.process(surveyResponse, {
       sessionId,
       data: {
-        questions: SURVEY_QUESTIONS,
+        questions,
       },
     });
 
@@ -51,6 +53,25 @@ export async function POST(request: Request) {
 
     // Persist to Supabase — failures are logged but do not block the response
     try {
+      const supabase = getSupabaseAdmin();
+
+      // 1. Session upsert — 설문이 먼저 실행되므로 session이 없을 수 있음 (FK 위반 방지)
+      const { error: upsertError } = await supabase
+        .from('sessions')
+        .upsert(
+          { id: sessionId, status: 'survey_started', updated_at: new Date().toISOString() },
+          { onConflict: 'id', ignoreDuplicates: true }
+        );
+      if (upsertError) {
+        console.error('[POST /api/survey/submit] sessions upsert error:', upsertError);
+      }
+
+      // 2. 기존 응답 삭제 후 재삽입 (중복 제출 처리)
+      await supabase
+        .from('survey_responses')
+        .delete()
+        .eq('session_id', sessionId);
+
       const rows = answers.map((a) => ({
         session_id: sessionId,
         question_id: null,
@@ -59,7 +80,6 @@ export async function POST(request: Request) {
         score: a.score,
       }));
 
-      const supabase = getSupabaseAdmin();
       const { error: insertError } = await supabase
         .from('survey_responses')
         .insert(rows);
@@ -68,6 +88,7 @@ export async function POST(request: Request) {
         console.error('[POST /api/survey/submit] survey_responses insert error:', insertError);
       }
 
+      // 3. Session 상태 업데이트
       const { error: updateError } = await supabase
         .from('sessions')
         .update({ survey_completed: true, updated_at: new Date().toISOString() })

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { BirthInfoForm } from "@/components/saju/BirthInfoForm";
@@ -43,6 +43,14 @@ export default function BirthInfoPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState(false);
 
+  // psaResult 가드: 설문 미완료 시 /survey로 리디렉트
+  useEffect(() => {
+    const psaResult = sessionStorage.getItem('psaResult');
+    if (!psaResult) {
+      router.replace('/survey');
+    }
+  }, [router]);
+
   async function handleSubmit(data: {
     year: number;
     month: number;
@@ -55,10 +63,12 @@ export default function BirthInfoPage() {
     setError(null);
 
     try {
+      // 설문에서 생성된 sessionId를 saju API에 전달
+      const existingSessionId = sessionStorage.getItem('saju-session-id');
       const res = await fetch(apiUrl("/api/saju/calculate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, sessionId: existingSessionId }),
       });
 
       if (!res.ok) {
@@ -75,7 +85,7 @@ export default function BirthInfoPage() {
       const sm = getStateManager();
       sm.setSessionId(result.sessionId);
       await sm.save('sajuResult', result);
-      router.push("/saju-preview");
+      router.push("/result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
@@ -92,18 +102,18 @@ export default function BirthInfoPage() {
         transition={{ duration: 0.4 }}
         className="mb-8 flex items-center gap-2"
       >
-        {[1, 2, 3, 4].map((step) => (
+        {[1, 2, 3].map((step) => (
           <div key={step} className="flex items-center gap-2">
             <div
               className={
-                step === 1
+                step <= 2
                   ? styles.stepActive
                   : styles.stepInactive
               }
             >
               {step}
             </div>
-            {step < 4 && <div className={styles.stepLine} />}
+            {step < 3 && <div className={step <= 1 ? styles.stepLineActive : styles.stepLine} />}
           </div>
         ))}
       </motion.div>
@@ -118,7 +128,7 @@ export default function BirthInfoPage() {
         {/* 제목 */}
         <div className="mb-8 text-center">
           <p className="text-xs font-semibold text-primary/80 tracking-widest uppercase mb-2">
-            Step 1 / 4
+            Step 2 / 3
           </p>
           <h1 className={styles.title}>생년월일 입력</h1>
           <p className={`mt-2 ${styles.subtitle}`}>

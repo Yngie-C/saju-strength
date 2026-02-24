@@ -26,7 +26,7 @@ class StateManager {
     if (typeof window === 'undefined') return '';
     let sessionId = sessionStorage.getItem(KEYS.SESSION_ID);
     if (!sessionId) {
-      sessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      sessionId = crypto.randomUUID();
       sessionStorage.setItem(KEYS.SESSION_ID, sessionId);
     }
     return sessionId;

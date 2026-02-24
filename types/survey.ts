@@ -46,6 +46,7 @@ export interface SurveyQuestion {
   questionHint?: string;
   version: number;
   isReverseScored?: boolean; // NEW: For reverse-scored questions
+  tier?: 'basic' | 'premium'; // 문항 티어 (basic: 30문항, premium: 추가 30문항)
 }
 
 /**
