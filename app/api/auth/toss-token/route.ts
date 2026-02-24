@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { mtlsFetch } from '@/lib/mtls';
+import { decryptTossUserData } from '@/lib/crypto';
 
 export async function POST(request: Request) {
   try {
@@ -8,34 +10,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'authorizationCode가 필요합니다.' }, { status: 400 });
     }
 
-    // mTLS 인증서가 설정된 후 실제 토스 서버 API 호출
-    // 현재는 개발 환경용 placeholder
-    const TOSS_API_BASE = 'https://api-partner.toss.im';
-    const tokenEndpoint = `${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2/generate-token`;
-
-    // TODO: mTLS 인증서 설정 후 활성화
-    // const https = require('https');
-    // const agent = new https.Agent({
-    //   cert: process.env.TOSS_MTLS_CERT,
-    //   key: process.env.TOSS_MTLS_KEY,
-    // });
-
-    // Placeholder: 개발 환경에서는 mock 응답 반환
+    // 개발 환경 mock 응답
     if (process.env.NODE_ENV === 'development' || !process.env.TOSS_MTLS_CERT) {
       const mockUserId = `dev-user-${Date.now()}`;
       return NextResponse.json({
         userId: mockUserId,
-        accessToken: `mock-token-${mockUserId}`,
+        accessToken: `mock-access-${mockUserId}`,
+        refreshToken: `mock-refresh-${mockUserId}`,
         expiresIn: 3600,
       });
     }
 
-    // Production: 실제 토스 API 호출
-    const tokenResponse = await fetch(tokenEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authorizationCode, referrer: referrer || 'DEFAULT' }),
-    });
+    // mTLS로 토큰 발급
+    const tokenResponse = await mtlsFetch(
+      '/api-partner/v1/apps-in-toss/user/oauth2/generate-token',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ authorizationCode, referrer: referrer || 'DEFAULT' }),
+      }
+    );
 
     if (!tokenResponse.ok) {
       const error = await tokenResponse.json().catch(() => ({}));
@@ -45,11 +39,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const tokenData = await tokenResponse.json();
+    const tokenData = await tokenResponse.json() as {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
 
-    // 사용자 정보 조회
-    const userResponse = await fetch(
-      `${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2/login-me`,
+    // mTLS로 사용자 정보 조회
+    const userResponse = await mtlsFetch(
+      '/api-partner/v1/apps-in-toss/user/oauth2/login-me',
       {
         headers: { Authorization: `Bearer ${tokenData.accessToken}` },
       }
@@ -59,12 +57,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '사용자 정보 조회 실패' }, { status: 500 });
     }
 
-    const userData = await userResponse.json();
+    const rawUserData = await userResponse.json() as { userKey: string; encryptedData?: string };
+
+    // AES-256-GCM 복호화 (암호화된 사용자 데이터가 있는 경우)
+    let userData: Record<string, unknown> = { userKey: rawUserData.userKey };
+    if (rawUserData.encryptedData && process.env.TOSS_DECRYPT_KEY) {
+      try {
+        userData = {
+          ...userData,
+          ...decryptTossUserData(rawUserData.encryptedData),
+        };
+      } catch (e) {
+        console.error('[toss-token] 사용자 데이터 복호화 실패:', e);
+      }
+    }
 
     return NextResponse.json({
-      userId: userData.userKey,
+      userId: rawUserData.userKey,
       accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
       expiresIn: tokenData.expiresIn,
+      userData,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : '인증 오류';

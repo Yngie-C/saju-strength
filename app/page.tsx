@@ -54,10 +54,14 @@ export default function LandingPage() {
           </span>
 
           {/* 타이틀 */}
-          <h1 className="text-5xl sm:text-7xl font-extrabold leading-tight tracking-tight">
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-              사주강점
-            </span>
+          <h1 className={`text-5xl sm:text-7xl font-extrabold leading-tight tracking-tight ${IS_TOSS ? 'text-tds-grey-900' : ''}`}>
+            {IS_TOSS ? (
+              '사주강점'
+            ) : (
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                사주강점
+              </span>
+            )}
           </h1>
 
           {/* 서브타이틀 */}

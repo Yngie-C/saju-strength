@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "build:web": "NEXT_PUBLIC_BUILD_TARGET=web next build",
-    "build:toss": "bash -c 'mv app/p app/_p_excluded && trap \"mv app/_p_excluded app/p\" EXIT && NEXT_PUBLIC_BUILD_TARGET=toss next build'",
+    "build:toss": "NEXT_PUBLIC_BUILD_TARGET=toss granite build",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -18,6 +18,9 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.0.2",
     "@supabase/supabase-js": "^2.48.0",
+    "@apps-in-toss/web-framework": "latest",
+    "@granite-js/plugin-sentry": "latest",
+    "node-fetch": "^2.7.0",
     "@toss/tds-mobile": "^2.2.1",
     "@toss/tds-mobile-ait": "^2.2.1",
     "class-variance-authority": "^0.7.0",
