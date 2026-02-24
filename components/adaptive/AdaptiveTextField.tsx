@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AdaptiveTextFieldProps {
   value: string;
@@ -14,15 +14,6 @@ interface AdaptiveTextFieldProps {
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
-let TDSTextField: any = null;
-if (IS_TOSS) {
-  try {
-    TDSTextField = require(/* webpackIgnore: true */ '@toss/tds-mobile').TextField;
-  } catch {
-    // Fallback to web version
-  }
-}
-
 export function AdaptiveTextField({
   value,
   onChange,
@@ -32,6 +23,18 @@ export function AdaptiveTextField({
   disabled,
   className = '',
 }: AdaptiveTextFieldProps) {
+  const [TDSTextField, setTDSTextField] = useState<any>(null);
+
+  useEffect(() => {
+    if (IS_TOSS) {
+      try {
+        setTDSTextField(() => require('@toss/tds-mobile').TextField);
+      } catch {
+        // Fallback to web version
+      }
+    }
+  }, []);
+
   if (IS_TOSS && TDSTextField) {
     // TDS TextField: onChange receives the string value directly
     return (

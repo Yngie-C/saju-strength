@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface AdaptiveButtonProps {
@@ -15,15 +15,6 @@ interface AdaptiveButtonProps {
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
-let TDSButton: any = null;
-if (IS_TOSS) {
-  try {
-    TDSButton = require(/* webpackIgnore: true */ '@toss/tds-mobile').Button;
-  } catch {
-    // Fallback to web version
-  }
-}
-
 export function AdaptiveButton({
   children,
   onClick,
@@ -33,6 +24,18 @@ export function AdaptiveButton({
   className = '',
   type = 'button',
 }: AdaptiveButtonProps) {
+  const [TDSButton, setTDSButton] = useState<any>(null);
+
+  useEffect(() => {
+    if (IS_TOSS) {
+      try {
+        setTDSButton(() => require('@toss/tds-mobile').Button);
+      } catch {
+        // Fallback to web version
+      }
+    }
+  }, []);
+
   if (IS_TOSS && TDSButton) {
     // TDS Button: variant maps to styleVariant, size maps to sizeVariant
     const tdsVariant = variant === 'primary' ? 'primary' : variant === 'secondary' ? 'secondary' : 'ghost';

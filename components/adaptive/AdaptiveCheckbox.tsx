@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AdaptiveCheckboxProps {
   checked: boolean;
@@ -12,15 +12,6 @@ interface AdaptiveCheckboxProps {
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
-let TDSCheckbox: any = null;
-if (IS_TOSS) {
-  try {
-    TDSCheckbox = require(/* webpackIgnore: true */ '@toss/tds-mobile').Checkbox;
-  } catch {
-    // Fallback to web version
-  }
-}
-
 export function AdaptiveCheckbox({
   checked,
   onChange,
@@ -28,6 +19,18 @@ export function AdaptiveCheckbox({
   description,
   className = '',
 }: AdaptiveCheckboxProps) {
+  const [TDSCheckbox, setTDSCheckbox] = useState<any>(null);
+
+  useEffect(() => {
+    if (IS_TOSS) {
+      try {
+        setTDSCheckbox(() => require('@toss/tds-mobile').Checkbox);
+      } catch {
+        // Fallback to web version
+      }
+    }
+  }, []);
+
   if (IS_TOSS && TDSCheckbox) {
     // TDS Checkbox: isChecked + onChangeChecked
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AdaptiveBottomCTAProps {
   children: React.ReactNode;
@@ -15,15 +15,6 @@ interface AdaptiveBottomCTAProps {
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
-let TDSBottomCTA: any = null;
-if (IS_TOSS) {
-  try {
-    TDSBottomCTA = require(/* webpackIgnore: true */ '@toss/tds-mobile').BottomCTA;
-  } catch {
-    // Fallback to web version
-  }
-}
-
 export function AdaptiveBottomCTA({
   children,
   onClick,
@@ -31,6 +22,18 @@ export function AdaptiveBottomCTA({
   className = '',
   topAccessory,
 }: AdaptiveBottomCTAProps) {
+  const [TDSBottomCTA, setTDSBottomCTA] = useState<any>(null);
+
+  useEffect(() => {
+    if (IS_TOSS) {
+      try {
+        setTDSBottomCTA(() => require('@toss/tds-mobile').BottomCTA);
+      } catch {
+        // Fallback to web version
+      }
+    }
+  }, []);
+
   if (IS_TOSS && TDSBottomCTA) {
     // TDS BottomCTA.Single — wraps a single action button
     return (

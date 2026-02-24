@@ -1,19 +1,26 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState, ComponentType } from 'react';
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
 export function TDSProvider({ children }: { children: ReactNode }) {
-  if (!IS_TOSS) {
-    return <>{children}</>;
+  const [Provider, setProvider] = useState<ComponentType<{ children: ReactNode }> | null>(null);
+
+  useEffect(() => {
+    if (IS_TOSS) {
+      try {
+        const { TDSMobileAITProvider } = require('@toss/tds-mobile-ait');
+        setProvider(() => TDSMobileAITProvider);
+      } catch {
+        // Module not available — fallback to plain wrapper
+      }
+    }
+  }, []);
+
+  if (Provider) {
+    return <Provider>{children}</Provider>;
   }
 
-  // Dynamic require for toss builds only
-  try {
-    const { TDSMobileAITProvider } = require(/* webpackIgnore: true */ '@toss/tds-mobile-ait');
-    return <TDSMobileAITProvider>{children}</TDSMobileAITProvider>;
-  } catch {
-    return <>{children}</>;
-  }
+  return <>{children}</>;
 }
