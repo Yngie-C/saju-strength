@@ -9,6 +9,7 @@ const nextConfig = {
         ...config.resolve.alias,
         '@toss/tds-mobile': false,
         '@toss/tds-mobile-ait': false,
+        '@granite-js/plugin-sentry': false,
       };
       return config;
     },
