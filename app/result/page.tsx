@@ -11,6 +11,7 @@ import { SajuProfileSection } from "@/components/result/SajuProfileSection";
 import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
+import { PremiumUpsellSection } from "@/components/result/PremiumUpsellSection";
 
 // Parse growthGuide string back into structured form
 function parseGrowthGuide(raw: string): {
@@ -61,6 +62,7 @@ export default function ResultPage() {
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "shared">(
     "idle"
   );
+  const [sessionId, setSessionId] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -101,13 +103,13 @@ export default function ResultPage() {
       setSajuResult(parsedSaju);
       setPsaResult(parsedPsa);
 
-      const sessionId =
-        parsedSaju.sessionId ?? `session-${Date.now()}`;
+      const sid = parsedSaju.sessionId ?? `session-${Date.now()}`;
+      setSessionId(sid);
 
       fetch(apiUrl("/api/combined/analyze"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, sajuResult: parsedSaju, psaResult: parsedPsa }),
+        body: JSON.stringify({ sessionId: sid, sajuResult: parsedSaju, psaResult: parsedPsa }),
       })
         .then(async (res) => {
           if (!res.ok) {
@@ -314,6 +316,25 @@ export default function ResultPage() {
             brandingMessages={brandingMessages}
           />
         </motion.div>
+
+        <SectionDivider />
+
+        {/* Section E: Premium Upsell */}
+        {sessionId && sajuResult && psaResult && combined && (
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+          >
+            <PremiumUpsellSection
+              sessionId={sessionId}
+              sajuResult={sajuResult}
+              psaResult={psaResult}
+              axes={combined.axes as AxisAnalysis[]}
+            />
+          </motion.div>
+        )}
 
         {/* CTA Buttons */}
         <motion.div
