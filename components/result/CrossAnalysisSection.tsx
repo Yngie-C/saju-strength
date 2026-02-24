@@ -2,8 +2,7 @@
 
 import { DualRadarChart } from "@/components/result/DualRadarChart";
 import { CrossAnalysisType, FiveElement } from "@/types/saju";
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { ELEMENT_COLORS, IS_TOSS, designTokens } from "@/lib/design-tokens";
 
 const styles = IS_TOSS ? {
   sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-400 uppercase',
@@ -18,17 +17,17 @@ const styles = IS_TOSS ? {
   insightTitle: 'text-sm font-semibold text-tds-grey-500',
   insightText: 'text-sm text-tds-grey-600 leading-relaxed pl-5',
 } : {
-  sectionLabel: 'text-xs font-semibold tracking-widest text-purple-400/70 uppercase',
+  sectionLabel: 'text-xs font-semibold tracking-widest text-primary/70 uppercase',
   sectionTitle: 'text-2xl font-bold text-foreground',
-  sectionSubtitle: 'text-white/40 font-normal text-lg',
-  sectionDesc: 'text-sm text-white/50',
-  card: 'rounded-2xl border border-white/10 p-6',
-  cardTitle: 'text-sm font-semibold text-white/60 mb-4',
-  matrixDesc: 'text-[11px] text-white/40',
-  matrixEmpty: 'text-xs text-white/30',
-  matrixItem: 'text-xs text-white/60 flex items-center gap-2',
-  insightTitle: 'text-sm font-semibold text-white/60',
-  insightText: 'text-sm text-white/65 leading-relaxed pl-5',
+  sectionSubtitle: 'text-muted-foreground/50 font-normal text-lg',
+  sectionDesc: 'text-sm text-muted-foreground/70',
+  card: 'rounded-2xl border border-border p-6',
+  cardTitle: 'text-sm font-semibold text-muted-foreground/80 mb-4',
+  matrixDesc: 'text-[11px] text-muted-foreground/50',
+  matrixEmpty: 'text-xs text-muted-foreground/40',
+  matrixItem: 'text-xs text-muted-foreground/80 flex items-center gap-2',
+  insightTitle: 'text-sm font-semibold text-muted-foreground/80',
+  insightText: 'text-sm text-muted-foreground/85 leading-relaxed pl-5',
 } as const;
 
 interface AxisData {
@@ -90,14 +89,6 @@ const PSA_TO_AXIS: Record<string, string> = {
   resilience: "회복/수",
 };
 
-const ELEMENT_COLORS: Record<FiveElement, string> = {
-  wood: "#22c55e",
-  fire: "#ef4444",
-  earth: "#eab308",
-  metal: "#a1a1aa",
-  water: "#3b82f6",
-};
-
 // rank→score: rank 1=100, 2=80, 3=60, 4=40, 5=20
 function rankToScore(rank: number): number {
   return Math.max(0, 120 - rank * 20);
@@ -152,10 +143,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
       </div>
 
       {/* Dual Radar Chart */}
-      <div
-        className={styles.card}
-        style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-      >
+      <div className={`${styles.card} ${IS_TOSS ? '' : 'bg-card'}`}>
         <h3 className={styles.cardTitle}>
           선천 · 후천 이중 레이더
         </h3>

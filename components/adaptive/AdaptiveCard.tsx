@@ -17,9 +17,9 @@ const tossStyles = {
 } as const;
 
 const webStyles = {
-  default: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl',
-  outlined: 'bg-transparent border border-white/10 rounded-2xl',
-  elevated: 'bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-2xl shadow-lg shadow-black/20',
+  default: 'bg-card border border-border rounded-xl',
+  outlined: 'bg-transparent border border-border rounded-xl',
+  elevated: 'bg-card border border-border rounded-xl shadow-lg shadow-black/20',
 } as const;
 
 export function AdaptiveCard({

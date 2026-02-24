@@ -16,12 +16,12 @@ const formStyles = IS_TOSS ? {
   sectionTitle: 'text-t5 font-semibold text-tds-grey-900',
   divider: 'border-t border-tds-grey-200',
 } : {
-  label: 'text-sm font-medium text-white/70 mb-2',
-  input: 'w-full px-4 py-3 rounded-xl border border-white/15 bg-white/5 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50',
-  select: 'w-full px-4 py-3 rounded-xl border border-white/15 bg-white/5 text-white',
-  helper: 'text-xs text-white/40 mt-1',
-  sectionTitle: 'text-lg font-semibold text-white',
-  divider: 'border-t border-white/10',
+  label: 'text-sm font-medium text-foreground mb-2',
+  input: 'w-full px-4 py-3 rounded-xl border border-border bg-secondary text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50',
+  select: 'w-full px-4 py-3 rounded-xl border border-border bg-secondary text-foreground',
+  helper: 'text-xs text-muted-foreground/50 mt-1',
+  sectionTitle: 'text-lg font-semibold text-foreground',
+  divider: 'border-t border-border',
 } as const;
 
 interface BirthInfoFormProps {
@@ -115,7 +115,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             "flex-1 py-2 rounded-lg text-sm font-medium transition-colors",
             !isLunar
               ? "bg-primary text-white"
-              : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-white/5 text-white/50 hover:bg-white/10"
+              : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
           )}
         >
           양력
@@ -127,7 +127,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             "flex-1 py-2 rounded-lg text-sm font-medium transition-colors",
             isLunar
               ? "bg-primary text-white"
-              : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-white/5 text-white/50 hover:bg-white/10"
+              : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
           )}
         >
           음력
@@ -145,7 +145,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             onChange={(e) => setYear(e.target.value)}
             min={1900}
             max={2050}
-            className={IS_TOSS ? formStyles.input : "bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"}
+            className={IS_TOSS ? formStyles.input : "bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary"}
           />
           {errors.year && <p className={formStyles.helper}>{errors.year}</p>}
         </div>
@@ -158,7 +158,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             onChange={(e) => setMonth(e.target.value)}
             min={1}
             max={12}
-            className={IS_TOSS ? formStyles.input : "bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"}
+            className={IS_TOSS ? formStyles.input : "bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary"}
           />
           {errors.month && <p className={formStyles.helper}>{errors.month}</p>}
         </div>
@@ -171,7 +171,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             onChange={(e) => setDay(e.target.value)}
             min={1}
             max={31}
-            className={IS_TOSS ? formStyles.input : "bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"}
+            className={IS_TOSS ? formStyles.input : "bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary"}
           />
           {errors.day && <p className={formStyles.helper}>{errors.day}</p>}
         </div>
@@ -188,16 +188,16 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             else if (v === "null") setHour(null);
             else setHour(Number(v));
           }}
-          className={IS_TOSS ? formStyles.select : "w-full h-10 rounded-md bg-white/5 border border-white/10 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-primary"}
+          className={IS_TOSS ? formStyles.select : "w-full h-10 rounded-md bg-secondary border border-border text-foreground text-sm px-3 focus:outline-none focus:ring-2 focus:ring-primary"}
         >
-          <option value="" disabled className={IS_TOSS ? "bg-white" : "bg-gray-900"}>
+          <option value="" disabled className={IS_TOSS ? "bg-white" : "bg-background"}>
             시진을 선택하세요
           </option>
           {SIJU_OPTIONS.map((opt) => (
             <option
               key={opt.label}
               value={opt.value === null ? "null" : String(opt.value)}
-              className={IS_TOSS ? "bg-white" : "bg-gray-900"}
+              className={IS_TOSS ? "bg-white" : "bg-background"}
             >
               {opt.label}
             </option>
@@ -217,7 +217,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
               "flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors",
               gender === "male"
                 ? "bg-blue-600 text-white"
-                : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-white/5 text-white/50 hover:bg-white/10"
+                : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
             )}
           >
             남성
@@ -229,7 +229,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
               "flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors",
               gender === "female"
                 ? "bg-pink-600 text-white"
-                : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-white/5 text-white/50 hover:bg-white/10"
+                : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
             )}
           >
             여성

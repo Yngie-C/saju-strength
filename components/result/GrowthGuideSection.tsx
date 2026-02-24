@@ -1,6 +1,6 @@
 "use client";
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS, designTokens } from "@/lib/design-tokens";
 
 const styles = IS_TOSS ? {
   sectionLabel: 'text-xs font-semibold tracking-widest text-tds-green-500 uppercase',
@@ -29,31 +29,31 @@ const styles = IS_TOSS ? {
   pitchText: 'text-sm text-tds-grey-700 leading-relaxed',
   hashtag: 'text-xs px-3 py-1.5 rounded-full border border-tds-grey-200 text-tds-grey-500 font-medium bg-tds-grey-50',
 } : {
-  sectionLabel: 'text-xs font-semibold tracking-widest text-emerald-400/70 uppercase',
+  sectionLabel: 'text-xs font-semibold tracking-widest text-muted-foreground uppercase',
   sectionTitle: 'text-2xl font-bold text-foreground',
-  summaryCard: 'rounded-2xl border border-emerald-500/20 p-6',
-  summaryTitle: 'text-sm font-semibold text-emerald-400 mb-3',
-  summaryText: 'text-sm text-white/75 leading-relaxed',
-  focusTitle: 'text-sm font-semibold text-white/60',
-  focusCard: 'rounded-xl border border-white/10 p-4 space-y-2',
-  focusIndex: 'w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-xs flex items-center justify-center font-bold flex-shrink-0',
-  focusArea: 'text-sm font-semibold text-white/80',
-  focusAdvice: 'text-sm text-white/55 leading-relaxed pl-8',
-  practiceCard: 'rounded-xl border border-white/10 p-5',
-  practiceTitle: 'text-sm font-semibold text-white/60 mb-2',
-  practiceText: 'text-sm text-white/70 leading-relaxed',
-  tipsTitle: 'text-sm font-semibold text-white/60',
-  tipCard: 'rounded-xl border border-cyan-500/15 p-4 space-y-1.5',
-  tipTitle: 'text-sm font-semibold text-cyan-300',
-  tipText: 'text-sm text-white/60 leading-relaxed',
-  brandingTitle: 'text-sm font-semibold text-white/60',
-  brandingCard: 'rounded-xl border border-white/10 p-4 space-y-1.5',
-  brandingLabel: 'text-xs text-white/40 font-medium',
-  brandingText: 'text-sm text-white/80 leading-relaxed',
-  pitchCard: 'rounded-xl border border-purple-500/15 p-4 space-y-1.5',
-  pitchLabel: 'text-xs text-purple-400/70 font-medium',
-  pitchText: 'text-sm text-white/75 leading-relaxed',
-  hashtag: 'text-xs px-3 py-1.5 rounded-full border border-white/15 text-white/50 font-medium',
+  summaryCard: 'rounded-2xl border border-border p-6',
+  summaryTitle: 'text-sm font-semibold text-primary mb-3',
+  summaryText: 'text-sm text-muted-foreground leading-relaxed',
+  focusTitle: 'text-sm font-semibold text-muted-foreground/80',
+  focusCard: 'rounded-xl border border-border p-4 space-y-2',
+  focusIndex: 'w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-bold flex-shrink-0',
+  focusArea: 'text-sm font-semibold text-foreground/80',
+  focusAdvice: 'text-sm text-muted-foreground/70 leading-relaxed pl-8',
+  practiceCard: 'rounded-xl border border-border p-5',
+  practiceTitle: 'text-sm font-semibold text-muted-foreground/80 mb-2',
+  practiceText: 'text-sm text-muted-foreground leading-relaxed',
+  tipsTitle: 'text-sm font-semibold text-muted-foreground/80',
+  tipCard: 'rounded-xl border border-primary/15 p-4 space-y-1.5',
+  tipTitle: 'text-sm font-semibold text-primary',
+  tipText: 'text-sm text-muted-foreground/80 leading-relaxed',
+  brandingTitle: 'text-sm font-semibold text-muted-foreground/80',
+  brandingCard: 'rounded-xl border border-border p-4 space-y-1.5',
+  brandingLabel: 'text-xs text-muted-foreground/50 font-medium',
+  brandingText: 'text-sm text-foreground/80 leading-relaxed',
+  pitchCard: 'rounded-xl border border-primary/15 p-4 space-y-1.5',
+  pitchLabel: 'text-xs text-primary/70 font-medium',
+  pitchText: 'text-sm text-muted-foreground leading-relaxed',
+  hashtag: 'text-xs px-3 py-1.5 rounded-full border border-border text-muted-foreground/70 font-medium',
 } as const;
 
 interface FocusArea {
@@ -102,7 +102,7 @@ export function GrowthGuideSection({
 
       {/* Summary */}
       <div
-        className={styles.summaryCard}
+        className={`${styles.summaryCard} ${IS_TOSS ? '' : 'bg-card'}`}
         style={IS_TOSS ? undefined : {
           background:
             "linear-gradient(160deg, rgba(34,197,94,0.07) 0%, rgba(34,197,94,0.02) 100%)",
@@ -122,8 +122,7 @@ export function GrowthGuideSection({
             {guide.focusAreas.map((fa, i) => (
               <div
                 key={i}
-                className={styles.focusCard}
-                style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
+                className={`${styles.focusCard} ${IS_TOSS ? '' : 'bg-card'}`}
               >
                 <div className="flex items-center gap-2">
                   <span className={styles.focusIndex}>
@@ -142,10 +141,7 @@ export function GrowthGuideSection({
 
       {/* Daily Practice */}
       {guide.dailyPractice && (
-        <div
-          className={styles.practiceCard}
-          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-        >
+        <div className={`${styles.practiceCard} ${IS_TOSS ? '' : 'bg-card'}`}>
           <h3 className={styles.practiceTitle}>
             일상 실천 가이드
           </h3>
@@ -185,10 +181,7 @@ export function GrowthGuideSection({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Self Intro */}
-            <div
-              className={styles.brandingCard}
-              style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-            >
+            <div className={`${styles.brandingCard} ${IS_TOSS ? '' : 'bg-card'}`}>
               <p className={styles.brandingLabel}>한 줄 자기소개</p>
               <p className={styles.brandingText}>
                 {brandingMessages.selfIntro}
@@ -196,10 +189,7 @@ export function GrowthGuideSection({
             </div>
 
             {/* LinkedIn */}
-            <div
-              className={styles.brandingCard}
-              style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-            >
+            <div className={`${styles.brandingCard} ${IS_TOSS ? '' : 'bg-card'}`}>
               <p className={styles.brandingLabel}>
                 LinkedIn 헤드라인
               </p>
@@ -212,7 +202,7 @@ export function GrowthGuideSection({
           {/* Elevator Pitch */}
           <div
             className={styles.pitchCard}
-            style={IS_TOSS ? undefined : { background: "rgba(168,85,247,0.05)" }}
+            style={IS_TOSS ? undefined : { background: "rgba(49,130,246,0.05)" }}
           >
             <p className={styles.pitchLabel}>
               엘리베이터 피치

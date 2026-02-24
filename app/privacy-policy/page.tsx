@@ -3,6 +3,7 @@ const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { designTokens } from '@/lib/design-tokens';
 
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
@@ -11,11 +12,11 @@ const styles = IS_TOSS ? {
   body: 'text-st8 text-tds-grey-700 leading-relaxed',
   heading: 'text-t5 font-semibold text-tds-grey-900',
 } : {
-  page: 'min-h-screen bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900',
+  page: 'min-h-screen bg-background',
   container: 'px-4 py-12 max-w-2xl mx-auto',
-  title: 'text-3xl font-bold text-white',
-  body: 'text-sm text-white/70 leading-relaxed',
-  heading: 'text-lg font-semibold text-white',
+  title: 'text-3xl font-bold text-foreground',
+  body: 'text-sm text-muted-foreground leading-relaxed',
+  heading: 'text-lg font-semibold text-foreground',
 } as const;
 
 export const metadata: Metadata = {
@@ -25,12 +26,12 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className={`${styles.page} ${IS_TOSS ? 'text-tds-grey-900' : 'text-white'}`}>
+    <main className={`${styles.page} ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'}`}>
       <div className={`${styles.container} space-y-8`}>
         {/* 뒤로가기 */}
         <Link
           href="/birth-info"
-          className={`inline-flex items-center gap-2 text-sm transition-colors ${IS_TOSS ? 'text-tds-grey-500 hover:text-tds-grey-700' : 'text-white/50 hover:text-white/80'}`}
+          className={`inline-flex items-center gap-2 text-sm transition-colors ${IS_TOSS ? 'text-tds-grey-500 hover:text-tds-grey-700' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
         >
           <ArrowLeft size={16} />
           돌아가기
@@ -39,7 +40,7 @@ export default function PrivacyPolicyPage() {
         {/* 제목 */}
         <div className="space-y-2">
           <h1 className={styles.title}>개인정보 처리방침</h1>
-          <p className={`text-sm ${IS_TOSS ? 'text-tds-grey-400' : 'text-white/40'}`}>시행일: 2026년 2월 24일</p>
+          <p className={`text-sm ${IS_TOSS ? 'text-tds-grey-400' : 'text-muted-foreground/40'}`}>시행일: 2026년 2월 24일</p>
         </div>
 
         {/* 본문 */}
@@ -96,7 +97,7 @@ export default function PrivacyPolicyPage() {
             <p>
               개인정보 보호책임자에게 문의사항이 있으시면 아래 연락처로 문의해 주세요.
             </p>
-            <p className={IS_TOSS ? 'text-tds-grey-500' : 'text-white/50'}>이메일: privacy@saju-strength.com</p>
+            <p className={IS_TOSS ? 'text-tds-grey-500' : 'text-muted-foreground/50'}>이메일: privacy@saju-strength.com</p>
           </section>
 
           <section className="space-y-3">
@@ -118,7 +119,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         {/* 하단 */}
-        <div className={`border-t pt-6 ${IS_TOSS ? 'border-tds-grey-200' : 'border-white/10'}`}>
+        <div className={`border-t pt-6 ${IS_TOSS ? 'border-tds-grey-200' : 'border-border'}`}>
           <Link
             href="/birth-info"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/20 text-primary font-medium text-sm hover:bg-primary/30 transition-colors"

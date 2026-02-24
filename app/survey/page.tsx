@@ -50,24 +50,24 @@ const styles = IS_TOSS ? {
   bodyText: 'text-st8 text-tds-grey-700',
   caption: 'text-st11 text-tds-grey-500',
 } : {
-  page: 'min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900',
-  header: 'sticky top-0 z-30 bg-slate-900/80 backdrop-blur-md border-b border-white/10',
-  headerTitle: 'text-lg font-semibold text-white',
-  questionCard: 'bg-white/90 rounded-2xl p-5 shadow-lg',
-  questionNumber: 'bg-indigo-100 text-indigo-700 rounded-full px-2.5 py-0.5 text-xs font-medium',
-  questionText: 'text-lg font-semibold text-slate-900',
-  questionCategory: 'text-xs text-slate-500',
-  likertSelected: 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-transparent rounded-xl',
-  likertUnselected: 'bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50',
-  likertLabel: 'text-xs text-slate-400',
-  bottomNav: 'fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-white/10 z-40',
+  page: 'min-h-screen bg-background',
+  header: 'sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border',
+  headerTitle: 'text-lg font-semibold text-foreground',
+  questionCard: 'bg-card rounded-xl p-5 border border-border',
+  questionNumber: 'bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-xs font-medium',
+  questionText: 'text-lg font-semibold text-card-foreground',
+  questionCategory: 'text-xs text-muted-foreground',
+  likertSelected: 'bg-primary text-primary-foreground border-transparent rounded-[14px]',
+  likertUnselected: 'bg-secondary border border-border text-secondary-foreground rounded-[14px] hover:bg-secondary/80',
+  likertLabel: 'text-xs text-muted-foreground',
+  bottomNav: 'fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40',
   bottomGradient: '',
-  dotActive: 'w-2.5 h-2.5 rounded-full bg-indigo-500',
-  dotCompleted: 'w-2 h-2 rounded-full bg-indigo-300',
-  dotPending: 'w-2 h-2 rounded-full bg-white/20',
+  dotActive: 'w-2.5 h-2.5 rounded-full bg-primary',
+  dotCompleted: 'w-2 h-2 rounded-full bg-primary/50',
+  dotPending: 'w-2 h-2 rounded-full bg-muted',
   container: 'px-4 py-4 pb-32',
-  bodyText: 'text-sm text-white/70',
-  caption: 'text-xs text-white/40',
+  bodyText: 'text-sm text-muted-foreground',
+  caption: 'text-xs text-muted-foreground/50',
 } as const;
 
 export default function SurveyPage() {
@@ -244,7 +244,7 @@ export default function SurveyPage() {
             <span className={styles.caption}>
               {currentPage + 1} / {TOTAL_PAGES} 페이지
             </span>
-            <span className={IS_TOSS ? 'text-st11 text-tds-blue-500 font-medium' : 'text-xs text-indigo-400 font-medium'}>
+            <span className={IS_TOSS ? 'text-st11 text-tds-blue-500 font-medium' : 'text-xs text-primary font-medium'}>
               {Math.round(progress)}%
             </span>
           </div>
@@ -255,7 +255,7 @@ export default function SurveyPage() {
       <div className={`max-w-2xl mx-auto ${styles.container}`} {...swipeHandlers}>
         {/* Page title */}
         <div className="mb-6 text-center">
-          <h1 className={IS_TOSS ? 'text-t4 font-bold text-tds-grey-900' : 'text-xl font-bold text-white'}>
+          <h1 className={IS_TOSS ? 'text-t4 font-bold text-tds-grey-900' : 'text-xl font-bold text-foreground'}>
             강점 역량 설문 (PSA)
           </h1>
           <p className={`mt-1 ${styles.bodyText}`}>
@@ -280,13 +280,13 @@ export default function SurveyPage() {
               return (
                 <div
                   key={question.id}
-                  className={IS_TOSS ? styles.questionCard : 'bg-white/90 backdrop-blur-md rounded-2xl p-5 shadow-lg'}
+                  className={IS_TOSS ? styles.questionCard : 'bg-card rounded-xl p-5 border border-border'}
                 >
                   <div className="flex items-start gap-3 mb-4">
                     <span className={`flex-shrink-0 w-7 h-7 flex items-center justify-center text-sm font-bold ${styles.questionNumber}`}>
                       {globalIdx}
                     </span>
-                    <p className={IS_TOSS ? 'font-medium leading-relaxed text-sm text-tds-grey-800' : 'text-slate-800 font-medium leading-relaxed text-sm sm:text-base'}>
+                    <p className={IS_TOSS ? 'font-medium leading-relaxed text-sm text-tds-grey-800' : 'text-card-foreground font-medium leading-relaxed text-sm sm:text-base'}>
                       {question.questionText}
                     </p>
                   </div>
@@ -315,10 +315,10 @@ export default function SurveyPage() {
                               isSelected
                                 ? IS_TOSS
                                   ? `${styles.likertSelected} ring-2 ring-tds-blue-300 scale-110 shadow-md`
-                                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white ring-4 ring-indigo-300 scale-110 shadow-lg rounded-xl'
+                                  : 'bg-primary text-primary-foreground ring-4 ring-primary/30 scale-110 shadow-lg rounded-[14px]'
                                 : IS_TOSS
                                   ? styles.likertUnselected
-                                  : 'bg-gray-100 border-2 border-gray-300 text-gray-600 hover:border-indigo-400 hover:bg-indigo-50 active:scale-95 rounded-full',
+                                  : 'bg-secondary border border-border text-secondary-foreground hover:bg-secondary/80 active:scale-95 rounded-[14px]',
                             ].join(' ')}
                             aria-label={`${value}점${LIKERT_LABELS[value] ? ` (${LIKERT_LABELS[value]})` : ''}`}
                           >
@@ -361,7 +361,7 @@ export default function SurveyPage() {
               disabled={!allAnswered || isSubmitting}
               className={IS_TOSS
                 ? 'flex-1 py-3 rounded-xl font-bold text-white transition-all duration-200 bg-tds-blue-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-tds-blue-600 active:scale-[0.98]'
-                : 'flex-1 py-3 rounded-xl font-bold text-white transition-all duration-200 bg-gradient-to-r from-indigo-600 to-purple-600 disabled:opacity-40 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-purple-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]'}
+                : 'flex-1 py-3 rounded-[14px] font-bold text-primary-foreground transition-all duration-200 bg-primary disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 active:scale-[0.98]'}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
@@ -381,7 +381,7 @@ export default function SurveyPage() {
               disabled={!currentPageAnswered}
               className={IS_TOSS
                 ? 'flex-1 flex items-center justify-center gap-1 py-3 rounded-xl font-bold text-white bg-tds-blue-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-tds-blue-600 active:scale-[0.98]'
-                : 'flex-1 flex items-center justify-center gap-1 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-purple-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]'}
+                : 'flex-1 flex items-center justify-center gap-1 py-3 rounded-[14px] font-bold text-primary-foreground bg-primary transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 active:scale-[0.98]'}
             >
               다음
               <ChevronRight className="w-5 h-5" />
@@ -403,10 +403,10 @@ export default function SurveyPage() {
                 className={[
                   'transition-all duration-200',
                   i === currentPage
-                    ? IS_TOSS ? 'w-6 h-2.5 rounded-full bg-tds-blue-500' : 'w-6 h-2 rounded-full bg-indigo-400'
+                    ? IS_TOSS ? 'w-6 h-2.5 rounded-full bg-tds-blue-500' : 'w-6 h-2 rounded-full bg-primary'
                     : pageAnswered
-                    ? IS_TOSS ? styles.dotCompleted : 'w-2 h-2 rounded-full bg-indigo-600'
-                    : IS_TOSS ? styles.dotPending : 'w-2 h-2 rounded-full bg-slate-600',
+                    ? IS_TOSS ? styles.dotCompleted : 'w-2 h-2 rounded-full bg-primary/50'
+                    : IS_TOSS ? styles.dotPending : 'w-2 h-2 rounded-full bg-muted',
                 ].join(' ')}
                 aria-label={`${i + 1}페이지로 이동`}
               />

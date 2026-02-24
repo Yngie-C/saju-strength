@@ -33,19 +33,19 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RadarChart cx="50%" cy="50%" outerRadius={100} data={data}>
-        <PolarGrid stroke={IS_TOSS ? "#e5e8eb" : "rgba(255,255,255,0.1)"} />
+        <PolarGrid stroke={IS_TOSS ? "#e5e8eb" : "rgba(255,255,255,0.08)"} />
         <PolarAngleAxis
           dataKey="axis"
           tick={{
-            fill: IS_TOSS ? "#6b7684" : "rgba(255,255,255,0.6)",
+            fill: IS_TOSS ? "#6b7684" : "rgba(255,255,255,0.5)",
             fontSize: 12,
           }}
         />
         <Radar
           name="사주 오행 (선천)"
           dataKey="element"
-          stroke="#a855f7"
-          fill="#a855f7"
+          stroke="#3182f6"
+          fill="#3182f6"
           fillOpacity={0.3}
         />
         <Radar
@@ -58,7 +58,7 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
         <Legend
           wrapperStyle={{
             fontSize: "12px",
-            color: IS_TOSS ? "#4e5968" : "rgba(255,255,255,0.7)",
+            color: IS_TOSS ? "#4e5968" : "rgba(255,255,255,0.6)",
           }}
         />
       </RadarChart>

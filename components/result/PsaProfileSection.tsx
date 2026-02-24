@@ -7,8 +7,7 @@ import {
   Radar,
   ResponsiveContainer,
 } from "recharts";
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS, designTokens } from "@/lib/design-tokens";
 
 const styles = IS_TOSS ? {
   sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-400 uppercase',
@@ -25,26 +24,30 @@ const styles = IS_TOSS ? {
   scoreCardTitle: 'text-sm font-semibold text-tds-grey-500',
   scoreLabel: 'text-sm text-tds-grey-600 w-20 flex-shrink-0',
   scoreBar: 'flex-1 h-2 rounded-full bg-tds-grey-100 overflow-hidden',
+} : {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-primary/70 uppercase',
+  sectionTitle: 'text-2xl font-bold text-foreground',
+  sectionSubtitle: 'text-muted-foreground/50 font-normal text-lg',
+  card: 'rounded-2xl border border-border p-6',
+  cardTitle: 'text-sm font-semibold text-muted-foreground/80 mb-2',
+  personaCard: 'rounded-2xl border border-primary/20 p-6 space-y-4',
+  personaCardTitle: 'text-sm font-semibold text-muted-foreground/80',
+  personaTitle: 'text-2xl font-bold text-primary',
+  personaTagline: 'text-sm text-muted-foreground/70 mt-1 italic',
+  strengthsSummary: 'text-sm text-muted-foreground leading-relaxed',
+  scoreCard: 'rounded-2xl border border-border p-6 space-y-4',
+  scoreCardTitle: 'text-sm font-semibold text-muted-foreground/80',
+  scoreLabel: 'text-sm text-muted-foreground w-20 flex-shrink-0',
+  scoreBar: 'flex-1 h-2 rounded-full bg-secondary overflow-hidden',
+} as const;
+
+const chartStyles = IS_TOSS ? {
   radarGridStroke: 'rgba(0,0,0,0.08)',
   radarTickFill: '#6B7280',
 } : {
-  sectionLabel: 'text-xs font-semibold tracking-widest text-cyan-400/70 uppercase',
-  sectionTitle: 'text-2xl font-bold text-foreground',
-  sectionSubtitle: 'text-white/40 font-normal text-lg',
-  card: 'rounded-2xl border border-white/10 p-6',
-  cardTitle: 'text-sm font-semibold text-white/60 mb-2',
-  personaCard: 'rounded-2xl border border-cyan-400/20 p-6 space-y-4',
-  personaCardTitle: 'text-sm font-semibold text-white/60',
-  personaTitle: 'text-2xl font-bold text-cyan-300',
-  personaTagline: 'text-sm text-white/50 mt-1 italic',
-  strengthsSummary: 'text-sm text-white/70 leading-relaxed',
-  scoreCard: 'rounded-2xl border border-white/10 p-6 space-y-4',
-  scoreCardTitle: 'text-sm font-semibold text-white/60',
-  scoreLabel: 'text-sm text-white/70 w-20 flex-shrink-0',
-  scoreBar: 'flex-1 h-2 rounded-full bg-white/10 overflow-hidden',
-  radarGridStroke: 'rgba(255,255,255,0.1)',
-  radarTickFill: 'rgba(255,255,255,0.6)',
-} as const;
+  radarGridStroke: 'hsl(var(--border))',
+  radarTickFill: 'hsl(var(--muted-foreground))',
+};
 
 interface CategoryScore {
   category: string;
@@ -73,7 +76,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   resilience: "상황 회복",
 };
 
-const RANK_COLORS = ["#a855f7", "#06b6d4", "#22c55e", "#eab308", "#a1a1aa"];
+const RANK_COLORS = ["#3182f6", "#06b6d4", "#22c55e", "#eab308", "#a1a1aa"];
 
 export function PsaProfileSection({
   categoryScores,
@@ -98,19 +101,16 @@ export function PsaProfileSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Radar Chart */}
-        <div
-          className={styles.card}
-          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-        >
+        <div className={`${styles.card} ${IS_TOSS ? '' : 'bg-card'}`}>
           <h3 className={styles.cardTitle}>
             5차원 강점 레이더
           </h3>
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart cx="50%" cy="50%" outerRadius={90} data={radarData}>
-              <PolarGrid stroke={styles.radarGridStroke} />
+              <PolarGrid stroke={chartStyles.radarGridStroke} />
               <PolarAngleAxis
                 dataKey="category"
-                tick={{ fill: styles.radarTickFill, fontSize: 11 }}
+                tick={{ fill: chartStyles.radarTickFill, fontSize: 11 }}
               />
               <Radar
                 name="PSA 점수"
@@ -148,10 +148,7 @@ export function PsaProfileSection({
       </div>
 
       {/* Category Score Bars */}
-      <div
-        className={styles.scoreCard}
-        style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-      >
+      <div className={`${styles.scoreCard} ${IS_TOSS ? '' : 'bg-card'}`}>
         <h3 className={styles.scoreCardTitle}>카테고리별 점수</h3>
         <div className="space-y-3">
           {sorted.map((cs, i) => {

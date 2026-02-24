@@ -9,6 +9,7 @@ import { ArchetypeCard } from "@/components/saju/ArchetypeCard";
 import { Button } from "@/components/ui/button";
 import type { SajuAnalysis } from "@/types/saju";
 import { getStateManager } from '@/lib/state-manager';
+import { designTokens, IS_TOSS } from '@/lib/design-tokens';
 
 const PILLAR_LABELS = ["년주", "월주", "일주", "시주"] as const;
 
@@ -25,8 +26,6 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
 };
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
   container: 'px-6 py-6 pb-[calc(100px+env(safe-area-inset-bottom))]',
@@ -42,15 +41,15 @@ const styles = IS_TOSS ? {
 } : {
   page: 'min-h-screen bg-background',
   container: 'px-4 py-8 max-w-2xl mx-auto pb-32',
-  title: 'text-2xl font-bold text-white',
-  subtitle: 'text-sm text-white/70',
-  card: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-5',
-  sectionTitle: 'text-xl font-bold text-white',
-  bodyText: 'text-sm text-white/70',
-  caption: 'text-xs text-white/40',
+  title: 'text-2xl font-bold text-foreground',
+  subtitle: 'text-sm text-muted-foreground',
+  card: 'bg-card border border-border rounded-2xl p-5',
+  sectionTitle: 'text-xl font-bold text-foreground',
+  bodyText: 'text-sm text-muted-foreground',
+  caption: 'text-xs text-muted-foreground/50',
   stepActive: 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold',
-  stepInactive: 'w-8 h-8 rounded-full border-2 border-white/20 text-white/40 flex items-center justify-center text-xs',
-  divider: 'border-t border-white/10',
+  stepInactive: 'w-8 h-8 rounded-full border-2 border-border text-muted-foreground/50 flex items-center justify-center text-xs',
+  divider: 'border-t border-border',
 } as const;
 
 export default function SajuPreviewPage() {
@@ -85,7 +84,7 @@ export default function SajuPreviewPage() {
   if (error) {
     return (
       <main className={`min-h-screen bg-background flex flex-col items-center justify-center gap-4 ${IS_TOSS ? 'px-6' : 'px-4'}`}>
-        <p className="text-red-400 text-sm">{error}</p>
+        <p className="text-destructive text-sm">{error}</p>
         <Button onClick={() => router.push("/birth-info")}>다시 시작</Button>
       </main>
     );
@@ -131,7 +130,7 @@ export default function SajuPreviewPage() {
               {step < 4 && (
                 IS_TOSS
                   ? <div className="w-8 h-px bg-tds-grey-200" />
-                  : <div className="w-8 h-px bg-white/15" />
+                  : <div className="w-8 h-px bg-border" />
               )}
             </div>
           ))}
@@ -169,8 +168,7 @@ export default function SajuPreviewPage() {
                   variants={fadeUp}
                   className={IS_TOSS
                     ? "rounded-xl border border-tds-grey-200 flex flex-col items-center justify-center py-10 text-tds-grey-400 text-sm"
-                    : "rounded-2xl border border-white/5 flex flex-col items-center justify-center py-10 text-white/20 text-sm"}
-                  style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.02)" }}
+                    : "rounded-2xl border border-border bg-card flex flex-col items-center justify-center py-10 text-muted-foreground/40 text-sm"}
                 >
                   {label}
                   <br />
@@ -201,10 +199,9 @@ export default function SajuPreviewPage() {
           transition={{ delay: 0.4 }}
           className={IS_TOSS
             ? "rounded-xl border border-tds-grey-200 p-6 bg-white"
-            : "rounded-2xl border border-white/10 p-6"}
-          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
+            : "rounded-2xl border border-border bg-card p-6"}
         >
-          <h2 className={`text-base font-semibold mb-6 text-center ${IS_TOSS ? 'text-tds-grey-900' : 'text-white'}`}>
+          <h2 className={`text-base font-semibold mb-6 text-center ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'}`}>
             오행 분포
           </h2>
           <FiveElementsChart distribution={elementDistribution} />
@@ -217,7 +214,7 @@ export default function SajuPreviewPage() {
           animate="visible"
           transition={{ delay: 0.5 }}
         >
-          <h2 className={`text-base font-semibold mb-4 text-center ${IS_TOSS ? 'text-tds-grey-900' : 'text-white'}`}>
+          <h2 className={`text-base font-semibold mb-4 text-center ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'}`}>
             일간 아키타입
           </h2>
           <ArchetypeCard
@@ -236,13 +233,12 @@ export default function SajuPreviewPage() {
           transition={{ delay: 0.65 }}
           className={IS_TOSS
             ? "rounded-xl border border-tds-blue-200 p-6 text-center bg-tds-blue-50"
-            : "rounded-2xl border border-primary/30 p-6 text-center"}
-          style={IS_TOSS ? undefined : { background: "rgba(139,92,246,0.08)" }}
+            : "rounded-2xl border border-primary/30 p-6 text-center bg-primary/10"}
         >
-          <p className={`font-medium mb-1 ${IS_TOSS ? 'text-tds-grey-900' : 'text-white'}`}>
+          <p className={`font-medium mb-1 ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'}`}>
             더 정확한 분석을 원하시나요?
           </p>
-          <p className={`text-sm mb-5 ${IS_TOSS ? 'text-tds-grey-600' : 'text-white/50'}`}>
+          <p className={`text-sm mb-5 ${IS_TOSS ? 'text-tds-grey-600' : 'text-muted-foreground'}`}>
             강점 설문을 진행하면 선천적 기질과 후천적 강점을 교차 분석한
             나만의 리포트를 받을 수 있어요.
           </p>

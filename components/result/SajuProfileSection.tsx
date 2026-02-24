@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import { SajuPillarCard } from "@/components/saju/SajuPillarCard";
 import { FiveElementsChart } from "@/components/saju/FiveElementsChart";
 import { Pillar, ElementDistribution } from "@/types/saju";
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { ELEMENT_COLORS, IS_TOSS, designTokens } from "@/lib/design-tokens";
 
 const styles = IS_TOSS ? {
   sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-500 uppercase',
@@ -23,16 +22,16 @@ const styles = IS_TOSS ? {
 } : {
   sectionLabel: 'text-xs font-semibold tracking-widest text-primary/70 uppercase',
   sectionTitle: 'text-2xl font-bold text-foreground',
-  sectionSubtitle: 'text-white/40 font-normal text-lg',
-  emptyPillarCard: 'flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] min-h-[160px]',
-  emptyPillarLabel: 'text-xs text-white/30',
-  emptyPillarSub: 'text-xs text-white/20 mt-1',
-  card: 'rounded-2xl border border-white/10 p-6',
-  cardTitle: 'text-sm font-semibold text-white/60 mb-4',
-  dayMasterCardTitle: 'text-sm font-semibold text-white/60',
+  sectionSubtitle: 'text-muted-foreground/50 font-normal text-lg',
+  emptyPillarCard: 'flex flex-col items-center justify-center rounded-2xl border border-border bg-card min-h-[160px]',
+  emptyPillarLabel: 'text-xs text-muted-foreground/40',
+  emptyPillarSub: 'text-xs text-muted-foreground/30 mt-1',
+  card: 'rounded-2xl border border-border p-6',
+  cardTitle: 'text-sm font-semibold text-muted-foreground/80 mb-4',
+  dayMasterCardTitle: 'text-sm font-semibold text-muted-foreground/80',
   dayMasterName: 'text-xl font-bold',
-  dayMasterSub: 'text-xs text-white/40',
-  dayMasterDesc: 'text-sm text-white/70 leading-relaxed',
+  dayMasterSub: 'text-xs text-muted-foreground/50',
+  dayMasterDesc: 'text-sm text-muted-foreground leading-relaxed',
 } as const;
 
 interface DayMasterInfo {
@@ -54,14 +53,6 @@ interface SajuProfileSectionProps {
   elementDistribution: ElementDistribution;
   dominantElement: string;
 }
-
-const ELEMENT_COLORS: Record<string, string> = {
-  wood: "#22c55e",
-  fire: "#ef4444",
-  earth: "#eab308",
-  metal: "#a1a1aa",
-  water: "#3b82f6",
-};
 
 const PILLAR_LABELS = ["년주", "월주", "일주", "시주"];
 
@@ -124,19 +115,13 @@ export function SajuProfileSection({
       {/* Chart + Archetype Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Five Elements Chart */}
-        <div
-          className={styles.card}
-          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-        >
+        <div className={`${styles.card} ${IS_TOSS ? '' : 'bg-card'}`}>
           <h3 className={styles.cardTitle}>오행 분포</h3>
           <FiveElementsChart distribution={elementDistribution} />
         </div>
 
         {/* Day Master Archetype */}
-        <div
-          className={`${styles.card} space-y-4`}
-          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
-        >
+        <div className={`${styles.card} ${IS_TOSS ? '' : 'bg-card'} space-y-4`}>
           <h3 className={styles.dayMasterCardTitle}>일간 아키타입</h3>
 
           <div className="flex items-center gap-3">

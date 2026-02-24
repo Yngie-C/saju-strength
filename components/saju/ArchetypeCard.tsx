@@ -1,5 +1,7 @@
 "use client";
 
+import { ELEMENT_COLORS, ELEMENT_BG, ELEMENT_BG_TOSS } from "@/lib/design-tokens";
+
 interface ArchetypeCardProps {
   name: string;
   element: string;
@@ -8,31 +10,7 @@ interface ArchetypeCardProps {
   image: string;
 }
 
-const ELEMENT_COLORS: Record<string, string> = {
-  wood:  "#22c55e",
-  fire:  "#ef4444",
-  earth: "#eab308",
-  metal: "#a1a1aa",
-  water: "#3b82f6",
-};
-
-const ELEMENT_BG: Record<string, string> = {
-  wood:  "rgba(34,197,94,0.08)",
-  fire:  "rgba(239,68,68,0.08)",
-  earth: "rgba(234,179,8,0.08)",
-  metal: "rgba(161,161,170,0.08)",
-  water: "rgba(59,130,246,0.08)",
-};
-
-const ELEMENT_BG_TOSS: Record<string, string> = {
-  wood:  "rgba(34,197,94,0.05)",
-  fire:  "rgba(239,68,68,0.05)",
-  earth: "rgba(234,179,8,0.05)",
-  metal: "rgba(161,161,170,0.05)",
-  water: "rgba(59,130,246,0.05)",
-};
-
-const ELEMENT_KOREAN: Record<string, string> = {
+const ELEMENT_KOREAN_FULL: Record<string, string> = {
   wood: "목(木)", fire: "화(火)", earth: "토(土)", metal: "금(金)", water: "수(水)",
 };
 
@@ -63,7 +41,7 @@ export function ArchetypeCard({
         >
           <div>
             <p className="text-xs font-medium mb-1" style={{ color }}>
-              {ELEMENT_KOREAN[element]} 일간 아키타입
+              {ELEMENT_KOREAN_FULL[element]} 일간 아키타입
             </p>
             <h3 className="text-2xl font-bold text-tds-grey-900">{name}</h3>
           </div>
@@ -71,7 +49,7 @@ export function ArchetypeCard({
             className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold border-2"
             style={{ borderColor: color, color, background: `${color}18` }}
           >
-            {ELEMENT_KOREAN[element]?.charAt(0)}
+            {ELEMENT_KOREAN_FULL[element]?.charAt(0)}
           </div>
         </div>
 
@@ -111,7 +89,7 @@ export function ArchetypeCard({
 
   return (
     <div
-      className="rounded-2xl border border-white/10 overflow-hidden"
+      className="rounded-2xl border border-border overflow-hidden"
       style={{ background: bg }}
     >
       {/* 헤더 */}
@@ -121,15 +99,15 @@ export function ArchetypeCard({
       >
         <div>
           <p className="text-xs font-medium mb-1" style={{ color }}>
-            {ELEMENT_KOREAN[element]} 일간 아키타입
+            {ELEMENT_KOREAN_FULL[element]} 일간 아키타입
           </p>
-          <h3 className="text-2xl font-bold text-white">{name}</h3>
+          <h3 className="text-2xl font-bold text-foreground">{name}</h3>
         </div>
         <div
           className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold border-2"
           style={{ borderColor: color, color, background: `${color}18` }}
         >
-          {ELEMENT_KOREAN[element]?.charAt(0)}
+          {ELEMENT_KOREAN_FULL[element]?.charAt(0)}
         </div>
       </div>
 
@@ -153,11 +131,11 @@ export function ArchetypeCard({
         </div>
 
         {/* 설명 */}
-        <p className="text-sm text-white/70 leading-relaxed">{description}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
 
         {/* 비유 이미지 */}
         <p
-          className="text-sm italic text-white/40 leading-relaxed border-l-2 pl-3"
+          className="text-sm italic text-muted-foreground/50 leading-relaxed border-l-2 pl-3"
           style={{ borderColor: `${color}50` }}
         >
           &ldquo;{image}&rdquo;

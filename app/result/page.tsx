@@ -7,13 +7,12 @@ import { BriefAnalysis } from "@/types/survey";
 import { apiUrl } from "@/lib/config";
 import { shareResult } from '@/lib/share';
 import { getStateManager } from '@/lib/state-manager';
+import { designTokens, IS_TOSS } from '@/lib/design-tokens';
 import { SajuProfileSection } from "@/components/result/SajuProfileSection";
 import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { PremiumUpsellSection } from "@/components/result/PremiumUpsellSection";
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
@@ -29,14 +28,14 @@ const styles = IS_TOSS ? {
 } : {
   page: 'min-h-screen bg-background text-foreground',
   container: 'px-4 py-8 max-w-2xl mx-auto',
-  title: 'text-3xl font-bold text-white',
-  subtitle: 'text-sm text-white/70',
-  sectionTitle: 'text-2xl font-bold text-white',
-  bodyText: 'text-sm text-white/70',
-  caption: 'text-xs text-white/40',
-  card: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-5',
-  divider: 'border-t border-white/10 my-8',
-  shareButton: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl px-6 py-3 font-bold',
+  title: 'text-3xl font-bold text-foreground',
+  subtitle: 'text-sm text-muted-foreground',
+  sectionTitle: 'text-2xl font-bold text-foreground',
+  bodyText: 'text-sm text-muted-foreground',
+  caption: 'text-xs text-muted-foreground/50',
+  card: 'bg-card border border-border rounded-2xl p-5',
+  divider: 'border-t border-border my-8',
+  shareButton: 'bg-primary text-primary-foreground rounded-[14px] px-6 py-3 font-bold',
 } as const;
 
 // Parse growthGuide string back into structured form
@@ -74,7 +73,7 @@ function SectionDivider() {
 function SkeletonBlock({ h = "h-40" }: { h?: string }) {
   return (
     <div
-      className={`rounded-2xl border ${IS_TOSS ? 'border-tds-grey-200 bg-tds-grey-50' : 'border-white/5 bg-white/[0.03]'} animate-pulse ${h}`}
+      className={`rounded-2xl border animate-pulse ${h} ${IS_TOSS ? 'border-tds-grey-200 bg-tds-grey-50' : 'border-border bg-muted'}`}
     />
   );
 }
@@ -202,7 +201,7 @@ export default function ResultPage() {
           <p className={styles.bodyText}>{error}</p>
           <button
             onClick={() => (window.location.href = "/")}
-            className={`mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold ${IS_TOSS ? 'bg-tds-blue-500 text-white' : 'bg-primary text-white'}`}
+            className={`mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold ${IS_TOSS ? 'bg-tds-blue-500 text-white' : `${designTokens.primaryButton}`}`}
           >
             처음으로
           </button>
@@ -372,11 +371,7 @@ export default function ResultPage() {
         >
           <button
             onClick={handleShare}
-            className={`flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${IS_TOSS ? 'bg-tds-blue-500 text-white' : ''}`}
-            style={IS_TOSS ? undefined : {
-              background: "linear-gradient(135deg, #a855f7 0%, #6366f1 100%)",
-              color: "#fff",
-            }}
+            className={`flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${IS_TOSS ? 'bg-tds-blue-500 text-white' : 'bg-primary text-primary-foreground'}`}
           >
             {shareStatus === "copied"
               ? "링크 복사됨!"
@@ -387,7 +382,7 @@ export default function ResultPage() {
           {!IS_TOSS && (
             <button
               onClick={() => (window.location.href = "/p")}
-              className="flex-1 py-3.5 rounded-xl border border-white/15 text-white/70 font-semibold text-sm hover:bg-white/5 transition-all duration-200"
+              className="flex-1 py-3.5 rounded-xl border border-border text-muted-foreground font-semibold text-sm hover:bg-muted transition-all duration-200"
             >
               웹 프로필 만들기
             </button>
@@ -395,7 +390,7 @@ export default function ResultPage() {
         </motion.div>
 
         {/* Disclaimer */}
-        <p className={`text-center leading-relaxed pb-8 ${IS_TOSS ? 'text-[11px] text-tds-grey-400' : 'text-[11px] text-white/25'}`}>
+        <p className={`text-center leading-relaxed pb-8 ${IS_TOSS ? 'text-[11px] text-tds-grey-400' : 'text-[11px] text-muted-foreground/40'}`}>
           이 서비스는 재미와 자기 이해를 위한 도구이며, 의학적/심리학적 진단을
           대체하지 않습니다.
         </p>

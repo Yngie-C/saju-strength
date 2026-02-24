@@ -72,18 +72,18 @@ export function AdaptiveBottomCTA({
     );
   }
 
-  // Web: gradient CTA button
+  // Web: primary CTA button
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-white/10 px-4 py-4">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-4">
       {topAccessory && <div className="max-w-2xl mx-auto mb-3">{topAccessory}</div>}
       <div className="max-w-2xl mx-auto">
         <button
           onClick={onClick}
           disabled={disabled}
-          className={`w-full py-3.5 rounded-xl font-bold text-white transition-all duration-200
-            bg-gradient-to-r from-indigo-600 to-purple-600
+          className={`w-full py-3.5 rounded-[14px] font-bold text-primary-foreground transition-all duration-200
+            bg-primary
             disabled:opacity-40 disabled:cursor-not-allowed
-            hover:from-indigo-500 hover:to-purple-500
+            hover:bg-primary/90
             active:scale-[0.98] ${className}`}
         >
           {children}

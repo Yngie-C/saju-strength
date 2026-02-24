@@ -81,8 +81,8 @@ export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
                   </div>
                 ) : (
                   <div style={{
-                    background: "hsl(222 47% 8%)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "hsl(218, 22%, 14%)",
+                    border: "1px solid rgba(255,255,255,0.08)",
                     borderRadius: "8px",
                     color: "#fff",
                     fontSize: "12px",
@@ -105,7 +105,7 @@ export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
           >
             {dominant.label}
           </span>
-          <span className={`text-xs mt-0.5 ${IS_TOSS ? 'text-tds-grey-500' : 'text-white/40'}`}>주도 오행</span>
+          <span className={`text-xs mt-0.5 ${IS_TOSS ? 'text-tds-grey-500' : 'text-muted-foreground/50'}`}>주도 오행</span>
         </div>
       </div>
 
@@ -117,7 +117,7 @@ export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
               className="w-3 h-3 rounded-full"
               style={{ background: entry.color }}
             />
-            <span className={`text-[10px] ${IS_TOSS ? 'text-tds-grey-600' : 'text-white/60'}`}>{entry.name}</span>
+            <span className={`text-[10px] ${IS_TOSS ? 'text-tds-grey-600' : 'text-muted-foreground'}`}>{entry.name}</span>
             <span
               className="text-xs font-semibold"
               style={{ color: entry.color }}

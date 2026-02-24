@@ -61,12 +61,12 @@ export function AdaptiveProgressBar({
     );
   }
 
-  // Web: gradient progress bar
+  // Web: primary progress bar
   return (
     <div className={className}>
-      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+      <div className="h-2 bg-secondary rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full"
+          className="h-full bg-primary rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.3 }}
@@ -76,7 +76,7 @@ export function AdaptiveProgressBar({
         <motion.p
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-xs text-indigo-400 font-medium mt-1.5 text-center"
+          className="text-xs text-primary font-medium mt-1.5 text-center"
         >
           {milestoneMessage}
         </motion.p>

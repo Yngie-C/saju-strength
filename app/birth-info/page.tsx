@@ -6,9 +6,8 @@ import { motion } from "framer-motion";
 import { BirthInfoForm } from "@/components/saju/BirthInfoForm";
 import { apiUrl } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
+import { designTokens, IS_TOSS } from '@/lib/design-tokens';
 import Link from 'next/link';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
@@ -26,16 +25,16 @@ const styles = IS_TOSS ? {
 } : {
   page: 'min-h-screen bg-background',
   container: 'px-4 py-8 max-w-2xl mx-auto pb-32',
-  title: 'text-2xl font-bold text-white',
-  subtitle: 'text-sm text-white/70',
-  card: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-6',
+  title: 'text-2xl font-bold text-foreground',
+  subtitle: 'text-sm text-muted-foreground',
+  card: 'bg-card border border-border rounded-2xl p-6',
   stepActive: 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold',
-  stepInactive: 'w-8 h-8 rounded-full border-2 border-white/20 text-white/40 flex items-center justify-center text-xs',
-  stepLine: 'h-0.5 flex-1 bg-white/10',
+  stepInactive: 'w-8 h-8 rounded-full border-2 border-border text-muted-foreground/50 flex items-center justify-center text-xs',
+  stepLine: 'h-0.5 flex-1 bg-border',
   stepLineActive: 'h-0.5 flex-1 bg-primary',
   stepLabel: 'text-xs text-primary font-medium',
-  stepLabelInactive: 'text-xs text-white/40',
-  error: 'text-sm text-red-400',
+  stepLabelInactive: 'text-xs text-muted-foreground/50',
+  error: 'text-sm text-destructive',
 } as const;
 
 export default function BirthInfoPage() {
@@ -114,11 +113,7 @@ export default function BirthInfoPage() {
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="w-full max-w-md rounded-2xl border border-white/10 p-8"
-        style={IS_TOSS ? undefined : {
-          background: "rgba(255,255,255,0.04)",
-          backdropFilter: "blur(16px)",
-        }}
+        className={`w-full max-w-md rounded-2xl p-8 ${IS_TOSS ? 'border border-tds-grey-200 bg-white' : 'bg-card border border-border'}`}
       >
         {/* 제목 */}
         <div className="mb-8 text-center">
@@ -132,7 +127,7 @@ export default function BirthInfoPage() {
         </div>
 
         {/* 개인정보 수집 동의 */}
-        <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <div className={`mb-6 rounded-xl p-4 ${IS_TOSS ? 'border border-tds-grey-200 bg-tds-grey-50' : 'border border-border bg-card'}`}>
           <div className="flex items-start gap-3">
             <button
               type="button"
@@ -140,7 +135,7 @@ export default function BirthInfoPage() {
               className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                 hasConsented
                   ? 'bg-primary border-primary'
-                  : 'border-white/30 hover:border-white/50'
+                  : IS_TOSS ? 'border-tds-grey-300 hover:border-tds-grey-500' : 'border-border hover:border-muted-foreground'
               }`}
             >
               {hasConsented && (
@@ -150,10 +145,10 @@ export default function BirthInfoPage() {
               )}
             </button>
             <div className="flex-1">
-              <p className="text-sm text-white/80 leading-relaxed">
-                <span className="font-medium text-white">개인정보 수집 및 이용에 동의합니다.</span>
+              <p className={`text-sm leading-relaxed ${designTokens.textPrimary}`}>
+                <span className="font-medium">개인정보 수집 및 이용에 동의합니다.</span>
               </p>
-              <p className="mt-1.5 text-xs text-white/40 leading-relaxed">
+              <p className={`mt-1.5 text-xs leading-relaxed ${designTokens.textCaption}`}>
                 수집 항목: 생년월일시, 성별, 양음력 여부 · 수집 목적: 사주 분석 서비스 제공 · 보유 기간: 서비스 탈퇴 시까지
               </p>
               <Link
@@ -186,7 +181,7 @@ export default function BirthInfoPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="mt-6 text-xs text-white/30 text-center max-w-xs"
+        className={`mt-6 text-xs text-center max-w-xs ${designTokens.textCaption}`}
       >
         입력하신 정보는 사주 분석 서비스 제공 외 다른 목적으로 사용되지 않습니다.
       </motion.p>
