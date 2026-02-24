@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
@@ -78,6 +78,22 @@ export default function SurveyPage() {
   const [startTime] = useState(Date.now());
   const [direction, setDirection] = useState(0);
 
+  // 마지막으로 답변한 질문 ID (새 답변일 때만 스크롤 트리거)
+  const lastAnsweredRef = useRef<{ questionId: string; isNew: boolean } | null>(null);
+
+  // 현재 페이지 질문 DOM 참조 (자동 스크롤용, 페이지당 최대 6개)
+  const currentPageRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // 전체 30문항 기준 첫 번째 미답변 질문의 전역 인덱스 (0-based)
+  const getFirstUnansweredIndex = useCallback((): number => {
+    for (let i = 0; i < BASIC_QUESTIONS.length; i++) {
+      if (answers[BASIC_QUESTIONS[i].id] === undefined) {
+        return i;
+      }
+    }
+    return BASIC_QUESTIONS.length;
+  }, [answers]);
+
   // Load saved answers from localStorage / DB
   useEffect(() => {
     async function loadSaved() {
@@ -113,6 +129,61 @@ export default function SurveyPage() {
     sm.save('surveyPage', currentPage);
   }, [answers, currentPage]);
 
+  // 답변 후 다음 미답변 질문으로 자동 스크롤
+  useEffect(() => {
+    const lastAnswered = lastAnsweredRef.current;
+    if (!lastAnswered || !lastAnswered.isNew) {
+      lastAnsweredRef.current = null;
+      return;
+    }
+    lastAnsweredRef.current = null;
+
+    const currentIndex = BASIC_QUESTIONS.findIndex((q) => q.id === lastAnswered.questionId);
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex >= BASIC_QUESTIONS.length) return;
+
+    const nextQuestionPage = Math.floor(nextIndex / BASIC_QUESTIONS_PER_PAGE);
+
+    // 다음 질문이 다른 페이지에 있으면 스크롤 불필요 ("다음" 버튼으로 전환)
+    if (nextQuestionPage !== currentPage) return;
+
+    // 같은 페이지: 다음 질문으로 스크롤
+    const localIdx = nextIndex - currentPage * BASIC_QUESTIONS_PER_PAGE;
+    setTimeout(() => {
+      const ref = currentPageRefs.current[localIdx];
+      if (ref) {
+        ref.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  }, [answers, currentPage]);
+
+  // 페이지 전환 후 해당 페이지의 첫 미답변 질문으로 스크롤
+  const SCROLL_DELAY_AFTER_PAGE_TRANSITION = 350;
+  useEffect(() => {
+    const pageStart = currentPage * BASIC_QUESTIONS_PER_PAGE;
+    const pageEnd = Math.min(pageStart + BASIC_QUESTIONS_PER_PAGE, BASIC_QUESTIONS.length);
+
+    let targetLocalIdx: number | null = null;
+    for (let i = pageStart; i < pageEnd; i++) {
+      if (answers[BASIC_QUESTIONS[i].id] === undefined) {
+        targetLocalIdx = i - pageStart;
+        break;
+      }
+    }
+
+    // 모든 질문이 답변되었거나 첫 번째 질문이면 기존 scrollTo(top:0)에 맡김
+    if (targetLocalIdx === null || targetLocalIdx === 0) return;
+
+    setTimeout(() => {
+      const ref = currentPageRefs.current[targetLocalIdx!];
+      if (ref) {
+        ref.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, SCROLL_DELAY_AFTER_PAGE_TRANSITION);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
+
   const currentQuestions = BASIC_QUESTIONS.slice(
     currentPage * BASIC_QUESTIONS_PER_PAGE,
     (currentPage + 1) * BASIC_QUESTIONS_PER_PAGE
@@ -135,7 +206,11 @@ export default function SurveyPage() {
   const currentPageAnswered = currentQuestions.every((q) => answers[q.id] !== undefined);
 
   const handleAnswer = useCallback((questionId: string, value: number) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    setAnswers((prev) => {
+      const isNewAnswer = prev[questionId] === undefined;
+      lastAnsweredRef.current = { questionId, isNew: isNewAnswer };
+      return { ...prev, [questionId]: value };
+    });
   }, []);
 
   const goToPage = useCallback(
@@ -277,12 +352,19 @@ export default function SurveyPage() {
           >
             {currentQuestions.map((question, idx) => {
               const globalIdx = currentPage * BASIC_QUESTIONS_PER_PAGE + idx + 1;
+              const globalIndex = currentPage * BASIC_QUESTIONS_PER_PAGE + idx;
+              const firstUnansweredIndex = getFirstUnansweredIndex();
               const selectedValue = answers[question.id];
+              const isDisabled = selectedValue === undefined && globalIndex > firstUnansweredIndex;
 
               return (
                 <div
                   key={question.id}
-                  className={IS_TOSS ? styles.questionCard : 'bg-card rounded-xl p-5 border border-border'}
+                  ref={(el) => { currentPageRefs.current[idx] = el; }}
+                  className={`${IS_TOSS ? styles.questionCard : 'bg-card rounded-xl p-5 border border-border'} transition-opacity duration-300 ${
+                    isDisabled ? 'opacity-40' : 'opacity-100'
+                  }`}
+                  style={{ scrollMarginTop: '120px', scrollMarginBottom: '140px' }}
                 >
                   <div className="flex items-start gap-3 mb-4">
                     <span className={`flex-shrink-0 w-7 h-7 flex items-center justify-center text-sm font-bold ${styles.questionNumber}`}>
@@ -309,11 +391,15 @@ export default function SurveyPage() {
                           <motion.button
                             key={value}
                             onClick={() => handleAnswer(question.id, value)}
-                            whileHover={IS_TOSS ? undefined : { scale: 1.02 }}
-                            whileTap={{ scale: 0.95 }}
+                            disabled={isDisabled}
+                            aria-disabled={isDisabled}
+                            tabIndex={isDisabled ? -1 : 0}
+                            whileHover={IS_TOSS ? undefined : { scale: isDisabled ? 1 : 1.02 }}
+                            whileTap={isDisabled ? undefined : { scale: 0.95 }}
                             className={[
                               'flex-1 min-w-[36px] min-h-[44px] flex items-center justify-center',
                               'text-sm font-bold transition-all duration-200',
+                              isDisabled ? 'cursor-not-allowed' : '',
                               isSelected
                                 ? IS_TOSS
                                   ? `${styles.likertSelected} ring-2 ring-tds-blue-300 scale-110 shadow-md`
