@@ -7,9 +7,12 @@ import { useSwipeable } from 'react-swipeable';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { SURVEY_QUESTIONS, QUESTIONS_PER_PAGE, TOTAL_PAGES } from '@/lib/survey-questions';
 import { SurveyAnswer } from '@/types/survey';
+import { apiUrl } from '@/lib/config';
+import { getStateManager } from '@/lib/state-manager';
+import { AdaptiveProgressBar } from '@/components/adaptive';
 
 const STORAGE_KEY = 'saju-survey-answers';
-const RESULT_STORAGE_KEY = 'saju-survey-result';
+const RESULT_STORAGE_KEY = 'psaResult';
 const SESSION_ID_KEY = 'saju-session-id';
 
 const LIKERT_LABELS: Record<number, string> = {
@@ -26,16 +29,26 @@ export default function SurveyPage() {
   const [startTime] = useState(Date.now());
   const [direction, setDirection] = useState(0);
 
-  // Load saved answers from localStorage
+  // Load saved answers from localStorage / DB
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setAnswers(JSON.parse(saved));
+    async function loadSaved() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          setAnswers(JSON.parse(saved));
+          return;
+        }
+        // Fallback: try DB
+        const sm = getStateManager();
+        const dbAnswers = await sm.load<Record<string, number>>('surveyAnswers');
+        if (dbAnswers) setAnswers(dbAnswers);
+        const dbPage = await sm.load<number>('surveyPage');
+        if (dbPage !== null) setCurrentPage(dbPage);
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
     }
+    loadSaved();
   }, []);
 
   // Auto-save to localStorage
@@ -45,7 +58,11 @@ export default function SurveyPage() {
     } catch {
       // ignore
     }
-  }, [answers]);
+    // DB persistence for toss environment
+    const sm = getStateManager();
+    sm.save('surveyAnswers', answers);
+    sm.save('surveyPage', currentPage);
+  }, [answers, currentPage]);
 
   const currentQuestions = SURVEY_QUESTIONS.slice(
     currentPage * QUESTIONS_PER_PAGE,
@@ -54,6 +71,17 @@ export default function SurveyPage() {
 
   const totalAnswered = Object.keys(answers).length;
   const progress = (totalAnswered / SURVEY_QUESTIONS.length) * 100;
+
+  const getMilestoneMessage = (pct: number): string | undefined => {
+    if (pct >= 75 && pct < 80) return '거의 다 왔어요! 조금만 더 하면 결과를 확인할 수 있어요';
+    if (pct >= 50 && pct < 55) return '절반 완료! 흥미로운 패턴이 보이기 시작해요';
+    if (pct >= 25 && pct < 30) return '벌써 1/4 완료! 당신의 강점이 드러나고 있어요';
+    return undefined;
+  };
+
+  const milestoneMessage = getMilestoneMessage(progress);
+
+  const estimatedMinutesLeft = Math.max(1, Math.ceil((SURVEY_QUESTIONS.length - totalAnswered) * 5 / 60));
 
   const currentPageAnswered = currentQuestions.every((q) => answers[q.id] !== undefined);
 
@@ -113,7 +141,7 @@ export default function SurveyPage() {
 
       const completionTimeSeconds = Math.round((Date.now() - startTime) / 1000);
 
-      const response = await fetch('/api/survey/submit', {
+      const response = await fetch(apiUrl('/api/survey/submit'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -130,7 +158,11 @@ export default function SurveyPage() {
       const result = await response.json();
 
       sessionStorage.setItem(RESULT_STORAGE_KEY, JSON.stringify(result));
+      await getStateManager().save('psaResult', result);
       localStorage.removeItem(STORAGE_KEY);
+      const sm = getStateManager();
+      sm.remove('surveyAnswers');
+      sm.remove('surveyPage');
 
       router.push('/result');
     } catch (error) {
@@ -151,21 +183,14 @@ export default function SurveyPage() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-slate-400 text-sm">
               <Clock className="w-4 h-4" />
-              <span>약 5분 소요</span>
+              <span>남은 시간: 약 {estimatedMinutesLeft}분</span>
             </div>
             <span className="text-slate-400 text-sm">
               {totalAnswered} / {SURVEY_QUESTIONS.length} 완료
             </span>
           </div>
           {/* Progress bar */}
-          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
+          <AdaptiveProgressBar progress={progress} milestoneMessage={milestoneMessage} />
           <div className="flex justify-between mt-1">
             <span className="text-xs text-slate-500">
               {currentPage + 1} / {TOTAL_PAGES} 페이지

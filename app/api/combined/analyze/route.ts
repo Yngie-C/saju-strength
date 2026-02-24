@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { CombinedAnalyzerAgent } from '@/agents/combined-analyzer';
 import { SajuAnalysis } from '@/types/saju';
 import { BriefAnalysis } from '@/types/survey';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
   try {
@@ -30,6 +31,44 @@ export async function POST(request: Request) {
         { error: result.error || '교차 분석에 실패했습니다.' },
         { status: 500 }
       );
+    }
+
+    try {
+      const supabase = getSupabaseAdmin();
+      let sajuAnalysisId: string | null = null;
+      const { data: sajuRow } = await supabase
+        .from('saju_analyses')
+        .select('id')
+        .eq('session_id', sessionId)
+        .single();
+      if (sajuRow) {
+        sajuAnalysisId = sajuRow.id;
+      }
+
+      await supabase.from('combined_reports').insert({
+        session_id: sessionId,
+        saju_analysis_id: sajuAnalysisId,
+        cross_analysis: result.data.axes,
+        growth_guide: { text: result.data.growthGuide },
+        persona_type: psaResult.persona.type,
+        persona_title: psaResult.persona.title,
+        psa_scores: psaResult.categoryScores,
+        top_categories: psaResult.topCategories,
+        strengths_summary: psaResult.strengthsSummary,
+        branding_keywords: psaResult.brandingKeywords,
+        radar_data: psaResult.radarData,
+        strength_tips: psaResult.strengthTips ?? null,
+        branding_messages: psaResult.brandingMessages ?? null,
+        total_score: psaResult.totalScore,
+        completion_time_seconds: psaResult.completionTimeSeconds ?? null,
+      });
+
+      await supabase
+        .from('sessions')
+        .update({ combined_report_generated: true, updated_at: new Date().toISOString() })
+        .eq('id', sessionId);
+    } catch (dbError: unknown) {
+      console.error('[POST /api/combined/analyze] Supabase persistence error:', dbError);
     }
 
     return NextResponse.json(result.data);

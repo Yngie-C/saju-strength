@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { SurveyAnalyzerAgent } from '@/agents/survey-analyzer';
 import { SURVEY_QUESTIONS } from '@/lib/survey-questions';
 import { SurveyAnswer, SurveyResponse } from '@/types/survey';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
   try {
@@ -46,6 +47,37 @@ export async function POST(request: Request) {
         { error: result.error || '분석에 실패했습니다.' },
         { status: 500 }
       );
+    }
+
+    // Persist to Supabase — failures are logged but do not block the response
+    try {
+      const rows = answers.map((a) => ({
+        session_id: sessionId,
+        question_id: null,
+        question_number: a.questionNumber,
+        category: a.category,
+        score: a.score,
+      }));
+
+      const supabase = getSupabaseAdmin();
+      const { error: insertError } = await supabase
+        .from('survey_responses')
+        .insert(rows);
+
+      if (insertError) {
+        console.error('[POST /api/survey/submit] survey_responses insert error:', insertError);
+      }
+
+      const { error: updateError } = await supabase
+        .from('sessions')
+        .update({ survey_completed: true, updated_at: new Date().toISOString() })
+        .eq('id', sessionId);
+
+      if (updateError) {
+        console.error('[POST /api/survey/submit] sessions update error:', updateError);
+      }
+    } catch (dbError) {
+      console.error('[POST /api/survey/submit] Supabase operation failed:', dbError);
     }
 
     return NextResponse.json(result.data);

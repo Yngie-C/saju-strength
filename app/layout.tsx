@@ -1,20 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import localFont from "next/font/local";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const pretendard = localFont({
-  src: "../public/fonts/PretendardVariable.woff2",
-  display: "swap",
-  variable: "--font-pretendard",
-  weight: "45 920",
-});
+import { TDSProvider } from '@/components/adaptive/TDSProvider';
 
 export const metadata: Metadata = {
   title: "사주강점 - 타고난 기질 x 현재 강점",
@@ -34,7 +20,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${inter.variable} ${pretendard.variable} font-sans`}>{children}</body>
+      <body
+        className="font-sans"
+        style={{ fontFamily: "'PretendardVariable', 'Inter', system-ui, sans-serif" }}
+      >
+        <TDSProvider>
+          {children}
+        </TDSProvider>
+      </body>
     </html>
   );
 }

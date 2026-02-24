@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { SajuAnalysis, CombinedAnalysis, AxisAnalysis } from "@/types/saju";
 import { BriefAnalysis } from "@/types/survey";
+import { apiUrl } from "@/lib/config";
+import { shareResult } from '@/lib/share';
+import { getStateManager } from '@/lib/state-manager';
 import { SajuProfileSection } from "@/components/result/SajuProfileSection";
 import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
@@ -60,70 +63,84 @@ export default function ResultPage() {
   );
 
   useEffect(() => {
-    const rawSaju = sessionStorage.getItem("sajuResult");
-    const rawPsa = sessionStorage.getItem("psaResult");
+    (async () => {
+      let rawSaju = sessionStorage.getItem("sajuResult");
+      let rawPsa = sessionStorage.getItem("psaResult");
 
-    if (!rawSaju || !rawPsa) {
-      setError("분석 데이터를 찾을 수 없습니다. 처음부터 다시 시작해주세요.");
-      setLoading(false);
-      return;
-    }
-
-    let parsedSaju: SajuAnalysis;
-    let parsedPsa: BriefAnalysis;
-
-    try {
-      parsedSaju = JSON.parse(rawSaju) as SajuAnalysis;
-      parsedPsa = JSON.parse(rawPsa) as BriefAnalysis;
-    } catch {
-      setError("데이터 파싱에 실패했습니다. 처음부터 다시 시작해주세요.");
-      setLoading(false);
-      return;
-    }
-
-    setSajuResult(parsedSaju);
-    setPsaResult(parsedPsa);
-
-    const sessionId =
-      parsedSaju.sessionId ?? `session-${Date.now()}`;
-
-    fetch("/api/combined/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, sajuResult: parsedSaju, psaResult: parsedPsa }),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error((body as { error?: string }).error ?? "교차 분석 실패");
+      // State manager fallback (toss WebView or lost sessionStorage)
+      if (!rawSaju || !rawPsa) {
+        const sm = getStateManager();
+        if (!rawSaju) {
+          const dbSaju = await sm.load('sajuResult');
+          if (dbSaju) rawSaju = JSON.stringify(dbSaju);
         }
-        return res.json() as Promise<CombinedAnalysis>;
-      })
-      .then((data) => {
-        setCombined(data);
+        if (!rawPsa) {
+          const dbPsa = await sm.load('psaResult');
+          if (dbPsa) rawPsa = JSON.stringify(dbPsa);
+        }
+      }
+
+      if (!rawSaju || !rawPsa) {
+        setError("분석 데이터를 찾을 수 없습니다. 처음부터 다시 시작해주세요.");
         setLoading(false);
-      })
-      .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : "알 수 없는 오류";
-        setError(msg);
+        return;
+      }
+
+      let parsedSaju: SajuAnalysis;
+      let parsedPsa: BriefAnalysis;
+
+      try {
+        parsedSaju = JSON.parse(rawSaju) as SajuAnalysis;
+        parsedPsa = JSON.parse(rawPsa) as BriefAnalysis;
+      } catch {
+        setError("데이터 파싱에 실패했습니다. 처음부터 다시 시작해주세요.");
         setLoading(false);
-      });
+        return;
+      }
+
+      setSajuResult(parsedSaju);
+      setPsaResult(parsedPsa);
+
+      const sessionId =
+        parsedSaju.sessionId ?? `session-${Date.now()}`;
+
+      fetch(apiUrl("/api/combined/analyze"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, sajuResult: parsedSaju, psaResult: parsedPsa }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error((body as { error?: string }).error ?? "교차 분석 실패");
+          }
+          return res.json() as Promise<CombinedAnalysis>;
+        })
+        .then((data) => {
+          setCombined(data);
+          setLoading(false);
+        })
+        .catch((err: unknown) => {
+          const msg = err instanceof Error ? err.message : "알 수 없는 오류";
+          setError(msg);
+          setLoading(false);
+        });
+    })();
   }, []);
 
   const handleShare = async () => {
-    const url = window.location.href;
-    const text = `나의 사주-강점 교차 분석 결과를 확인해보세요!`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "사주 강점 분석", text, url });
-        setShareStatus("shared");
-      } catch {
-        // user cancelled
-      }
-    } else {
-      await navigator.clipboard.writeText(url);
-      setShareStatus("copied");
-      setTimeout(() => setShareStatus("idle"), 2000);
+    const personaTitle = psaResult?.persona?.title || '강점 분석';
+    const result = await shareResult({
+      title: `사주강점 - ${personaTitle}`,
+      description: '나의 사주-강점 교차 분석 결과를 확인해보세요!',
+      path: '/result',
+    });
+
+    if (result === 'copied') {
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus('idle'), 2000);
+    } else if (result === 'shared') {
+      setShareStatus('shared');
     }
   };
 

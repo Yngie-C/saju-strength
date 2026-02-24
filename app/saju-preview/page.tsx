@@ -8,6 +8,7 @@ import { FiveElementsChart } from "@/components/saju/FiveElementsChart";
 import { ArchetypeCard } from "@/components/saju/ArchetypeCard";
 import { Button } from "@/components/ui/button";
 import type { SajuAnalysis } from "@/types/saju";
+import { getStateManager } from '@/lib/state-manager';
 
 const PILLAR_LABELS = ["년주", "월주", "일주", "시주"] as const;
 
@@ -30,13 +31,27 @@ export default function SajuPreviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem("sajuResult");
-      if (!raw) throw new Error("분석 결과가 없습니다. 다시 시작해주세요.");
-      setResult(JSON.parse(raw) as SajuAnalysis);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "데이터를 불러올 수 없습니다.");
+    async function loadResult() {
+      try {
+        // Try sessionStorage first
+        const raw = sessionStorage.getItem("sajuResult");
+        if (raw) {
+          setResult(JSON.parse(raw) as SajuAnalysis);
+          return;
+        }
+        // Fallback: state manager (DB)
+        const sm = getStateManager();
+        const dbResult = await sm.load<SajuAnalysis>('sajuResult');
+        if (dbResult) {
+          setResult(dbResult);
+          return;
+        }
+        throw new Error("분석 결과가 없습니다. 다시 시작해주세요.");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "데이터를 불러올 수 없습니다.");
+      }
     }
+    loadResult();
   }, []);
 
   if (error) {

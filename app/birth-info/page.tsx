@@ -4,11 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { BirthInfoForm } from "@/components/saju/BirthInfoForm";
+import { apiUrl } from '@/lib/config';
+import { getStateManager } from '@/lib/state-manager';
+import Link from 'next/link';
 
 export default function BirthInfoPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasConsented, setHasConsented] = useState(false);
 
   async function handleSubmit(data: {
     year: number;
@@ -22,7 +26,7 @@ export default function BirthInfoPage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/saju/calculate", {
+      const res = await fetch(apiUrl("/api/saju/calculate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -37,6 +41,11 @@ export default function BirthInfoPage() {
       const result = json?.data ?? json;
 
       sessionStorage.setItem("sajuResult", JSON.stringify(result));
+      sessionStorage.setItem("saju-session-id", result.sessionId);
+      // Persist to DB for toss environment
+      const sm = getStateManager();
+      sm.setSessionId(result.sessionId);
+      await sm.save('sajuResult', result);
       router.push("/saju-preview");
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
@@ -92,8 +101,43 @@ export default function BirthInfoPage() {
           </p>
         </div>
 
+        {/* 개인정보 수집 동의 */}
+        <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-start gap-3">
+            <button
+              type="button"
+              onClick={() => setHasConsented(!hasConsented)}
+              className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                hasConsented
+                  ? 'bg-primary border-primary'
+                  : 'border-white/30 hover:border-white/50'
+              }`}
+            >
+              {hasConsented && (
+                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+            <div className="flex-1">
+              <p className="text-sm text-white/80 leading-relaxed">
+                <span className="font-medium text-white">개인정보 수집 및 이용에 동의합니다.</span>
+              </p>
+              <p className="mt-1.5 text-xs text-white/40 leading-relaxed">
+                수집 항목: 생년월일시, 성별, 양음력 여부 · 수집 목적: 사주 분석 서비스 제공 · 보유 기간: 서비스 탈퇴 시까지
+              </p>
+              <Link
+                href="/privacy-policy"
+                className="mt-2 inline-block text-xs text-primary/70 hover:text-primary underline underline-offset-2"
+              >
+                개인정보 처리방침 전문 보기
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* 폼 */}
-        <BirthInfoForm onSubmit={handleSubmit} isLoading={isLoading} />
+        <BirthInfoForm onSubmit={handleSubmit} isLoading={isLoading || !hasConsented} />
 
         {/* 에러 메시지 */}
         {error && (
@@ -114,7 +158,7 @@ export default function BirthInfoPage() {
         transition={{ delay: 0.6 }}
         className="mt-6 text-xs text-white/30 text-center max-w-xs"
       >
-        입력하신 정보는 사주 분석 외 다른 목적으로 사용되지 않습니다.
+        입력하신 정보는 사주 분석 서비스 제공 외 다른 목적으로 사용되지 않습니다.
       </motion.p>
     </main>
   );

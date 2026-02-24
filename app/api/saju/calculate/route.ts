@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SajuAnalyzerAgent } from '@/agents/saju-analyzer';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
   try {
@@ -34,6 +35,40 @@ export async function POST(request: Request) {
       ...result.data,
       analyzedAt: result.data!.analyzedAt.toISOString(),
     };
+
+    // Supabase 데이터 저장 (실패해도 응답에 영향 없음)
+    try {
+      const { fourPillars, dayMaster, elementDistribution, elementRanks } = result.data!;
+
+      const supabase = getSupabaseAdmin();
+      await supabase.from('sessions').insert({ id: sessionId, status: 'birth_input' });
+
+      await supabase.from('saju_analyses').insert({
+        id: crypto.randomUUID(),
+        session_id: sessionId,
+        birth_year: year,
+        birth_month: month,
+        birth_day: day,
+        birth_hour: hour ?? null,
+        gender,
+        is_lunar: isLunar ?? false,
+        year_pillar_stem: fourPillars.year.stem,
+        year_pillar_branch: fourPillars.year.branch,
+        month_pillar_stem: fourPillars.month.stem,
+        month_pillar_branch: fourPillars.month.branch,
+        day_pillar_stem: fourPillars.day.stem,
+        day_pillar_branch: fourPillars.day.branch,
+        hour_pillar_stem: fourPillars.hour?.stem ?? null,
+        hour_pillar_branch: fourPillars.hour?.branch ?? null,
+        day_master: dayMaster.stem,
+        day_master_element: dayMaster.element,
+        archetype: dayMaster.name,
+        five_elements: elementDistribution,
+        element_ranks: elementRanks,
+      });
+    } catch (dbError: unknown) {
+      console.error('[Supabase] 저장 실패:', dbError);
+    }
 
     return NextResponse.json({ data });
   } catch (error: any) {
