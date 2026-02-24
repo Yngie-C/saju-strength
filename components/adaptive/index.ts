@@ -13,4 +13,6 @@ export { AdaptiveTextField } from './AdaptiveTextField';
 export { AdaptiveBottomCTA } from './AdaptiveBottomCTA';
 export { AdaptiveProgressBar } from './AdaptiveProgressBar';
 export { AdaptiveCheckbox } from './AdaptiveCheckbox';
+export { AdaptiveCard } from './AdaptiveCard';
+export { AdaptiveTab } from './AdaptiveTab';
 export { TDSProvider } from './TDSProvider';

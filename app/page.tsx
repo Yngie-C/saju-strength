@@ -1,9 +1,35 @@
 "use client";
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useInView } from "framer-motion";
 import { Star, Diamond, TrendingUp, Circle, Sparkles, BarChart3, GitMerge, ArrowRight } from "lucide-react";
+
+const styles = IS_TOSS ? {
+  page: 'min-h-screen bg-white',
+  heroTitle: 'text-t1 font-bold text-tds-grey-900',
+  heroSubtitle: 'text-st8 text-tds-grey-700',
+  ctaButton: 'bg-tds-blue-500 text-white rounded-[14px] w-full py-4 font-semibold text-t5 hover:bg-tds-blue-600 transition-colors',
+  card: 'bg-white border border-tds-grey-200 rounded-xl p-6',
+  badge: 'bg-tds-blue-50 text-tds-blue-600 border border-tds-blue-100 rounded-full px-3 py-1 text-st11 font-medium',
+  sectionTitle: 'text-t3 font-bold text-tds-grey-900',
+  bodyText: 'text-st8 text-tds-grey-700',
+  caption: 'text-st11 text-tds-grey-500',
+  container: 'px-6 py-8 max-w-[375px] mx-auto',
+} : {
+  page: 'min-h-screen bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900',
+  heroTitle: 'text-5xl md:text-7xl font-bold text-white',
+  heroSubtitle: 'text-lg text-white/70',
+  ctaButton: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl w-full py-3.5 font-bold hover:from-purple-400 hover:to-pink-400 transition-all',
+  card: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-6',
+  badge: 'bg-purple-500/20 text-purple-300 border border-purple-400/20 rounded-full px-3 py-1 text-xs font-medium',
+  sectionTitle: 'text-3xl font-bold text-white',
+  bodyText: 'text-sm text-white/70',
+  caption: 'text-xs text-white/40',
+  container: 'px-4 py-12 max-w-2xl mx-auto',
+} as const;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -30,13 +56,15 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900 text-white overflow-x-hidden">
+    <main className={`${styles.page} ${IS_TOSS ? 'text-tds-grey-900' : 'text-white'} overflow-x-hidden`}>
       {/* 히어로 섹션 */}
-      <section className="relative flex flex-col items-center justify-center min-h-screen px-4 pt-20 pb-16 text-center">
+      <section className={`relative flex flex-col items-center justify-center min-h-screen ${IS_TOSS ? 'px-6' : 'px-4'} pt-20 pb-16 text-center`}>
         {/* 배경 글로우 */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-3xl" />
-        </div>
+        {!IS_TOSS && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-3xl" />
+          </div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -45,7 +73,7 @@ export default function LandingPage() {
           className="relative z-10 flex flex-col items-center gap-6 max-w-2xl mx-auto"
         >
           {/* 뱃지 */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-purple-500/40 bg-purple-500/10 text-purple-300 text-xs font-semibold tracking-widest uppercase">
+          <span className={`inline-flex items-center gap-1.5 ${styles.badge}`}>
             <Sparkles size={12} />
             사주 × 강점 교차 분석
           </span>
@@ -58,18 +86,18 @@ export default function LandingPage() {
           </h1>
 
           {/* 서브타이틀 */}
-          <p className="text-lg sm:text-2xl font-medium text-white/80 leading-snug">
+          <p className={`font-medium leading-snug ${styles.heroSubtitle}`}>
             타고난 기질 × 현재 강점 = 당신만의 성장 지도
           </p>
 
           {/* 설명 */}
-          <p className="text-sm sm:text-base text-white/50 leading-relaxed max-w-md whitespace-pre-line">
+          <p className={`leading-relaxed max-w-md whitespace-pre-line ${styles.caption}`}>
             {"사주 오행 분석과 Big5 기반 강점 설문으로\n선천적 기질과 후천적 강점을 교차 분석합니다."}
           </p>
 
           {/* CTA */}
           <motion.button
-            whileHover={{ scale: 1.04 }}
+            whileHover={IS_TOSS ? undefined : { scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => router.push("/birth-info")}
             className="mt-2 inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg shadow-lg shadow-purple-900/50 hover:shadow-purple-700/60 transition-shadow"
@@ -79,17 +107,17 @@ export default function LandingPage() {
           </motion.button>
 
           {/* 무료 강조 */}
-          <p className="text-xs text-white/35 tracking-wide">
+          <p className={`tracking-wide ${styles.caption}`}>
             100% 무료 · 5분 소요 · 즉시 결과
           </p>
         </motion.div>
       </section>
 
       {/* 가치 제안 3컬럼 */}
-      <section className="px-4 py-20">
+      <section className={`${IS_TOSS ? 'px-6' : 'px-4'} py-20`}>
         <div className="max-w-5xl mx-auto">
           <SectionReveal className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white/90">어떻게 분석하나요?</h2>
+            <h2 className={styles.sectionTitle}>어떻게 분석하나요?</h2>
           </SectionReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -115,17 +143,17 @@ export default function LandingPage() {
             ].map((item, i) => (
               <SectionReveal key={i}>
                 <motion.div
-                  whileHover={{ y: -4 }}
+                  whileHover={IS_TOSS ? undefined : { y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="rounded-2xl border border-white/10 p-6 flex flex-col gap-4"
-                  style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)" }}
+                  className={`rounded-2xl flex flex-col gap-4 ${styles.card}`}
+                  style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)" }}
                 >
                   <div className="flex items-center justify-between">
                     {item.icon}
-                    <span className="text-3xl font-black text-white/10">{item.step}</span>
+                    <span className={`text-3xl font-black ${IS_TOSS ? 'text-tds-grey-200' : 'text-white/10'}`}>{item.step}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-white">{item.title}</h3>
-                  <p className="text-sm text-white/55 leading-relaxed">{item.desc}</p>
+                  <h3 className={`text-lg font-bold ${IS_TOSS ? 'text-tds-grey-900' : 'text-white'}`}>{item.title}</h3>
+                  <p className={`leading-relaxed ${styles.bodyText}`}>{item.desc}</p>
                 </motion.div>
               </SectionReveal>
             ))}
@@ -134,11 +162,11 @@ export default function LandingPage() {
       </section>
 
       {/* 4유형 설명 섹션 */}
-      <section className="px-4 py-20">
+      <section className={`${IS_TOSS ? 'px-6' : 'px-4'} py-20`}>
         <div className="max-w-5xl mx-auto">
           <SectionReveal className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white/90">4가지 강점 유형</h2>
-            <p className="mt-3 text-sm text-white/45">교차 분석이 발견하는 당신의 강점 지형</p>
+            <h2 className={styles.sectionTitle}>4가지 강점 유형</h2>
+            <p className={`mt-3 ${styles.caption}`}>교차 분석이 발견하는 당신의 강점 지형</p>
           </SectionReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -174,8 +202,8 @@ export default function LandingPage() {
             ].map((item, i) => (
               <SectionReveal key={i}>
                 <div
-                  className="rounded-2xl border border-white/10 p-6 flex flex-col gap-3 h-full"
-                  style={{ background: "rgba(255,255,255,0.03)" }}
+                  className={`rounded-2xl flex flex-col gap-3 h-full ${styles.card}`}
+                  style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
                 >
                   <div className="flex items-center gap-3">
                     {item.icon}
@@ -183,8 +211,8 @@ export default function LandingPage() {
                       {item.badge}
                     </span>
                   </div>
-                  <p className="text-base font-semibold text-white/90">{item.title}</p>
-                  <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+                  <p className={`text-base font-semibold ${IS_TOSS ? 'text-tds-grey-800' : 'text-white/90'}`}>{item.title}</p>
+                  <p className={`leading-relaxed ${styles.bodyText}`}>{item.desc}</p>
                 </div>
               </SectionReveal>
             ))}
@@ -194,13 +222,13 @@ export default function LandingPage() {
 
       {/* 하단 CTA */}
       <SectionReveal>
-        <section className="px-4 py-20 text-center">
+        <section className={`${IS_TOSS ? 'px-6' : 'px-4'} py-20 text-center`}>
           <div className="max-w-lg mx-auto flex flex-col items-center gap-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white/90">
+            <h2 className={styles.sectionTitle}>
               지금 바로 분석해보세요
             </h2>
             <motion.button
-              whileHover={{ scale: 1.04 }}
+              whileHover={IS_TOSS ? undefined : { scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => router.push("/birth-info")}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg shadow-lg shadow-purple-900/50"
@@ -208,14 +236,14 @@ export default function LandingPage() {
               무료로 시작하기
               <ArrowRight size={20} />
             </motion.button>
-            <p className="text-xs text-white/35 tracking-wide">100% 무료 · 5분 소요 · 즉시 결과</p>
+            <p className={`tracking-wide ${styles.caption}`}>100% 무료 · 5분 소요 · 즉시 결과</p>
           </div>
         </section>
       </SectionReveal>
 
       {/* Footer 면책 고지 */}
-      <footer className="px-4 py-10 border-t border-white/8">
-        <p className="max-w-2xl mx-auto text-center text-xs text-white/30 leading-relaxed">
+      <footer className={`${IS_TOSS ? 'px-6' : 'px-4'} py-10 border-t ${IS_TOSS ? 'border-tds-grey-200' : 'border-white/8'}`}>
+        <p className={`max-w-2xl mx-auto text-center leading-relaxed ${styles.caption}`}>
           이 서비스는 동양 전통 기질 분석과 현대 강점 진단의 융합 서비스이며, 의학적/심리학적 진단을 대체하지 않습니다.
         </p>
       </footer>

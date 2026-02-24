@@ -9,6 +9,8 @@ import { purchaseProduct, checkPurchase, PRODUCTS } from '@/lib/iap';
 import { isTossEnvironment } from '@/lib/toss';
 import { apiUrl } from '@/lib/config';
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
 interface Props {
   sessionId: string;
   sajuResult: SajuAnalysis;
@@ -71,36 +73,44 @@ export function PremiumUpsellSection({ sessionId, sajuResult, psaResult, axes }:
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-indigo-900/20 p-6"
+        className={
+          IS_TOSS
+            ? "relative overflow-hidden rounded-xl border border-tds-blue-200 bg-tds-blue-50 p-6"
+            : "relative overflow-hidden rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-indigo-900/20 p-6"
+        }
       >
-        {/* Glow effect */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
+        {/* Glow effect (web only) */}
+        {!IS_TOSS && (
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
+        )}
 
         <div className="relative space-y-4">
           <div className="flex items-center gap-2">
             <span className="text-lg">&#x2728;</span>
-            <h3 className="text-lg font-bold text-white">프리미엄 심층 리포트</h3>
+            <h3 className={IS_TOSS ? "text-t4 font-bold text-tds-grey-900" : "text-lg font-bold text-white"}>
+              프리미엄 심층 리포트
+            </h3>
           </div>
 
-          <p className="text-sm text-white/60">
+          <p className={IS_TOSS ? "text-st8 text-tds-grey-600" : "text-sm text-white/60"}>
             기본 분석에서 더 깊이 들어가보세요
           </p>
 
-          <ul className="space-y-2 text-sm text-white/70">
+          <ul className={IS_TOSS ? "space-y-2 text-sm text-tds-grey-700" : "space-y-2 text-sm text-white/70"}>
             <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">&#x2713;</span>
+              <span className={IS_TOSS ? "text-tds-blue-500 mt-0.5" : "text-purple-400 mt-0.5"}>&#x2713;</span>
               <span>10가지 페르소나 심층 분석</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">&#x2713;</span>
+              <span className={IS_TOSS ? "text-tds-blue-500 mt-0.5" : "text-purple-400 mt-0.5"}>&#x2713;</span>
               <span>4주 개인화 성장 로드맵</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">&#x2713;</span>
+              <span className={IS_TOSS ? "text-tds-blue-500 mt-0.5" : "text-purple-400 mt-0.5"}>&#x2713;</span>
               <span>퍼스널 브랜딩 메시지 생성</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">&#x2713;</span>
+              <span className={IS_TOSS ? "text-tds-blue-500 mt-0.5" : "text-purple-400 mt-0.5"}>&#x2713;</span>
               <span>강점 활용 실전 시나리오</span>
             </li>
           </ul>
@@ -109,8 +119,12 @@ export function PremiumUpsellSection({ sessionId, sajuResult, psaResult, axes }:
             <button
               onClick={handlePurchase}
               disabled={purchasing}
-              className="w-full py-3 rounded-xl font-semibold text-sm text-white disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)' }}
+              className={
+                IS_TOSS
+                  ? "w-full py-3 rounded-[14px] font-semibold text-sm text-white bg-tds-blue-500 disabled:opacity-50"
+                  : "w-full py-3 rounded-xl font-semibold text-sm text-white disabled:opacity-50"
+              }
+              style={IS_TOSS ? undefined : { background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)' }}
             >
               {purchasing ? '결제 진행 중...' : `${PRODUCTS.premium_report.priceDisplay}으로 잠금 해제`}
             </button>
@@ -131,8 +145,8 @@ export function PremiumUpsellSection({ sessionId, sajuResult, psaResult, axes }:
   // PREMIUM REPORT CONTENT (purchased)
   if (!report) {
     return (
-      <div className="rounded-2xl border border-purple-500/20 bg-purple-900/10 p-6 animate-pulse">
-        <p className="text-sm text-white/40 text-center">프리미엄 리포트 불러오는 중...</p>
+      <div className={`rounded-xl p-6 animate-pulse ${IS_TOSS ? 'border border-tds-blue-200 bg-tds-blue-50' : 'rounded-2xl border border-purple-500/20 bg-purple-900/10'}`}>
+        <p className={`text-sm text-center ${IS_TOSS ? 'text-tds-grey-500' : 'text-white/40'}`}>프리미엄 리포트 불러오는 중...</p>
       </div>
     );
   }

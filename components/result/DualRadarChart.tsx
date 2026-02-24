@@ -9,6 +9,8 @@ import {
   Legend,
 } from "recharts";
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === "toss";
+
 interface DualRadarChartProps {
   elementData: Array<{ axis: string; value: number }>;
   psaData: Array<{ axis: string; value: number }>;
@@ -31,10 +33,13 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RadarChart cx="50%" cy="50%" outerRadius={100} data={data}>
-        <PolarGrid stroke="rgba(255,255,255,0.1)" />
+        <PolarGrid stroke={IS_TOSS ? "#e5e8eb" : "rgba(255,255,255,0.1)"} />
         <PolarAngleAxis
           dataKey="axis"
-          tick={{ fill: "rgba(255,255,255,0.6)", fontSize: 12 }}
+          tick={{
+            fill: IS_TOSS ? "#6b7684" : "rgba(255,255,255,0.6)",
+            fontSize: 12,
+          }}
         />
         <Radar
           name="사주 오행 (선천)"
@@ -51,7 +56,10 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
           fillOpacity={0.3}
         />
         <Legend
-          wrapperStyle={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}
+          wrapperStyle={{
+            fontSize: "12px",
+            color: IS_TOSS ? "#4e5968" : "rgba(255,255,255,0.7)",
+          }}
         />
       </RadarChart>
     </ResponsiveContainer>

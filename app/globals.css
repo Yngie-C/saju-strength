@@ -9,6 +9,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * CSS Layer 관계:
+ * 1. :root          — 다크 테마 기본값 (웹 Vercel 빌드)
+ * 2. .tds-theme      — TDS 라이트 테마 오버라이드 (토스 빌드 전용)
+ * 3. Tailwind utils  — 컴포넌트별 유틸리티 (IS_TOSS 분기로 적용)
+ * 4. 콘텐츠 고유 색상 — ELEMENT_COLORS, TYPE_CONFIG (테마 독립)
+ *
+ * .tds-theme는 :root 다크 변수를 "완전히" 오버라이드한다.
+ * body에 .tds-theme이 있으면 라이트, 없으면 다크.
+ */
+
 @layer base {
   :root {
     --background: 222 47% 4%;
@@ -30,6 +41,30 @@
     --border: 217 32% 17%;
     --input: 217 32% 17%;
     --ring: 262 83% 58%;
+    --radius: 0.75rem;
+  }
+
+  /* TDS Light Theme (토스 앱인토스 전용) */
+  .tds-theme {
+    --background: 0 0% 100%;
+    --foreground: 213 24% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 213 24% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 24% 13%;
+    --primary: 213 92% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 9% 95%;
+    --secondary-foreground: 213 17% 25%;
+    --muted: 210 9% 95%;
+    --muted-foreground: 211 12% 47%;
+    --accent: 210 9% 95%;
+    --accent-foreground: 213 17% 25%;
+    --destructive: 354 87% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 14% 89%;
+    --input: 210 14% 89%;
+    --ring: 213 92% 58%;
     --radius: 0.75rem;
   }
 }

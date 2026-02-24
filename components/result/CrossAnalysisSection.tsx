@@ -3,6 +3,34 @@
 import { DualRadarChart } from "@/components/result/DualRadarChart";
 import { CrossAnalysisType, FiveElement } from "@/types/saju";
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
+const styles = IS_TOSS ? {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-400 uppercase',
+  sectionTitle: 'text-t3 font-bold text-tds-grey-900',
+  sectionSubtitle: 'text-tds-grey-400 font-normal text-lg',
+  sectionDesc: 'text-sm text-tds-grey-500',
+  card: 'rounded-2xl border border-tds-grey-200 bg-white p-6',
+  cardTitle: 'text-sm font-semibold text-tds-grey-500 mb-4',
+  matrixDesc: 'text-[11px] text-tds-grey-400',
+  matrixEmpty: 'text-xs text-tds-grey-300',
+  matrixItem: 'text-xs text-tds-grey-500 flex items-center gap-2',
+  insightTitle: 'text-sm font-semibold text-tds-grey-500',
+  insightText: 'text-sm text-tds-grey-600 leading-relaxed pl-5',
+} : {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-purple-400/70 uppercase',
+  sectionTitle: 'text-2xl font-bold text-foreground',
+  sectionSubtitle: 'text-white/40 font-normal text-lg',
+  sectionDesc: 'text-sm text-white/50',
+  card: 'rounded-2xl border border-white/10 p-6',
+  cardTitle: 'text-sm font-semibold text-white/60 mb-4',
+  matrixDesc: 'text-[11px] text-white/40',
+  matrixEmpty: 'text-xs text-white/30',
+  matrixItem: 'text-xs text-white/60 flex items-center gap-2',
+  insightTitle: 'text-sm font-semibold text-white/60',
+  insightText: 'text-sm text-white/65 leading-relaxed pl-5',
+} as const;
+
 interface AxisData {
   element: FiveElement;
   psaCategory: string;
@@ -109,26 +137,26 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
     <section className="space-y-8">
       {/* Section Header */}
       <div className="space-y-1">
-        <p className="text-xs font-semibold tracking-widest text-purple-400/70 uppercase">
+        <p className={styles.sectionLabel}>
           Section C
         </p>
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className={styles.sectionTitle}>
           교차 분석{" "}
-          <span className="text-white/40 font-normal text-lg">
+          <span className={styles.sectionSubtitle}>
             - 선천 × 후천
           </span>
         </h2>
-        <p className="text-sm text-white/50">
+        <p className={styles.sectionDesc}>
           사주 오행(타고난 기질)과 PSA 강점(현재 강점)을 겹쳐 분석합니다
         </p>
       </div>
 
       {/* Dual Radar Chart */}
       <div
-        className="rounded-2xl border border-white/10 p-6"
-        style={{ background: "rgba(255,255,255,0.03)" }}
+        className={styles.card}
+        style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
       >
-        <h3 className="text-sm font-semibold text-white/60 mb-4">
+        <h3 className={styles.cardTitle}>
           선천 · 후천 이중 레이더
         </h3>
         <DualRadarChart elementData={elementData} psaData={psaData} />
@@ -145,7 +173,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
               className="rounded-2xl border p-5 space-y-3"
               style={{
                 borderColor: `${cfg.color}30`,
-                background: `${cfg.color}08`,
+                background: IS_TOSS ? `${cfg.color}06` : `${cfg.color}08`,
               }}
             >
               <div className="flex items-center gap-2">
@@ -162,17 +190,17 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
                   >
                     {cfg.label}
                   </p>
-                  <p className="text-[11px] text-white/40">{cfg.description}</p>
+                  <p className={styles.matrixDesc}>{cfg.description}</p>
                 </div>
               </div>
               {items.length === 0 ? (
-                <p className="text-xs text-white/30">해당 없음</p>
+                <p className={styles.matrixEmpty}>해당 없음</p>
               ) : (
                 <div className="space-y-2">
                   {items.map((ax, i) => (
                     <div
                       key={i}
-                      className="text-xs text-white/60 flex items-center gap-2"
+                      className={styles.matrixItem}
                     >
                       <span
                         className="w-2 h-2 rounded-full flex-shrink-0"
@@ -192,7 +220,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
 
       {/* Insight Cards */}
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-white/60">축별 인사이트</h3>
+        <h3 className={styles.insightTitle}>축별 인사이트</h3>
         {axes.map((ax, i) => {
           const cfg = TYPE_CONFIG[ax.type];
           const axisLabel = ELEMENT_TO_AXIS[ax.element];
@@ -202,7 +230,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
               className="rounded-xl border p-4 space-y-1.5"
               style={{
                 borderColor: `${cfg.color}25`,
-                background: `${cfg.color}06`,
+                background: IS_TOSS ? `${cfg.color}05` : `${cfg.color}06`,
               }}
             >
               <div className="flex items-center gap-2">
@@ -225,7 +253,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
                   {cfg.label}
                 </span>
               </div>
-              <p className="text-sm text-white/65 leading-relaxed pl-5">
+              <p className={styles.insightText}>
                 {ax.insight}
               </p>
             </div>

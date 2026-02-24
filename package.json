@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:web": "BUILD_TARGET=web next build",
-    "build:toss": "mv app/p app/_p_excluded && BUILD_TARGET=toss next build; STATUS=$?; mv app/_p_excluded app/p; exit $STATUS"
+    "build:web": "NEXT_PUBLIC_BUILD_TARGET=web next build",
+    "build:toss": "mv app/p app/_p_excluded && NEXT_PUBLIC_BUILD_TARGET=toss next build; STATUS=$?; mv app/_p_excluded app/p; exit $STATUS"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

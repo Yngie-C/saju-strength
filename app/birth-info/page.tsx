@@ -8,6 +8,36 @@ import { apiUrl } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
 import Link from 'next/link';
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
+const styles = IS_TOSS ? {
+  page: 'min-h-screen bg-white',
+  container: 'px-6 py-6 pb-[calc(100px+env(safe-area-inset-bottom))]',
+  title: 'text-t3 font-bold text-tds-grey-900',
+  subtitle: 'text-st8 text-tds-grey-700',
+  card: 'bg-white border border-tds-grey-200 rounded-xl p-6',
+  stepActive: 'w-8 h-8 rounded-full bg-tds-blue-500 text-white flex items-center justify-center text-t7 font-bold',
+  stepInactive: 'w-8 h-8 rounded-full border-2 border-tds-grey-300 text-tds-grey-500 flex items-center justify-center text-t7',
+  stepLine: 'h-0.5 flex-1 bg-tds-grey-200',
+  stepLineActive: 'h-0.5 flex-1 bg-tds-blue-500',
+  stepLabel: 'text-st11 text-tds-blue-500 font-medium',
+  stepLabelInactive: 'text-st11 text-tds-grey-500',
+  error: 'text-st10 text-tds-red-500',
+} : {
+  page: 'min-h-screen bg-background',
+  container: 'px-4 py-8 max-w-2xl mx-auto pb-32',
+  title: 'text-2xl font-bold text-white',
+  subtitle: 'text-sm text-white/70',
+  card: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-6',
+  stepActive: 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold',
+  stepInactive: 'w-8 h-8 rounded-full border-2 border-white/20 text-white/40 flex items-center justify-center text-xs',
+  stepLine: 'h-0.5 flex-1 bg-white/10',
+  stepLineActive: 'h-0.5 flex-1 bg-primary',
+  stepLabel: 'text-xs text-primary font-medium',
+  stepLabelInactive: 'text-xs text-white/40',
+  error: 'text-sm text-red-400',
+} as const;
+
 export default function BirthInfoPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +85,7 @@ export default function BirthInfoPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12">
+    <main className={`min-h-screen ${IS_TOSS ? 'bg-white' : 'bg-background'} flex flex-col items-center justify-center ${IS_TOSS ? 'px-6' : 'px-4'} py-12`}>
       {/* 단계 표시 */}
       <motion.div
         initial={{ opacity: 0, y: -16 }}
@@ -68,13 +98,13 @@ export default function BirthInfoPage() {
             <div
               className={
                 step === 1
-                  ? "w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-white"
-                  : "w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-sm font-medium text-white/30"
+                  ? styles.stepActive
+                  : styles.stepInactive
               }
             >
               {step}
             </div>
-            {step < 4 && <div className="w-8 h-px bg-white/15" />}
+            {step < 4 && <div className={styles.stepLine} />}
           </div>
         ))}
       </motion.div>
@@ -85,7 +115,7 @@ export default function BirthInfoPage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
         className="w-full max-w-md rounded-2xl border border-white/10 p-8"
-        style={{
+        style={IS_TOSS ? undefined : {
           background: "rgba(255,255,255,0.04)",
           backdropFilter: "blur(16px)",
         }}
@@ -95,8 +125,8 @@ export default function BirthInfoPage() {
           <p className="text-xs font-semibold text-primary/80 tracking-widest uppercase mb-2">
             Step 1 / 4
           </p>
-          <h1 className="text-2xl font-bold text-white">생년월일 입력</h1>
-          <p className="mt-2 text-sm text-white/50">
+          <h1 className={styles.title}>생년월일 입력</h1>
+          <p className={`mt-2 ${styles.subtitle}`}>
             정확한 사주 분석을 위해 생년월일시를 입력해주세요.
           </p>
         </div>
@@ -144,7 +174,7 @@ export default function BirthInfoPage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-4 text-sm text-red-400 text-center"
+            className={`mt-4 text-center ${styles.error}`}
           >
             {error}
           </motion.p>

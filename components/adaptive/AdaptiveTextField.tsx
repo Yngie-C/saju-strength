@@ -48,17 +48,18 @@ export function AdaptiveTextField({
   }
 
   if (IS_TOSS && !TDSTextField) {
-    // TDS unavailable — fallback plain input
     return (
       <div className={className}>
-        {label && <label className="block text-sm font-medium mb-1">{label}</label>}
+        {label && (
+          <label className="block text-st10 font-medium text-tds-grey-700 mb-1.5">{label}</label>
+        )}
         <input
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-base"
+          className="w-full px-4 py-3 rounded-[14px] border border-tds-grey-200 bg-tds-grey-50 text-tds-grey-900 text-st8 placeholder:text-tds-grey-500 focus:outline-none focus:border-tds-blue-500 focus:ring-1 focus:ring-tds-blue-500 caret-tds-blue-500 transition-colors disabled:opacity-40"
         />
       </div>
     );

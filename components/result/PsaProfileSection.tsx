@@ -8,6 +8,44 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
+const styles = IS_TOSS ? {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-400 uppercase',
+  sectionTitle: 'text-t3 font-bold text-tds-grey-900',
+  sectionSubtitle: 'text-tds-grey-400 font-normal text-lg',
+  card: 'rounded-2xl border border-tds-grey-200 bg-white p-6',
+  cardTitle: 'text-sm font-semibold text-tds-grey-500 mb-2',
+  personaCard: 'rounded-2xl border border-tds-grey-200 bg-white p-6 space-y-4',
+  personaCardTitle: 'text-sm font-semibold text-tds-grey-500',
+  personaTitle: 'text-2xl font-bold text-tds-blue-600',
+  personaTagline: 'text-sm text-tds-grey-500 mt-1 italic',
+  strengthsSummary: 'text-sm text-tds-grey-600 leading-relaxed',
+  scoreCard: 'rounded-2xl border border-tds-grey-200 bg-white p-6 space-y-4',
+  scoreCardTitle: 'text-sm font-semibold text-tds-grey-500',
+  scoreLabel: 'text-sm text-tds-grey-600 w-20 flex-shrink-0',
+  scoreBar: 'flex-1 h-2 rounded-full bg-tds-grey-100 overflow-hidden',
+  radarGridStroke: 'rgba(0,0,0,0.08)',
+  radarTickFill: '#6B7280',
+} : {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-cyan-400/70 uppercase',
+  sectionTitle: 'text-2xl font-bold text-foreground',
+  sectionSubtitle: 'text-white/40 font-normal text-lg',
+  card: 'rounded-2xl border border-white/10 p-6',
+  cardTitle: 'text-sm font-semibold text-white/60 mb-2',
+  personaCard: 'rounded-2xl border border-cyan-400/20 p-6 space-y-4',
+  personaCardTitle: 'text-sm font-semibold text-white/60',
+  personaTitle: 'text-2xl font-bold text-cyan-300',
+  personaTagline: 'text-sm text-white/50 mt-1 italic',
+  strengthsSummary: 'text-sm text-white/70 leading-relaxed',
+  scoreCard: 'rounded-2xl border border-white/10 p-6 space-y-4',
+  scoreCardTitle: 'text-sm font-semibold text-white/60',
+  scoreLabel: 'text-sm text-white/70 w-20 flex-shrink-0',
+  scoreBar: 'flex-1 h-2 rounded-full bg-white/10 overflow-hidden',
+  radarGridStroke: 'rgba(255,255,255,0.1)',
+  radarTickFill: 'rgba(255,255,255,0.6)',
+} as const;
+
 interface CategoryScore {
   category: string;
   normalizedScore: number;
@@ -49,30 +87,30 @@ export function PsaProfileSection({
     <section className="space-y-8">
       {/* Section Header */}
       <div className="space-y-1">
-        <p className="text-xs font-semibold tracking-widest text-cyan-400/70 uppercase">
+        <p className={styles.sectionLabel}>
           Section B
         </p>
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className={styles.sectionTitle}>
           PSA 강점 프로필{" "}
-          <span className="text-white/40 font-normal text-lg">- 현재 강점</span>
+          <span className={styles.sectionSubtitle}>- 현재 강점</span>
         </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Radar Chart */}
         <div
-          className="rounded-2xl border border-white/10 p-6"
-          style={{ background: "rgba(255,255,255,0.03)" }}
+          className={styles.card}
+          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
         >
-          <h3 className="text-sm font-semibold text-white/60 mb-2">
+          <h3 className={styles.cardTitle}>
             5차원 강점 레이더
           </h3>
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart cx="50%" cy="50%" outerRadius={90} data={radarData}>
-              <PolarGrid stroke="rgba(255,255,255,0.1)" />
+              <PolarGrid stroke={styles.radarGridStroke} />
               <PolarAngleAxis
                 dataKey="category"
-                tick={{ fill: "rgba(255,255,255,0.6)", fontSize: 11 }}
+                tick={{ fill: styles.radarTickFill, fontSize: 11 }}
               />
               <Radar
                 name="PSA 점수"
@@ -87,23 +125,23 @@ export function PsaProfileSection({
 
         {/* Persona Card */}
         <div
-          className="rounded-2xl border border-cyan-400/20 p-6 space-y-4"
-          style={{
+          className={styles.personaCard}
+          style={IS_TOSS ? undefined : {
             background:
               "linear-gradient(160deg, rgba(6,182,212,0.08) 0%, rgba(6,182,212,0.02) 100%)",
           }}
         >
-          <h3 className="text-sm font-semibold text-white/60">나의 페르소나</h3>
+          <h3 className={styles.personaCardTitle}>나의 페르소나</h3>
           <div>
-            <p className="text-2xl font-bold text-cyan-300">{persona.title}</p>
+            <p className={styles.personaTitle}>{persona.title}</p>
             {persona.tagline && (
-              <p className="text-sm text-white/50 mt-1 italic">
+              <p className={styles.personaTagline}>
                 &ldquo;{persona.tagline}&rdquo;
               </p>
             )}
           </div>
 
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className={styles.strengthsSummary}>
             {strengthsSummary}
           </p>
         </div>
@@ -111,10 +149,10 @@ export function PsaProfileSection({
 
       {/* Category Score Bars */}
       <div
-        className="rounded-2xl border border-white/10 p-6 space-y-4"
-        style={{ background: "rgba(255,255,255,0.03)" }}
+        className={styles.scoreCard}
+        style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
       >
-        <h3 className="text-sm font-semibold text-white/60">카테고리별 점수</h3>
+        <h3 className={styles.scoreCardTitle}>카테고리별 점수</h3>
         <div className="space-y-3">
           {sorted.map((cs, i) => {
             const label = CATEGORY_LABELS[cs.category] ?? cs.category;
@@ -129,11 +167,11 @@ export function PsaProfileSection({
                   {cs.rank}
                 </span>
                 {/* Label */}
-                <span className="text-sm text-white/70 w-20 flex-shrink-0">
+                <span className={styles.scoreLabel}>
                   {label}
                 </span>
                 {/* Bar */}
-                <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                <div className={styles.scoreBar}>
                   <div
                     className="h-full rounded-full transition-all duration-700"
                     style={{

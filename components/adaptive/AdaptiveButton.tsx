@@ -51,13 +51,20 @@ export function AdaptiveButton({
   }
 
   if (IS_TOSS && !TDSButton) {
-    // TDS unavailable — fallback plain button
+    const variantClass = variant === 'primary'
+      ? 'bg-tds-blue-500 text-white hover:bg-tds-blue-600 active:bg-tds-blue-700'
+      : variant === 'secondary'
+      ? 'bg-tds-grey-100 text-tds-grey-900 hover:bg-tds-grey-200 active:bg-tds-grey-300'
+      : 'bg-transparent text-tds-grey-700 hover:bg-tds-grey-100';
+    const sizeClass = size === 'sm' ? 'h-10 px-4 text-st10'
+      : size === 'lg' ? 'h-14 px-6 text-t5'
+      : 'h-12 px-5 text-st8';
     return (
       <button
         type={type}
         onClick={onClick}
         disabled={disabled}
-        className={`tds-button tds-button--${variant} tds-button--${size} ${className}`}
+        className={`rounded-[14px] font-semibold transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed ${variantClass} ${sizeClass} ${className}`}
       >
         {children}
       </button>

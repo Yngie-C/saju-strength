@@ -42,18 +42,27 @@ export function AdaptiveCheckbox({
   }
 
   if (IS_TOSS && !TDSCheckbox) {
-    // TDS unavailable — fallback plain checkbox
     return (
       <label className={`flex items-start gap-3 cursor-pointer ${className}`}>
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
-          className="mt-0.5 w-5 h-5 rounded accent-blue-500"
-        />
+        <span
+          role="checkbox"
+          aria-checked={checked}
+          onClick={() => onChange(!checked)}
+          className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+            checked
+              ? 'bg-tds-blue-500 border-tds-blue-500'
+              : 'border-tds-grey-300 bg-white'
+          }`}
+        >
+          {checked && (
+            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </span>
         <div>
-          <span className="text-sm font-medium text-gray-900">{label}</span>
-          {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
+          <span className="text-st8 font-medium text-tds-grey-900">{label}</span>
+          {description && <p className="text-st11 text-tds-grey-600 mt-1">{description}</p>}
         </div>
       </label>
     );

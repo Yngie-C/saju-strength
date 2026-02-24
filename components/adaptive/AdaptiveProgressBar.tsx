@@ -32,7 +32,7 @@ export function AdaptiveProgressBar({
       <div className={className}>
         <TDSProgressBar value={progress} />
         {milestoneMessage && (
-          <p className="text-xs text-blue-500 font-medium mt-1.5 text-center animate-pulse">
+          <p className="text-st11 text-tds-blue-500 font-medium mt-1.5 text-center animate-pulse">
             {milestoneMessage}
           </p>
         )}
@@ -41,17 +41,16 @@ export function AdaptiveProgressBar({
   }
 
   if (IS_TOSS && !TDSProgressBar) {
-    // TDS unavailable — fallback plain progress bar
     return (
       <div className={className}>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-1 bg-tds-grey-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-300"
+            className="h-full bg-[#4593fc] rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
         {milestoneMessage && (
-          <p className="text-xs text-blue-500 font-medium mt-1.5 text-center animate-pulse">
+          <p className="text-st11 text-tds-blue-500 font-medium mt-1.5 text-center animate-pulse">
             {milestoneMessage}
           </p>
         )}

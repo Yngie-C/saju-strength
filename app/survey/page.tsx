@@ -21,6 +21,55 @@ const LIKERT_LABELS: Record<number, string> = {
   7: '매우 그렇다',
 };
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
+const styles = IS_TOSS ? {
+  page: 'min-h-screen bg-white',
+  // Sticky header
+  header: 'sticky top-0 z-30 bg-white border-b border-tds-grey-200',
+  headerTitle: 'text-t5 font-semibold text-tds-grey-900',
+  // Question card
+  questionCard: 'bg-tds-grey-50 rounded-xl border border-tds-grey-200 p-5',
+  questionNumber: 'bg-tds-blue-50 text-tds-blue-500 rounded-full px-2.5 py-0.5 text-st11 font-medium',
+  questionText: 'text-t5 font-semibold text-tds-grey-900',
+  questionCategory: 'text-st11 text-tds-grey-500',
+  // Likert scale buttons
+  likertSelected: 'bg-tds-blue-500 text-white border-tds-blue-500 rounded-xl',
+  likertUnselected: 'bg-tds-grey-100 border border-tds-grey-300 text-tds-grey-700 rounded-xl hover:bg-tds-grey-200',
+  likertLabel: 'text-st11 text-tds-grey-500',
+  // Bottom navigation
+  bottomNav: 'fixed bottom-0 left-0 right-0 bg-white z-40',
+  bottomGradient: 'h-9 bg-gradient-to-b from-transparent to-white pointer-events-none -mt-9',
+  // Page dots
+  dotActive: 'w-2.5 h-2.5 rounded-full bg-tds-blue-500',
+  dotCompleted: 'w-2 h-2 rounded-full bg-tds-blue-200',
+  dotPending: 'w-2 h-2 rounded-full bg-tds-grey-300',
+  // Container
+  container: 'px-6 py-4 pb-[calc(120px+env(safe-area-inset-bottom))]',
+  // Misc
+  bodyText: 'text-st8 text-tds-grey-700',
+  caption: 'text-st11 text-tds-grey-500',
+} : {
+  page: 'min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900',
+  header: 'sticky top-0 z-30 bg-slate-900/80 backdrop-blur-md border-b border-white/10',
+  headerTitle: 'text-lg font-semibold text-white',
+  questionCard: 'bg-white/90 rounded-2xl p-5 shadow-lg',
+  questionNumber: 'bg-indigo-100 text-indigo-700 rounded-full px-2.5 py-0.5 text-xs font-medium',
+  questionText: 'text-lg font-semibold text-slate-900',
+  questionCategory: 'text-xs text-slate-500',
+  likertSelected: 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-transparent rounded-xl',
+  likertUnselected: 'bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50',
+  likertLabel: 'text-xs text-slate-400',
+  bottomNav: 'fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-white/10 z-40',
+  bottomGradient: '',
+  dotActive: 'w-2.5 h-2.5 rounded-full bg-indigo-500',
+  dotCompleted: 'w-2 h-2 rounded-full bg-indigo-300',
+  dotPending: 'w-2 h-2 rounded-full bg-white/20',
+  container: 'px-4 py-4 pb-32',
+  bodyText: 'text-sm text-white/70',
+  caption: 'text-xs text-white/40',
+} as const;
+
 export default function SurveyPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
@@ -176,26 +225,26 @@ export default function SurveyPage() {
   const allAnswered = SURVEY_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+    <div className={styles.page}>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-3">
+      <div className={styles.header}>
+        <div className={`max-w-2xl mx-auto ${IS_TOSS ? 'px-6' : 'px-4'} py-3`}>
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 text-slate-400 text-sm">
+            <div className={`flex items-center gap-2 text-sm ${styles.caption}`}>
               <Clock className="w-4 h-4" />
               <span>남은 시간: 약 {estimatedMinutesLeft}분</span>
             </div>
-            <span className="text-slate-400 text-sm">
+            <span className={`text-sm ${styles.caption}`}>
               {totalAnswered} / {SURVEY_QUESTIONS.length} 완료
             </span>
           </div>
           {/* Progress bar */}
           <AdaptiveProgressBar progress={progress} milestoneMessage={milestoneMessage} />
           <div className="flex justify-between mt-1">
-            <span className="text-xs text-slate-500">
+            <span className={styles.caption}>
               {currentPage + 1} / {TOTAL_PAGES} 페이지
             </span>
-            <span className="text-xs text-indigo-400 font-medium">
+            <span className={IS_TOSS ? 'text-st11 text-tds-blue-500 font-medium' : 'text-xs text-indigo-400 font-medium'}>
               {Math.round(progress)}%
             </span>
           </div>
@@ -203,13 +252,13 @@ export default function SurveyPage() {
       </div>
 
       {/* Main content */}
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-32" {...swipeHandlers}>
+      <div className={`max-w-2xl mx-auto ${styles.container}`} {...swipeHandlers}>
         {/* Page title */}
         <div className="mb-6 text-center">
-          <h1 className="text-xl font-bold text-white">
+          <h1 className={IS_TOSS ? 'text-t4 font-bold text-tds-grey-900' : 'text-xl font-bold text-white'}>
             강점 역량 설문 (PSA)
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className={`mt-1 ${styles.bodyText}`}>
             각 문항을 읽고 본인과 얼마나 일치하는지 선택해 주세요
           </p>
         </div>
@@ -231,13 +280,13 @@ export default function SurveyPage() {
               return (
                 <div
                   key={question.id}
-                  className="bg-white/90 backdrop-blur-md rounded-2xl p-5 shadow-lg"
+                  className={IS_TOSS ? styles.questionCard : 'bg-white/90 backdrop-blur-md rounded-2xl p-5 shadow-lg'}
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">
+                    <span className={`flex-shrink-0 w-7 h-7 flex items-center justify-center text-sm font-bold ${styles.questionNumber}`}>
                       {globalIdx}
                     </span>
-                    <p className="text-slate-800 font-medium leading-relaxed text-sm sm:text-base">
+                    <p className={IS_TOSS ? 'font-medium leading-relaxed text-sm text-tds-grey-800' : 'text-slate-800 font-medium leading-relaxed text-sm sm:text-base'}>
                       {question.questionText}
                     </p>
                   </div>
@@ -245,7 +294,7 @@ export default function SurveyPage() {
                   {/* Likert scale */}
                   <div className="space-y-2">
                     {/* Labels */}
-                    <div className="flex justify-between text-xs text-slate-500 px-1">
+                    <div className={`flex justify-between px-1 ${styles.likertLabel}`}>
                       <span>전혀 아님</span>
                       <span>보통</span>
                       <span>매우 그렇다</span>
@@ -255,20 +304,26 @@ export default function SurveyPage() {
                       {[1, 2, 3, 4, 5, 6, 7].map((value) => {
                         const isSelected = selectedValue === value;
                         return (
-                          <button
+                          <motion.button
                             key={value}
                             onClick={() => handleAnswer(question.id, value)}
+                            whileHover={IS_TOSS ? undefined : { scale: 1.02 }}
+                            whileTap={{ scale: 0.95 }}
                             className={[
-                              'flex-1 min-w-[36px] min-h-[44px] rounded-full flex items-center justify-center',
+                              'flex-1 min-w-[36px] min-h-[44px] flex items-center justify-center',
                               'text-sm font-bold transition-all duration-200',
                               isSelected
-                                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white ring-4 ring-indigo-300 scale-110 shadow-lg'
-                                : 'bg-gray-100 border-2 border-gray-300 text-gray-600 hover:border-indigo-400 hover:bg-indigo-50 active:scale-95',
+                                ? IS_TOSS
+                                  ? `${styles.likertSelected} ring-2 ring-tds-blue-300 scale-110 shadow-md`
+                                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white ring-4 ring-indigo-300 scale-110 shadow-lg rounded-xl'
+                                : IS_TOSS
+                                  ? styles.likertUnselected
+                                  : 'bg-gray-100 border-2 border-gray-300 text-gray-600 hover:border-indigo-400 hover:bg-indigo-50 active:scale-95 rounded-full',
                             ].join(' ')}
                             aria-label={`${value}점${LIKERT_LABELS[value] ? ` (${LIKERT_LABELS[value]})` : ''}`}
                           >
                             {value}
-                          </button>
+                          </motion.button>
                         );
                       })}
                     </div>
@@ -280,19 +335,21 @@ export default function SurveyPage() {
         </AnimatePresence>
 
         {/* Mobile swipe hint */}
-        <p className="text-center text-xs text-slate-600 mt-4">
+        <p className={`text-center mt-4 ${styles.caption}`}>
           좌우로 스와이프하거나 버튼을 눌러 이동하세요
         </p>
       </div>
 
       {/* Bottom navigation - fixed */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-white/10 px-4 py-4">
+      <div className={`${styles.bottomNav} ${IS_TOSS ? 'px-6' : 'px-4'} py-4`}>
+        {IS_TOSS && <div className={styles.bottomGradient} />}
         <div className="max-w-2xl mx-auto flex gap-3">
           <button
             onClick={handlePrev}
             disabled={currentPage === 0}
-            className="flex items-center gap-1 px-4 py-3 rounded-xl bg-white/10 text-white font-medium
-                       disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors"
+            className={IS_TOSS
+              ? 'flex items-center gap-1 px-4 py-3 rounded-xl bg-tds-grey-100 text-tds-grey-700 font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-tds-grey-200 transition-colors'
+              : 'flex items-center gap-1 px-4 py-3 rounded-xl bg-white/10 text-white font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors'}
           >
             <ChevronLeft className="w-5 h-5" />
             이전
@@ -302,11 +359,9 @@ export default function SurveyPage() {
             <button
               onClick={handleSubmit}
               disabled={!allAnswered || isSubmitting}
-              className="flex-1 py-3 rounded-xl font-bold text-white transition-all duration-200
-                         bg-gradient-to-r from-indigo-600 to-purple-600
-                         disabled:opacity-40 disabled:cursor-not-allowed
-                         hover:from-indigo-500 hover:to-purple-500 hover:shadow-lg hover:shadow-indigo-500/30
-                         active:scale-[0.98]"
+              className={IS_TOSS
+                ? 'flex-1 py-3 rounded-xl font-bold text-white transition-all duration-200 bg-tds-blue-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-tds-blue-600 active:scale-[0.98]'
+                : 'flex-1 py-3 rounded-xl font-bold text-white transition-all duration-200 bg-gradient-to-r from-indigo-600 to-purple-600 disabled:opacity-40 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-purple-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]'}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
@@ -324,11 +379,9 @@ export default function SurveyPage() {
             <button
               onClick={handleNext}
               disabled={!currentPageAnswered}
-              className="flex-1 flex items-center justify-center gap-1 py-3 rounded-xl font-bold text-white
-                         bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-200
-                         disabled:opacity-40 disabled:cursor-not-allowed
-                         hover:from-indigo-500 hover:to-purple-500 hover:shadow-lg hover:shadow-indigo-500/30
-                         active:scale-[0.98]"
+              className={IS_TOSS
+                ? 'flex-1 flex items-center justify-center gap-1 py-3 rounded-xl font-bold text-white bg-tds-blue-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-tds-blue-600 active:scale-[0.98]'
+                : 'flex-1 flex items-center justify-center gap-1 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-purple-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]'}
             >
               다음
               <ChevronRight className="w-5 h-5" />
@@ -348,12 +401,12 @@ export default function SurveyPage() {
                 key={i}
                 onClick={() => goToPage(i)}
                 className={[
-                  'w-2 h-2 rounded-full transition-all duration-200',
+                  'transition-all duration-200',
                   i === currentPage
-                    ? 'w-6 bg-indigo-400'
+                    ? IS_TOSS ? 'w-6 h-2.5 rounded-full bg-tds-blue-500' : 'w-6 h-2 rounded-full bg-indigo-400'
                     : pageAnswered
-                    ? 'bg-indigo-600'
-                    : 'bg-slate-600',
+                    ? IS_TOSS ? styles.dotCompleted : 'w-2 h-2 rounded-full bg-indigo-600'
+                    : IS_TOSS ? styles.dotPending : 'w-2 h-2 rounded-full bg-slate-600',
                 ].join(' ')}
                 aria-label={`${i + 1}페이지로 이동`}
               />

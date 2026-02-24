@@ -5,6 +5,36 @@ import { SajuPillarCard } from "@/components/saju/SajuPillarCard";
 import { FiveElementsChart } from "@/components/saju/FiveElementsChart";
 import { Pillar, ElementDistribution } from "@/types/saju";
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
+const styles = IS_TOSS ? {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-500 uppercase',
+  sectionTitle: 'text-t3 font-bold text-tds-grey-900',
+  sectionSubtitle: 'text-tds-grey-400 font-normal text-lg',
+  emptyPillarCard: 'flex flex-col items-center justify-center rounded-2xl border border-tds-grey-200 bg-tds-grey-50 min-h-[160px]',
+  emptyPillarLabel: 'text-xs text-tds-grey-400',
+  emptyPillarSub: 'text-xs text-tds-grey-300 mt-1',
+  card: 'rounded-2xl border border-tds-grey-200 bg-white p-6',
+  cardTitle: 'text-sm font-semibold text-tds-grey-500 mb-4',
+  dayMasterCardTitle: 'text-sm font-semibold text-tds-grey-500',
+  dayMasterName: 'text-xl font-bold',
+  dayMasterSub: 'text-xs text-tds-grey-400',
+  dayMasterDesc: 'text-sm text-tds-grey-600 leading-relaxed',
+} : {
+  sectionLabel: 'text-xs font-semibold tracking-widest text-primary/70 uppercase',
+  sectionTitle: 'text-2xl font-bold text-foreground',
+  sectionSubtitle: 'text-white/40 font-normal text-lg',
+  emptyPillarCard: 'flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] min-h-[160px]',
+  emptyPillarLabel: 'text-xs text-white/30',
+  emptyPillarSub: 'text-xs text-white/20 mt-1',
+  card: 'rounded-2xl border border-white/10 p-6',
+  cardTitle: 'text-sm font-semibold text-white/60 mb-4',
+  dayMasterCardTitle: 'text-sm font-semibold text-white/60',
+  dayMasterName: 'text-xl font-bold',
+  dayMasterSub: 'text-xs text-white/40',
+  dayMasterDesc: 'text-sm text-white/70 leading-relaxed',
+} as const;
+
 interface DayMasterInfo {
   name: string;
   element: string;
@@ -54,12 +84,12 @@ export function SajuProfileSection({
     <section className="space-y-8">
       {/* Section Header */}
       <div className="space-y-1">
-        <p className="text-xs font-semibold tracking-widest text-primary/70 uppercase">
+        <p className={styles.sectionLabel}>
           Section A
         </p>
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className={styles.sectionTitle}>
           사주 프로필{" "}
-          <span className="text-white/40 font-normal text-lg">- 타고난 기질</span>
+          <span className={styles.sectionSubtitle}>- 타고난 기질</span>
         </h2>
       </div>
 
@@ -70,10 +100,10 @@ export function SajuProfileSection({
             return (
               <div
                 key={i}
-                className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] min-h-[160px]"
+                className={styles.emptyPillarCard}
               >
-                <span className="text-xs text-white/30">{label}</span>
-                <span className="text-xs text-white/20 mt-1">미입력</span>
+                <span className={styles.emptyPillarLabel}>{label}</span>
+                <span className={styles.emptyPillarSub}>미입력</span>
               </div>
             );
           }
@@ -95,19 +125,19 @@ export function SajuProfileSection({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Five Elements Chart */}
         <div
-          className="rounded-2xl border border-white/10 p-6"
-          style={{ background: "rgba(255,255,255,0.03)" }}
+          className={styles.card}
+          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
         >
-          <h3 className="text-sm font-semibold text-white/60 mb-4">오행 분포</h3>
+          <h3 className={styles.cardTitle}>오행 분포</h3>
           <FiveElementsChart distribution={elementDistribution} />
         </div>
 
         {/* Day Master Archetype */}
         <div
-          className="rounded-2xl border border-white/10 p-6 space-y-4"
-          style={{ background: "rgba(255,255,255,0.03)" }}
+          className={`${styles.card} space-y-4`}
+          style={IS_TOSS ? undefined : { background: "rgba(255,255,255,0.03)" }}
         >
-          <h3 className="text-sm font-semibold text-white/60">일간 아키타입</h3>
+          <h3 className={styles.dayMasterCardTitle}>일간 아키타입</h3>
 
           <div className="flex items-center gap-3">
             <div
@@ -121,16 +151,16 @@ export function SajuProfileSection({
             </div>
             <div>
               <p
-                className="text-xl font-bold"
+                className={styles.dayMasterName}
                 style={{ color: dominantColor }}
               >
                 {dayMaster.name}
               </p>
-              <p className="text-xs text-white/40">{dayMaster.image}</p>
+              <p className={styles.dayMasterSub}>{dayMaster.image}</p>
             </div>
           </div>
 
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className={styles.dayMasterDesc}>
             {dayMaster.description}
           </p>
 

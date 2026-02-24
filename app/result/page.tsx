@@ -13,6 +13,32 @@ import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { PremiumUpsellSection } from "@/components/result/PremiumUpsellSection";
 
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+
+const styles = IS_TOSS ? {
+  page: 'min-h-screen bg-white',
+  container: 'px-6 py-6',
+  title: 'text-t2 font-bold text-tds-grey-900',
+  subtitle: 'text-st8 text-tds-grey-700',
+  sectionTitle: 'text-t3 font-bold text-tds-grey-900',
+  bodyText: 'text-st8 text-tds-grey-700',
+  caption: 'text-st11 text-tds-grey-500',
+  card: 'bg-white border border-tds-grey-200 rounded-xl p-5',
+  divider: 'border-t border-tds-grey-200 my-8',
+  shareButton: 'bg-tds-blue-500 text-white rounded-[14px] px-6 py-3 font-semibold text-t6',
+} : {
+  page: 'min-h-screen bg-background text-foreground',
+  container: 'px-4 py-8 max-w-2xl mx-auto',
+  title: 'text-3xl font-bold text-white',
+  subtitle: 'text-sm text-white/70',
+  sectionTitle: 'text-2xl font-bold text-white',
+  bodyText: 'text-sm text-white/70',
+  caption: 'text-xs text-white/40',
+  card: 'bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-5',
+  divider: 'border-t border-white/10 my-8',
+  shareButton: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl px-6 py-3 font-bold',
+} as const;
+
 // Parse growthGuide string back into structured form
 function parseGrowthGuide(raw: string): {
   summary: string;
@@ -41,14 +67,14 @@ function parseGrowthGuide(raw: string): {
 
 function SectionDivider() {
   return (
-    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-2" />
+    <div className={styles.divider} />
   );
 }
 
 function SkeletonBlock({ h = "h-40" }: { h?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse ${h}`}
+      className={`rounded-2xl border ${IS_TOSS ? 'border-tds-grey-200 bg-tds-grey-50' : 'border-white/5 bg-white/[0.03]'} animate-pulse ${h}`}
     />
   );
 }
@@ -148,14 +174,14 @@ export default function ResultPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="max-w-2xl mx-auto px-4 py-12 space-y-8">
+      <div className={styles.page}>
+        <div className={`${IS_TOSS ? 'px-6 py-12' : 'max-w-2xl mx-auto px-4 py-12'} space-y-8`}>
           <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-2 text-primary">
+            <div className={`inline-flex items-center gap-2 ${IS_TOSS ? 'text-tds-blue-500' : 'text-primary'}`}>
               <span className="animate-spin text-xl">⟳</span>
               <span className="text-sm font-medium">교차 분석 중...</span>
             </div>
-            <p className="text-xs text-white/40">
+            <p className={styles.caption}>
               사주 오행과 PSA 강점을 비교 분석하고 있습니다
             </p>
           </div>
@@ -170,13 +196,13 @@ export default function ResultPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+      <div className={`${styles.page} flex items-center justify-center px-4`}>
         <div className="text-center space-y-4 max-w-sm">
           <p className="text-4xl">⚠</p>
-          <p className="text-white/70 text-sm">{error}</p>
+          <p className={styles.bodyText}>{error}</p>
           <button
             onClick={() => (window.location.href = "/")}
-            className="mt-4 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold"
+            className={`mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold ${IS_TOSS ? 'bg-tds-blue-500 text-white' : 'bg-primary text-white'}`}
           >
             처음으로
           </button>
@@ -224,8 +250,8 @@ export default function ResultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-2xl mx-auto px-4 py-12 space-y-12">
+    <div className={styles.page}>
+      <div className={`${IS_TOSS ? styles.container : 'max-w-2xl mx-auto px-4 py-12'} space-y-12`}>
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -233,10 +259,10 @@ export default function ResultPage() {
           transition={{ duration: 0.5 }}
           className="text-center space-y-2"
         >
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className={styles.title}>
             나의 강점 분석 리포트
           </h1>
-          <p className="text-sm text-white/50">
+          <p className={styles.subtitle}>
             사주 오행 × PSA 강점 — 선천과 후천의 교차
           </p>
         </motion.div>
@@ -346,8 +372,8 @@ export default function ResultPage() {
         >
           <button
             onClick={handleShare}
-            className="flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200"
-            style={{
+            className={`flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${IS_TOSS ? 'bg-tds-blue-500 text-white' : ''}`}
+            style={IS_TOSS ? undefined : {
               background: "linear-gradient(135deg, #a855f7 0%, #6366f1 100%)",
               color: "#fff",
             }}
@@ -358,16 +384,18 @@ export default function ResultPage() {
               ? "공유 완료!"
               : "결과 공유하기"}
           </button>
-          <button
-            onClick={() => (window.location.href = "/p")}
-            className="flex-1 py-3.5 rounded-xl border border-white/15 text-white/70 font-semibold text-sm hover:bg-white/5 transition-all duration-200"
-          >
-            웹 프로필 만들기
-          </button>
+          {!IS_TOSS && (
+            <button
+              onClick={() => (window.location.href = "/p")}
+              className="flex-1 py-3.5 rounded-xl border border-white/15 text-white/70 font-semibold text-sm hover:bg-white/5 transition-all duration-200"
+            >
+              웹 프로필 만들기
+            </button>
+          )}
         </motion.div>
 
         {/* Disclaimer */}
-        <p className="text-center text-[11px] text-white/25 leading-relaxed pb-8">
+        <p className={`text-center leading-relaxed pb-8 ${IS_TOSS ? 'text-[11px] text-tds-grey-400' : 'text-[11px] text-white/25'}`}>
           이 서비스는 재미와 자기 이해를 위한 도구이며, 의학적/심리학적 진단을
           대체하지 않습니다.
         </p>

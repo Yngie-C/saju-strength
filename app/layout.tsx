@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { cn } from '@/lib/utils';
 import "./globals.css";
 import { TDSProvider } from '@/components/adaptive/TDSProvider';
+
+const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
 export const metadata: Metadata = {
   title: "사주강점 - 타고난 기질 x 현재 강점",
@@ -21,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className="font-sans"
+        className={cn("font-sans", IS_TOSS && "tds-theme")}
         style={{ fontFamily: "'PretendardVariable', 'Inter', system-ui, sans-serif" }}
       >
         <TDSProvider>

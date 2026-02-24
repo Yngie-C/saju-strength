@@ -48,16 +48,18 @@ export function AdaptiveBottomCTA({
   }
 
   if (IS_TOSS && !TDSBottomCTA) {
-    // TDS unavailable — fallback plain button
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-white safe-area-pb">
-        {topAccessory && <div className="px-4 py-2 border-t">{topAccessory}</div>}
-        <div className="px-4 py-3">
+      <div className="fixed bottom-0 left-0 right-0 bg-white z-50">
+        <div className="h-9 bg-gradient-to-b from-transparent to-white pointer-events-none -mt-9" />
+        {topAccessory && <div className="px-5 py-2">{topAccessory}</div>}
+        <div className="px-5 pb-[calc(12px+env(safe-area-inset-bottom))]">
           <button
             onClick={onClick}
             disabled={disabled}
-            className={`w-full py-4 rounded-2xl font-bold text-white text-base transition-all ${
-              disabled ? 'bg-gray-300' : 'bg-blue-500 active:bg-blue-600'
+            className={`w-full py-4 rounded-[14px] font-bold text-white text-t5 transition-colors ${
+              disabled
+                ? 'bg-tds-grey-300 cursor-not-allowed'
+                : 'bg-tds-blue-500 active:bg-tds-blue-600'
             } ${className}`}
           >
             {children}
