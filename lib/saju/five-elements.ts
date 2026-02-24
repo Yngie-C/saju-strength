@@ -23,14 +23,6 @@ const WEIGHTS_WITHOUT_HOUR = {
   dayBranch:   2.5,
 } as const;
 
-/**
- * 토(Earth) 편향 보정 계수
- *
- * 지장간 적용 후에도 토는 12지지 평균 30.3%로 균등(20%) 대비 과대 대표됨
- * (생지 4개의 여기에 戊/己土 포함 + 고지 4개의 정기가 토)
- * 기존 0.85(1:1 매핑 기준)에서 지장간의 자연 분산을 반영하여 0.92로 완화
- */
-const EARTH_CORRECTION = 0.92;
 
 // ─── 조후(調候) 보정 ──────────────────────────────────
 // 계절(지지)에 따른 오행 강약 — 旺相休囚死 이론 기반
@@ -171,10 +163,7 @@ export function calculateElementDistribution(fourPillars: FourPillars): ElementD
     addBranch(fourPillars.day.branch,   w.dayBranch);
   }
 
-  // 1) 토(Earth) 구조적 편향 보정 (지지 12개 중 토가 4개 — 통계적 과대 대표)
-  dist.earth = dist.earth * EARTH_CORRECTION;
-
-  // 2) 조후(調候) 보정 — 계절(지지)에 따른 오행 강약 반영
+  // 조후(調候) 보정 — 계절(지지)에 따른 오행 강약 반영
   const johuMod = calculateJohuModifiers(fourPillars);
   const allElements: FiveElement[] = ['wood', 'fire', 'earth', 'metal', 'water'];
   for (const el of allElements) {
