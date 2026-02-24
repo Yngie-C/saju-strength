@@ -6,6 +6,13 @@ interface ProfilePageProps {
   params: { slug: string };
 }
 
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  // Static export: no pre-rendered profile pages (web-only feature)
+  return [];
+}
+
 export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
   return {
     title: `사주강점 프로필 - ${params.slug}`,
