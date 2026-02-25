@@ -13,6 +13,7 @@ import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { PremiumUpsellSection } from "@/components/result/PremiumUpsellSection";
+import { PurchaseHistorySection } from "@/components/result/PurchaseHistorySection";
 
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
@@ -388,6 +389,13 @@ export default function ResultPage() {
             </button>
           )}
         </motion.div>
+
+        {/* 결제 내역 */}
+        {IS_TOSS && sessionId && (
+          <div className="flex justify-center">
+            <PurchaseHistorySection sessionId={sessionId} />
+          </div>
+        )}
 
         {/* Disclaimer */}
         <p className={`text-center leading-relaxed pb-8 ${IS_TOSS ? 'text-[11px] text-tds-grey-400' : 'text-[11px] text-muted-foreground/40'}`}>
