@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { BASIC_QUESTIONS, BASIC_QUESTIONS_PER_PAGE, BASIC_TOTAL_PAGES } from '@/lib/survey-questions';
-import { SurveyAnswer } from '@/types/survey';
+import { SurveyAnswer, BriefAnalysis } from '@/types/survey';
 import { apiUrl } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
+import { setPendingAnalysis } from '@/lib/pending-analysis';
 import { AdaptiveProgressBar } from '@/components/adaptive';
 
 const STORAGE_KEY = 'saju-survey-answers';
@@ -251,22 +252,24 @@ export default function SurveyPage() {
 
     setIsSubmitting(true);
 
-    try {
-      const sessionId =
-        sessionStorage.getItem(SESSION_ID_KEY) ||
-        crypto.randomUUID();
-      // 생성된 sessionId를 즉시 저장 (전체 흐름에서 재사용)
-      sessionStorage.setItem(SESSION_ID_KEY, sessionId);
+    const sessionId =
+      sessionStorage.getItem(SESSION_ID_KEY) ||
+      crypto.randomUUID();
+    // 생성된 sessionId를 즉시 저장 (전체 흐름에서 재사용)
+    sessionStorage.setItem(SESSION_ID_KEY, sessionId);
 
-      const formattedAnswers: SurveyAnswer[] = BASIC_QUESTIONS.map((q) => ({
-        questionId: q.id,
-        questionNumber: q.questionNumber,
-        category: q.category,
-        score: answers[q.id],
-      }));
+    const formattedAnswers: SurveyAnswer[] = BASIC_QUESTIONS.map((q) => ({
+      questionId: q.id,
+      questionNumber: q.questionNumber,
+      category: q.category,
+      score: answers[q.id],
+    }));
 
-      const completionTimeSeconds = Math.round((Date.now() - startTime) / 1000);
+    const completionTimeSeconds = Math.round((Date.now() - startTime) / 1000);
 
+    // 비동기 분석: API 호출을 시작하되, 응답을 기다리지 않고 birth-info로 즉시 이동
+    // 사용자가 사주를 입력하는 동안 백그라운드에서 분석이 완료됨
+    const analysisPromise = (async (): Promise<BriefAnalysis> => {
       const response = await fetch(apiUrl('/api/survey/submit'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -278,24 +281,28 @@ export default function SurveyPage() {
       });
 
       if (!response.ok) {
-        throw new Error('제출 실패');
+        throw new Error('설문 분석 실패');
       }
 
-      const result = await response.json();
+      const result: BriefAnalysis = await response.json();
 
+      // 분석 완료 시 결과 저장
       sessionStorage.setItem(RESULT_STORAGE_KEY, JSON.stringify(result));
       await getStateManager().save('psaResult', result);
-      localStorage.removeItem(STORAGE_KEY);
-      const sm = getStateManager();
-      sm.remove('surveyAnswers');
-      sm.remove('surveyPage');
 
-      router.push('/birth-info');
-    } catch (error) {
-      console.error('Survey submit error:', error);
-      alert('제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
-      setIsSubmitting(false);
-    }
+      return result;
+    })();
+
+    // 전역 모듈에 Promise 등록 (birth-info 페이지에서 참조)
+    setPendingAnalysis(analysisPromise);
+
+    // 설문 응답 데이터 정리 & 즉시 페이지 전환
+    localStorage.removeItem(STORAGE_KEY);
+    const sm = getStateManager();
+    sm.remove('surveyAnswers');
+    sm.remove('surveyPage');
+
+    router.push('/birth-info');
   };
 
   const isLastPage = currentPage === BASIC_TOTAL_PAGES - 1;
