@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { BirthInfoForm } from "@/components/saju/BirthInfoForm";
 import { apiUrl } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
+import { getPendingAnalysis, clearPendingAnalysis } from '@/lib/pending-analysis';
 import { designTokens, IS_TOSS } from '@/lib/design-tokens';
 import Link from 'next/link';
 
@@ -43,10 +44,11 @@ export default function BirthInfoPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState(false);
 
-  // psaResult 가드: 설문 미완료 시 /survey로 리디렉트
+  // 설문 미완료 가드: psaResult도 없고 백그라운드 분석도 없으면 /survey로 리디렉트
   useEffect(() => {
     const psaResult = sessionStorage.getItem('psaResult');
-    if (!psaResult) {
+    const pendingAnalysis = getPendingAnalysis();
+    if (!psaResult && !pendingAnalysis) {
       router.replace('/survey');
     }
   }, [router]);
@@ -63,20 +65,37 @@ export default function BirthInfoPage() {
     setError(null);
 
     try {
-      // 설문에서 생성된 sessionId를 saju API에 전달
+      // 사주 계산 API 호출
       const existingSessionId = sessionStorage.getItem('saju-session-id');
-      const res = await fetch(apiUrl("/api/saju/calculate"), {
+      const sajuPromise = fetch(apiUrl("/api/saju/calculate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, sessionId: existingSessionId }),
       });
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+      // 백그라운드 설문 분석이 아직 진행 중이면 함께 대기
+      const pendingAnalysis = getPendingAnalysis();
+      const [sajuRes] = await Promise.all([
+        sajuPromise,
+        // 설문 분석이 이미 완료(sessionStorage에 저장됨)되었거나 없으면 즉시 resolve
+        pendingAnalysis ?? Promise.resolve(null),
+      ]);
+
+      // 백그라운드 분석 Promise 정리
+      clearPendingAnalysis();
+
+      // 설문 분석 결과 확인 (백그라운드에서 실패했을 수 있음)
+      const psaResult = sessionStorage.getItem('psaResult');
+      if (!psaResult) {
+        throw new Error('설문 분석 결과를 불러오지 못했습니다. 다시 시도해 주세요.');
+      }
+
+      if (!sajuRes.ok) {
+        const body = await sajuRes.json().catch(() => ({}));
         throw new Error(body?.error ?? "분석 중 오류가 발생했습니다.");
       }
 
-      const json = await res.json();
+      const json = await sajuRes.json();
       const result = json?.data ?? json;
 
       sessionStorage.setItem("sajuResult", JSON.stringify(result));
