@@ -10,8 +10,9 @@ export async function initSentry(): Promise<void> {
   if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return;
 
   try {
-    const { init } = await import('@granite-js/plugin-sentry');
-    init({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { init } = await import('@granite-js/plugin-sentry') as any;
+    (init as Function)({
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
       enableNative: false,
       useClient: false,
