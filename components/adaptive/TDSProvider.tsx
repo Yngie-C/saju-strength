@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState, ComponentType } from 'react';
 import { initTossApp } from '@/lib/toss';
 import { initSentry } from '@/lib/sentry';
+import { initializeAds } from '@/lib/ads/toss-ads';
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
@@ -13,6 +14,7 @@ export function TDSProvider({ children }: { children: ReactNode }) {
     if (IS_TOSS) {
       initTossApp();
       initSentry();
+      initializeAds();
       try {
         const { TDSMobileAITProvider } = require('@toss/tds-mobile-ait');
         setProvider(() => TDSMobileAITProvider);

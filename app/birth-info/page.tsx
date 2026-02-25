@@ -9,6 +9,7 @@ import { getStateManager } from '@/lib/state-manager';
 import { getPendingAnalysis, clearPendingAnalysis } from '@/lib/pending-analysis';
 import { designTokens, IS_TOSS } from '@/lib/design-tokens';
 import Link from 'next/link';
+import { preloadInterstitial, showInterstitial } from '@/lib/ads/toss-ads';
 
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
@@ -52,6 +53,11 @@ export default function BirthInfoPage() {
       router.replace('/survey');
     }
   }, [router]);
+
+  // 전면형 광고 사전 로드 (토스 환경에서만)
+  useEffect(() => {
+    preloadInterstitial();
+  }, []);
 
   async function handleSubmit(data: {
     year: number;
@@ -104,6 +110,9 @@ export default function BirthInfoPage() {
       const sm = getStateManager();
       sm.setSessionId(result.sessionId);
       await sm.save('sajuResult', result);
+      // 전면형 광고 표시 후 결과 페이지로 이동 (토스 환경)
+      // 광고 실패/미지원 시 즉시 이동
+      await showInterstitial();
       router.push("/result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");

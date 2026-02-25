@@ -12,8 +12,10 @@ import { SajuProfileSection } from "@/components/result/SajuProfileSection";
 import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
-import { PremiumUpsellSection } from "@/components/result/PremiumUpsellSection";
-import { PurchaseHistorySection } from "@/components/result/PurchaseHistorySection";
+// /* IAP_DISABLED */ import { PremiumUpsellSection } from "@/components/result/PremiumUpsellSection";
+// /* IAP_DISABLED */ import { PurchaseHistorySection } from "@/components/result/PurchaseHistorySection";
+import { TossBannerAd } from '@/components/ads/TossBannerAd';
+import { RewardedInsightSection } from '@/components/result/RewardedInsightSection';
 
 const styles = IS_TOSS ? {
   page: 'min-h-screen bg-white',
@@ -345,7 +347,7 @@ export default function ResultPage() {
 
         <SectionDivider />
 
-        {/* Section E: Premium Upsell */}
+        {/* IAP_DISABLED — Premium Upsell 섹션 비활성화
         {sessionId && sajuResult && psaResult && combined && (
           <motion.div
             variants={sectionVariants}
@@ -361,6 +363,25 @@ export default function ResultPage() {
             />
           </motion.div>
         )}
+        */}
+
+        {/* REWARDED_AD_READY — 보상형 광고 추가 인사이트. 활성화 시 아래 주석 해제
+        {sessionId && sajuResult && psaResult && combined && (
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+          >
+            <RewardedInsightSection
+              sessionId={sessionId}
+              sajuResult={sajuResult}
+              psaResult={psaResult}
+              axes={combined.axes as AxisAnalysis[]}
+            />
+          </motion.div>
+        )}
+        */}
 
         {/* CTA Buttons */}
         <motion.div
@@ -390,12 +411,16 @@ export default function ResultPage() {
           )}
         </motion.div>
 
-        {/* 결제 내역 */}
+        {/* 토스 배너 광고 */}
+        <TossBannerAd theme="light" variant="card" className="my-4" />
+
+        {/* IAP_DISABLED — 결제 내역 비활성화
         {IS_TOSS && sessionId && (
           <div className="flex justify-center">
             <PurchaseHistorySection sessionId={sessionId} />
           </div>
         )}
+        */}
 
         {/* Disclaimer */}
         <p className={`text-center leading-relaxed pb-8 ${IS_TOSS ? 'text-[11px] text-tds-grey-400' : 'text-[11px] text-muted-foreground/40'}`}>

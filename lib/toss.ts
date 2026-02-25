@@ -94,28 +94,32 @@ export function onBackButton(handler: () => void): () => void {
   };
 }
 
-/** 토스 IAP - 상품 목록 조회 */
-export async function getTossProducts(): Promise<unknown[]> {
-  if (!isTossEnvironment()) return [];
-
-  try {
-    const { getProductItemList } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
-    return await getProductItemList();
-  } catch (error) {
-    console.warn('[Toss] Product list failed:', error);
-    return [];
-  }
-}
-
-/** 토스 IAP - 구매 */
-export async function purchaseTossProduct(productId: string): Promise<unknown | null> {
-  if (!isTossEnvironment()) return null;
-
-  try {
-    const { createOneTimePurchaseOrder } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
-    return await createOneTimePurchaseOrder({ productId });
-  } catch (error) {
-    console.warn('[Toss] Purchase failed:', error);
-    return null;
-  }
-}
+// IAP_DISABLED_START — 인앱광고 전환으로 IAP 비활성화 (2026-02-26)
+//
+// /** 토스 IAP - 상품 목록 조회 */
+// export async function getTossProducts(): Promise<unknown[]> {
+//   if (!isTossEnvironment()) return [];
+//
+//   try {
+//     const { getProductItemList } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
+//     return await getProductItemList();
+//   } catch (error) {
+//     console.warn('[Toss] Product list failed:', error);
+//     return [];
+//   }
+// }
+//
+// /** 토스 IAP - 구매 */
+// export async function purchaseTossProduct(productId: string): Promise<unknown | null> {
+//   if (!isTossEnvironment()) return null;
+//
+//   try {
+//     const { createOneTimePurchaseOrder } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
+//     return await createOneTimePurchaseOrder({ productId });
+//   } catch (error) {
+//     console.warn('[Toss] Purchase failed:', error);
+//     return null;
+//   }
+// }
+//
+// IAP_DISABLED_END

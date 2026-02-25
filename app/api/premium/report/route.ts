@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+
+/* IAP_DISABLED_START — 인앱광고 전환으로 IAP 비활성화 (2026-02-26)
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { generatePremiumReport } from '@/lib/premium/analyzer';
 import { SajuAnalysis, AxisAnalysis } from '@/types/saju';
@@ -57,4 +59,13 @@ export async function POST(request: Request) {
     console.error('[POST /api/premium/report] Error:', error);
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+IAP_DISABLED_END */
+
+export async function POST() {
+  return NextResponse.json({ error: 'IAP is currently disabled' }, { status: 404 });
+}
+
+export async function GET() {
+  return NextResponse.json({ error: 'IAP is currently disabled' }, { status: 404 });
 }
