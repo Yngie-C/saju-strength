@@ -1,30 +1,23 @@
-import { defineConfig } from '@apps-in-toss/web-framework';
+import { defineConfig } from '@apps-in-toss/web-framework/config';
 
 export default defineConfig({
-  appId: 'saju-strength',
-  appName: '사주강점',
+  appName: 'saju-strength',
   brand: {
-    name: '사주강점',
-    color: '#3182F6',
+    displayName: '사주강점',
+    primaryColor: '#3182F6',
+    icon: './public/icon.png',
   },
   web: {
-    entryPoint: './out/index.html',
-    outdir: './out',
+    port: 3000,
+    commands: {
+      dev: 'next dev',
+      build: 'next build',
+    },
   },
+  outdir: './out',
   permissions: [],
-  auth: {
-    required: true,
-    scope: ['user_id', 'profile'],
-  },
-  iap: {
-    products: [
-      { id: 'premium_report', type: 'consumable', price: 1900 },
-      { id: 'couple_analysis', type: 'consumable', price: 2900 },
-    ],
-  },
   navigationBar: {
-    title: '사주강점',
-    leftButton: 'back',
-    rightButton: { icon: 'share', action: 'share' },
+    withBackButton: true,
+    withHomeButton: false,
   },
 });

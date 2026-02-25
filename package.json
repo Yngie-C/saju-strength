@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "build:web": "NEXT_PUBLIC_BUILD_TARGET=web next build",
-    "build:toss": "NEXT_PUBLIC_BUILD_TARGET=toss granite build",
+    "build:toss": "bash -c 'mv app/p app/_p_web_only; mv app/api app/_api_web_only; trap \"mv app/_p_web_only app/p; mv app/_api_web_only app/api\" EXIT; NEXT_PUBLIC_BUILD_TARGET=toss npx granite build'",
     "test": "vitest run",
     "test:watch": "vitest"
   },

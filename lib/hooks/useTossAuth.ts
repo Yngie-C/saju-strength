@@ -29,6 +29,9 @@ export function useTossAuth() {
   });
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // refreshAccessToken을 ref로 관리하여 순환 의존 방지
+  const refreshFnRef = useRef<() => Promise<void>>();
+
   // 자동 갱신 스케줄링
   const scheduleRefresh = useCallback((expiresIn: number) => {
     if (refreshTimerRef.current) {
@@ -37,7 +40,7 @@ export function useTossAuth() {
     // 만료 5분 전에 갱신 시도
     const refreshDelay = Math.max((expiresIn - 300) * 1000, 0);
     refreshTimerRef.current = setTimeout(() => {
-      refreshAccessToken();
+      refreshFnRef.current?.();
     }, refreshDelay);
   }, []);
 
@@ -76,6 +79,9 @@ export function useTossAuth() {
       console.warn('[useTossAuth] Token refresh failed');
     }
   }, [scheduleRefresh]);
+
+  // ref를 최신 함수로 업데이트
+  refreshFnRef.current = refreshAccessToken;
 
   // 저장된 사용자 ID 복원 (토큰은 메모리에서만 관리)
   useEffect(() => {
