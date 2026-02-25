@@ -34,6 +34,14 @@ const testPillars3: FourPillars = {
   hour:  { stem: '乙', branch: '卯', stemElement: 'wood', branchElement: 'wood', stemYinYang: 'yin'  },
 };
 
+// 타겟 사주: 1991.5.14 미시 — 辛未年 癸巳月 甲申日 辛未時 (일간: 甲木)
+const targetPillars: FourPillars = {
+  year:  { stem: '辛', branch: '未', stemElement: 'metal', branchElement: 'earth', stemYinYang: 'yin'  },
+  month: { stem: '癸', branch: '巳', stemElement: 'water', branchElement: 'fire',  stemYinYang: 'yin'  },
+  day:   { stem: '甲', branch: '申', stemElement: 'wood',  branchElement: 'metal', stemYinYang: 'yang' },
+  hour:  { stem: '辛', branch: '未', stemElement: 'metal', branchElement: 'earth', stemYinYang: 'yin'  },
+};
+
 describe('calculateElementDistribution()', () => {
   describe('시주 있는 사주 (甲寅丙午庚申壬子)', () => {
     let dist: ReturnType<typeof calculateElementDistribution>;
@@ -54,12 +62,12 @@ describe('calculateElementDistribution()', () => {
       expect(total).toBeGreaterThan(0);
     });
 
-    test('WEIGHTS_WITH_HOUR 총합(13) 범위 내에서 분포', () => {
-      // 시주 있을 때 총 가중치: 1+1+2+1.5+3+2+1.5+1 = 13
-      // 조후/토보정 적용 후이므로 정확히 13은 아니지만 합리적 범위 내
+    test('조후 보정 + 계절 기운 가산 후 총합이 합리적 범위 내', () => {
+      // 시주 있을 때 원시 가중치 총합: 13 + 계절 기운 가산(1.5) = 14.5 기준
+      // 조후 보정으로 변동 가능하므로 넉넉한 범위 설정
       const total = dist.wood + dist.fire + dist.earth + dist.metal + dist.water;
       expect(total).toBeGreaterThan(5);
-      expect(total).toBeLessThan(20);
+      expect(total).toBeLessThan(25);
     });
 
     test('4 사주가 균등 배분이라 특정 오행이 극단적으로 높지 않음 (< 총합의 60%)', () => {
@@ -114,24 +122,51 @@ describe('calculateElementDistribution()', () => {
       }
     });
   });
+
+  describe('巳月 타겟 사주 (辛未癸巳甲申辛未 — 1991.5.14 미시)', () => {
+    test('fire와 metal이 모두 상위권 (각각 3위 이내)', () => {
+      const dist = calculateElementDistribution(targetPillars);
+      const ranks = calculateElementRanks(dist);
+      expect(ranks.fire).toBeLessThanOrEqual(3);
+      expect(ranks.metal).toBeLessThanOrEqual(2);
+    });
+
+    test('metal이 1위', () => {
+      const dist = calculateElementDistribution(targetPillars);
+      const ranks = calculateElementRanks(dist);
+      expect(ranks.metal).toBe(1);
+    });
+
+    test('fire가 꼴찌(5위)가 아님', () => {
+      const dist = calculateElementDistribution(targetPillars);
+      const ranks = calculateElementRanks(dist);
+      expect(ranks.fire).not.toBe(5);
+    });
+
+    test('fire 절대값이 계절 기운 가산으로 의미 있는 수준', () => {
+      const dist = calculateElementDistribution(targetPillars);
+      // 巳月 계절 기운 가산(1.5)이 적용되어 fire가 2.5 이상이어야 함
+      expect(dist.fire).toBeGreaterThan(2.5);
+    });
+  });
 });
 
 describe('calculateJohuModifiers()', () => {
-  test('시주 있는 사주 — 모든 승수가 0.7~1.2 범위', () => {
+  test('시주 있는 사주 — 모든 승수가 이론적 범위 [0.50, 1.60] 내', () => {
     const mods = calculateJohuModifiers(testPillars1);
     const elements: FiveElement[] = ['wood', 'fire', 'earth', 'metal', 'water'];
     for (const el of elements) {
-      expect(mods[el]).toBeGreaterThanOrEqual(0.7);
-      expect(mods[el]).toBeLessThanOrEqual(1.2);
+      expect(mods[el]).toBeGreaterThanOrEqual(0.50);
+      expect(mods[el]).toBeLessThanOrEqual(1.60);
     }
   });
 
-  test('시주 없는 사주 — 모든 승수가 0.7~1.2 범위', () => {
+  test('시주 없는 사주 — 모든 승수가 이론적 범위 [0.50, 1.60] 내', () => {
     const mods = calculateJohuModifiers(testPillars2);
     const elements: FiveElement[] = ['wood', 'fire', 'earth', 'metal', 'water'];
     for (const el of elements) {
-      expect(mods[el]).toBeGreaterThanOrEqual(0.7);
-      expect(mods[el]).toBeLessThanOrEqual(1.2);
+      expect(mods[el]).toBeGreaterThanOrEqual(0.50);
+      expect(mods[el]).toBeLessThanOrEqual(1.60);
     }
   });
 
@@ -144,10 +179,88 @@ describe('calculateJohuModifiers()', () => {
     expect(mods).toHaveProperty('water');
   });
 
-  test('午月(화) 기준: 화(fire)는 旺(+0.15) 쪽으로 승수가 1.0 이상', () => {
-    // 午月이 가장 높은 가중치(0.50)를 가지므로 fire 승수는 1.0 이상이어야 함
+  test('午月(화) 기준: 화(fire) 승수가 1.15 이상 (旺 상태)', () => {
+    // 午月이 가장 높은 가중치(0.50)를 가지며 fire는 旺(+0.60) → 승수 최소 1.15+
     const mods = calculateJohuModifiers(testPillars1);
-    expect(mods.fire).toBeGreaterThanOrEqual(1.0);
+    expect(mods.fire).toBeGreaterThanOrEqual(1.15);
+  });
+
+  test('巳月 타겟 사주 — fire 승수 > 1.0 (旺 상태)', () => {
+    const mods = calculateJohuModifiers(targetPillars);
+    expect(mods.fire).toBeGreaterThan(1.0);
+  });
+
+  test('巳月 타겟 사주 — metal 승수 < 1.0 (巳月 火克金으로 약화)', () => {
+    const mods = calculateJohuModifiers(targetPillars);
+    expect(mods.metal).toBeLessThan(1.0);
+  });
+});
+
+describe('4계절 교차 검증 — 계절 오행이 상위권', () => {
+  // 봄(卯月): wood가 旺
+  const springPillars: FourPillars = {
+    year:  { stem: '甲', branch: '寅', stemElement: 'wood',  branchElement: 'wood',  stemYinYang: 'yang' },
+    month: { stem: '丙', branch: '卯', stemElement: 'fire',  branchElement: 'wood',  stemYinYang: 'yang' },
+    day:   { stem: '庚', branch: '申', stemElement: 'metal', branchElement: 'metal', stemYinYang: 'yang' },
+    hour:  { stem: '壬', branch: '子', stemElement: 'water', branchElement: 'water', stemYinYang: 'yang' },
+  };
+
+  // 가을(酉月): metal이 旺
+  const autumnPillars: FourPillars = {
+    year:  { stem: '甲', branch: '辰', stemElement: 'wood',  branchElement: 'earth', stemYinYang: 'yang' },
+    month: { stem: '癸', branch: '酉', stemElement: 'water', branchElement: 'metal', stemYinYang: 'yin'  },
+    day:   { stem: '丙', branch: '午', stemElement: 'fire',  branchElement: 'fire',  stemYinYang: 'yang' },
+    hour:  { stem: '戊', branch: '戌', stemElement: 'earth', branchElement: 'earth', stemYinYang: 'yang' },
+  };
+
+  // 겨울(子月): water가 旺
+  const winterPillars: FourPillars = {
+    year:  { stem: '庚', branch: '申', stemElement: 'metal', branchElement: 'metal', stemYinYang: 'yang' },
+    month: { stem: '戊', branch: '子', stemElement: 'earth', branchElement: 'water', stemYinYang: 'yang' },
+    day:   { stem: '乙', branch: '卯', stemElement: 'wood',  branchElement: 'wood',  stemYinYang: 'yin'  },
+    hour:  { stem: '丁', branch: '亥', stemElement: 'fire',  branchElement: 'water', stemYinYang: 'yin'  },
+  };
+
+  test('봄(卯月) — wood 승수 > 1.0, metal 승수 < 1.0', () => {
+    const mods = calculateJohuModifiers(springPillars);
+    expect(mods.wood).toBeGreaterThan(1.0);
+    expect(mods.metal).toBeLessThan(1.0);
+  });
+
+  test('여름(巳月) — fire 승수 > 1.0', () => {
+    const mods = calculateJohuModifiers(targetPillars);
+    expect(mods.fire).toBeGreaterThan(1.0);
+  });
+
+  test('가을(酉月) — metal 승수 > 1.0, wood 승수 < 1.0', () => {
+    const mods = calculateJohuModifiers(autumnPillars);
+    expect(mods.metal).toBeGreaterThan(1.0);
+    expect(mods.wood).toBeLessThan(1.0);
+  });
+
+  test('겨울(子月) — water 승수 > 1.0, fire 승수 < 1.0', () => {
+    const mods = calculateJohuModifiers(winterPillars);
+    expect(mods.water).toBeGreaterThan(1.0);
+    expect(mods.fire).toBeLessThan(1.0);
+  });
+
+  test('봄(卯月) — 계절 기운 가산으로 wood가 상위권', () => {
+    const dist = calculateElementDistribution(springPillars);
+    const ranks = calculateElementRanks(dist);
+    expect(ranks.wood).toBeLessThanOrEqual(2);
+  });
+
+  test('가을(酉月) — 계절 기운 가산으로 metal이 상위권 (3위 이내)', () => {
+    const dist = calculateElementDistribution(autumnPillars);
+    const ranks = calculateElementRanks(dist);
+    // 이 사주는 丙(화) 일간 + 午(화) 일지로 fire가 본래 강하므로 metal은 3위까지 허용
+    expect(ranks.metal).toBeLessThanOrEqual(3);
+  });
+
+  test('겨울(子月) — 계절 기운 가산으로 water가 상위권', () => {
+    const dist = calculateElementDistribution(winterPillars);
+    const ranks = calculateElementRanks(dist);
+    expect(ranks.water).toBeLessThanOrEqual(2);
   });
 });
 

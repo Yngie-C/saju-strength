@@ -72,13 +72,18 @@ function getJohuState(seasonElement: FiveElement, target: FiveElement): JohuStat
   return 'si';
 }
 
-/** 旺相休囚死 보정 편차 (1.0 기준) */
+/**
+ * 旺相休囚死 보정 편차 (1.0 기준)
+ *
+ * 전통 비율 10:7:5:3:1.5 → 정규화 2.0:1.4:1.0:0.6:0.3에 근사
+ * 旺/死 비율 = 1.60/0.50 = 3.20x (전통 5~10x과 현대 SW 2.0x 사이 균형점)
+ */
 const JOHU_DELTA: Record<JohuState, number> = {
-  wang:   0.15,   // 旺: +15%
-  xiang:  0.07,   // 相: +7%
-  xiu:    0.00,   // 休: ±0% (기준선)
-  qiu:   -0.10,   // 囚: -10%
-  si:    -0.20,   // 死: -20%
+  wang:   0.60,   // 旺: +60%  (계절과 동일 — 한창 왕성)
+  xiang:  0.25,   // 相: +25%  (계절이 생하는 오행 — 기세를 받음)
+  xiu:    0.00,   // 休: ±0%   (계절을 생하는 오행 — 쉬는 상태, 기준선)
+  qiu:   -0.30,   // 囚: -30%  (계절을 극하는 오행 — 갇힌 상태)
+  si:    -0.50,   // 死: -50%  (계절에 극당하는 오행 — 힘을 잃음)
 };
 
 /** 조후 위치 가중치 — 시주 있을 때 (월지 >> 일지 > 연지 > 시지) */
@@ -163,12 +168,20 @@ export function calculateElementDistribution(fourPillars: FourPillars): ElementD
     addBranch(fourPillars.day.branch,   w.dayBranch);
   }
 
-  // 조후(調候) 보정 — 계절(지지)에 따른 오행 강약 반영
+  // 조후(調候) 보정 Phase 1 — 旺相休囚死 승수 보정
   const johuMod = calculateJohuModifiers(fourPillars);
   const allElements: FiveElement[] = ['wood', 'fire', 'earth', 'metal', 'water'];
   for (const el of allElements) {
     dist[el] *= johuMod[el];
   }
+
+  // 조후(調候) 보정 Phase 2 — 계절 기운 가산(加算)
+  // 전통 조후론: 계절의 기운은 사주 전체에 스며들어 있다.
+  // 승수 보정만으로는 원시 점수가 낮은 오행의 계절 영향을 충분히 반영하지 못하므로,
+  // 월지의 계절 오행에 flat bonus를 가산한다.
+  const SEASONAL_QI_BONUS = fourPillars.hour !== null ? 1.5 : 1.2;
+  const monthSeasonElement = fourPillars.month.branchElement;
+  dist[monthSeasonElement] += SEASONAL_QI_BONUS;
 
   return dist;
 }
