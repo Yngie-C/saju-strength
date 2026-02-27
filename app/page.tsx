@@ -31,7 +31,7 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <main className={`${designTokens.pageMinHeight} ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'} overflow-x-hidden`}>
+    <main className={`${designTokens.pageMinHeight} ${designTokens.textPrimary} overflow-x-hidden`}>
       {/* 히어로 섹션 */}
       <section className={`relative flex flex-col items-center justify-center min-h-screen ${designTokens.pagePadding} pt-20 pb-16 text-center`}>
         {/* 배경 글로우 */}
@@ -54,7 +54,7 @@ export default function LandingPage() {
           </span>
 
           {/* 타이틀 */}
-          <h1 className={`text-5xl sm:text-7xl font-extrabold leading-tight tracking-tight ${IS_TOSS ? 'text-tds-grey-900' : ''}`}>
+          <h1 className={`text-5xl sm:text-7xl font-extrabold leading-tight tracking-tight ${designTokens.textPrimary}`}>
             {IS_TOSS ? (
               '사주강점'
             ) : (
@@ -65,7 +65,7 @@ export default function LandingPage() {
           </h1>
 
           {/* 서브타이틀 */}
-          <p className={`font-medium leading-snug ${IS_TOSS ? 'text-st8 text-tds-grey-700' : 'text-lg ' + designTokens.textSecondary}`}>
+          <p className={`font-medium leading-snug ${designTokens.subtitleSm} ${designTokens.textSecondary}`}>
             타고난 기질 × 현재 강점 = 당신만의 성장 지도
           </p>
 
@@ -76,7 +76,7 @@ export default function LandingPage() {
 
           {/* CTA */}
           <motion.button
-            whileHover={IS_TOSS ? undefined : { scale: 1.04 }}
+            whileHover={designTokens.hoverScale}
             whileTap={{ scale: 0.97 }}
             onClick={() => router.push("/survey")}
             className={`mt-2 inline-flex items-center gap-2 ${designTokens.primaryButton} px-8 py-4 font-bold text-lg shadow-lg shadow-primary/30 hover:opacity-90 transition-opacity`}
@@ -96,7 +96,7 @@ export default function LandingPage() {
       <section className={`${designTokens.pagePadding} py-20`}>
         <div className="max-w-5xl mx-auto">
           <SectionReveal className="text-center mb-12">
-            <h2 className={IS_TOSS ? 'text-t3 font-bold text-tds-grey-900' : 'text-3xl font-bold text-foreground'}>어떻게 분석하나요?</h2>
+            <h2 className={designTokens.headingLg}>어떻게 분석하나요?</h2>
           </SectionReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -122,15 +122,15 @@ export default function LandingPage() {
             ].map((item, i) => (
               <SectionReveal key={i}>
                 <motion.div
-                  whileHover={IS_TOSS ? undefined : { y: -4 }}
+                  whileHover={designTokens.hoverLift}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className={`rounded-2xl flex flex-col gap-4 ${designTokens.cardBg} p-6`}
                 >
                   <div className="flex items-center justify-between">
                     {item.icon}
-                    <span className={`text-3xl font-black ${IS_TOSS ? 'text-tds-grey-200' : 'text-muted-foreground/20'}`}>{item.step}</span>
+                    <span className={`text-3xl font-black ${designTokens.stepNumberMuted}`}>{item.step}</span>
                   </div>
-                  <h3 className={`text-lg font-bold ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'}`}>{item.title}</h3>
+                  <h3 className={`text-lg font-bold ${designTokens.textPrimary}`}>{item.title}</h3>
                   <p className={`leading-relaxed ${designTokens.textSecondary}`}>{item.desc}</p>
                 </motion.div>
               </SectionReveal>
@@ -143,7 +143,7 @@ export default function LandingPage() {
       <section className={`${designTokens.pagePadding} py-20`}>
         <div className="max-w-5xl mx-auto">
           <SectionReveal className="text-center mb-12">
-            <h2 className={IS_TOSS ? 'text-t3 font-bold text-tds-grey-900' : 'text-3xl font-bold text-foreground'}>4가지 강점 유형</h2>
+            <h2 className={designTokens.headingLg}>4가지 강점 유형</h2>
             <p className={`mt-3 ${designTokens.textCaption}`}>교차 분석이 발견하는 당신의 강점 지형</p>
           </SectionReveal>
 
@@ -188,7 +188,7 @@ export default function LandingPage() {
                       {item.badge}
                     </span>
                   </div>
-                  <p className={`text-base font-semibold ${IS_TOSS ? 'text-tds-grey-800' : 'text-foreground/90'}`}>{item.title}</p>
+                  <p className={`text-base font-semibold ${designTokens.textSubheading}`}>{item.title}</p>
                   <p className={`leading-relaxed ${designTokens.textSecondary}`}>{item.desc}</p>
                 </div>
               </SectionReveal>
@@ -201,11 +201,11 @@ export default function LandingPage() {
       <SectionReveal>
         <section className={`${designTokens.pagePadding} py-20 text-center`}>
           <div className="max-w-lg mx-auto flex flex-col items-center gap-6">
-            <h2 className={IS_TOSS ? 'text-t3 font-bold text-tds-grey-900' : 'text-3xl font-bold text-foreground'}>
+            <h2 className={designTokens.headingLg}>
               지금 바로 분석해보세요
             </h2>
             <motion.button
-              whileHover={IS_TOSS ? undefined : { scale: 1.04 }}
+              whileHover={designTokens.hoverScale}
               whileTap={{ scale: 0.97 }}
               onClick={() => router.push("/survey")}
               className={`inline-flex items-center gap-2 ${designTokens.primaryButton} px-8 py-4 font-bold text-lg shadow-lg shadow-primary/30`}
@@ -219,7 +219,7 @@ export default function LandingPage() {
       </SectionReveal>
 
       {/* Footer 면책 고지 */}
-      <footer className={`${designTokens.pagePadding} py-10 border-t ${IS_TOSS ? 'border-tds-grey-200' : 'border-border'}`}>
+      <footer className={`${designTokens.pagePadding} py-10 border-t ${designTokens.borderDefault}`}>
         <p className={`max-w-2xl mx-auto text-center leading-relaxed ${designTokens.textCaption}`}>
           이 서비스는 동양 전통 기질 분석과 현대 강점 진단의 융합 서비스이며, 의학적/심리학적 진단을 대체하지 않습니다.
         </p>

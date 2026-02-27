@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
+import { useAdaptiveLoader } from '@/hooks/useAdaptiveLoader';
 
 interface AdaptiveButtonProps {
   children: React.ReactNode;
@@ -13,8 +14,6 @@ interface AdaptiveButtonProps {
   type?: 'button' | 'submit';
 }
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
 export function AdaptiveButton({
   children,
   onClick,
@@ -24,20 +23,9 @@ export function AdaptiveButton({
   className = '',
   type = 'button',
 }: AdaptiveButtonProps) {
-  const [TDSButton, setTDSButton] = useState<any>(null);
+  const [isToss, TDSButton] = useAdaptiveLoader(() => require('@toss/tds-mobile').Button);
 
-  useEffect(() => {
-    if (IS_TOSS) {
-      try {
-        setTDSButton(() => require('@toss/tds-mobile').Button);
-      } catch {
-        // Fallback to web version
-      }
-    }
-  }, []);
-
-  if (IS_TOSS && TDSButton) {
-    // TDS Button: variant maps to styleVariant, size maps to sizeVariant
+  if (isToss && TDSButton) {
     const tdsVariant = variant === 'primary' ? 'primary' : variant === 'secondary' ? 'secondary' : 'ghost';
     const tdsSize = size === 'sm' ? 'small' : size === 'lg' ? 'large' : 'medium';
     return (
@@ -53,7 +41,7 @@ export function AdaptiveButton({
     );
   }
 
-  if (IS_TOSS && !TDSButton) {
+  if (isToss) {
     const variantClass = variant === 'primary'
       ? 'bg-tds-blue-500 text-white hover:bg-tds-blue-600 active:bg-tds-blue-700'
       : variant === 'secondary'

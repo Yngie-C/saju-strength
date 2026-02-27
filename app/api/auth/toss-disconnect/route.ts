@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isValidTossDisconnectBody } from '@/lib/validation';
 
 /**
  * 토스 로그인 연결 해제 콜백
@@ -23,12 +24,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { userKey, referrer } = body as { userKey: string; referrer: string };
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!userKey) {
+    if (!isValidTossDisconnectBody(body)) {
       return NextResponse.json({ error: 'userKey가 필요합니다.' }, { status: 400 });
     }
+
+    const { userKey, referrer } = body;
 
     // referrer에 따른 처리:
     // - UNLINK: 사용자가 토스 앱에서 연결 해제

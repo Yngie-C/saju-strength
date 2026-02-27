@@ -8,8 +8,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === "toss";
+import { designTokens } from "@/lib/design-tokens";
 
 interface DualRadarChartProps {
   elementData: Array<{ axis: string; value: number }>;
@@ -33,11 +32,11 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RadarChart cx="50%" cy="50%" outerRadius={100} data={data}>
-        <PolarGrid stroke={IS_TOSS ? "#e5e8eb" : "rgba(255,255,255,0.08)"} />
+        <PolarGrid stroke={designTokens.chartGridStroke} />
         <PolarAngleAxis
           dataKey="axis"
           tick={{
-            fill: IS_TOSS ? "#6b7684" : "rgba(255,255,255,0.5)",
+            fill: designTokens.chartTickFill,
             fontSize: 12,
           }}
         />
@@ -58,7 +57,7 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
         <Legend
           wrapperStyle={{
             fontSize: "12px",
-            color: IS_TOSS ? "#4e5968" : "rgba(255,255,255,0.6)",
+            color: designTokens.chartLegendColor,
           }}
         />
       </RadarChart>

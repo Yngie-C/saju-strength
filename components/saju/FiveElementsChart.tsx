@@ -1,6 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { designTokens } from '@/lib/design-tokens';
 
 interface FiveElementsChartProps {
   distribution: {
@@ -21,8 +22,6 @@ const ELEMENTS = [
 ] as const;
 
 type ElementKey = (typeof ELEMENTS)[number]["key"];
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
 export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
   const total = Object.values(distribution).reduce((s, v) => s + v, 0) || 1;
@@ -67,24 +66,12 @@ export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
                 const name = typeof p.name === "string" ? p.name : "";
                 const innerPayload = p.payload as Record<string, unknown> | undefined;
                 const color = typeof innerPayload?.color === "string" ? innerPayload.color : "#fff";
-                return IS_TOSS ? (
+                return (
                   <div style={{
-                    background: "#fff",
-                    border: "1px solid #e5e7eb",
+                    background: designTokens.tooltipBg,
+                    border: designTokens.tooltipBorder,
                     borderRadius: "8px",
-                    color: "#111827",
-                    fontSize: "12px",
-                    padding: "6px 10px",
-                  }}>
-                    <span style={{ color }}>{name}</span>
-                    {" "}{Math.round((val / total) * 100)}%
-                  </div>
-                ) : (
-                  <div style={{
-                    background: "hsl(218, 22%, 14%)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "8px",
-                    color: "#fff",
+                    color: designTokens.tooltipColor,
                     fontSize: "12px",
                     padding: "6px 10px",
                   }}>
@@ -105,7 +92,7 @@ export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
           >
             {dominant.label}
           </span>
-          <span className={`text-xs mt-0.5 ${IS_TOSS ? 'text-tds-grey-500' : 'text-muted-foreground/50'}`}>주도 오행</span>
+          <span className={`text-xs mt-0.5 ${designTokens.textMuted}`}>주도 오행</span>
         </div>
       </div>
 
@@ -117,7 +104,7 @@ export function FiveElementsChart({ distribution }: FiveElementsChartProps) {
               className="w-3 h-3 rounded-full"
               style={{ background: entry.color }}
             />
-            <span className={`text-[10px] ${IS_TOSS ? 'text-tds-grey-600' : 'text-muted-foreground'}`}>{entry.name}</span>
+            <span className={`text-[10px] ${designTokens.textTertiary}`}>{entry.name}</span>
             <span
               className="text-xs font-semibold"
               style={{ color: entry.color }}

@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
+import { isValidWaitlistJoinBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const { email, phone, sessionId } = await request.json();
-
-    if (!email) {
-      return NextResponse.json({ error: '이메일이 필요합니다.' }, { status: 400 });
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
     }
+
+    if (!isValidWaitlistJoinBody(body)) {
+      return NextResponse.json({ error: '유효한 이메일이 필요합니다.' }, { status: 400 });
+    }
+
+    const { email, phone, sessionId } = body;
 
     // MVP: DB 없이 성공 응답 반환 (Supabase 설정 후 waitlist 테이블에 INSERT)
     void phone;

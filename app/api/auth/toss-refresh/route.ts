@@ -1,13 +1,21 @@
 import { NextResponse } from 'next/server';
 import { mtlsFetch } from '@/lib/mtls';
+import { isValidTossRefreshBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const { refreshToken } = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!refreshToken) {
+    if (!isValidTossRefreshBody(body)) {
       return NextResponse.json({ error: 'refreshToken이 필요합니다.' }, { status: 400 });
     }
+
+    const { refreshToken } = body;
 
     // 개발 환경 mock
     if (process.env.NODE_ENV === 'development' || !process.env.TOSS_MTLS_CERT) {

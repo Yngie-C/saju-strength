@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useAdaptiveLoader } from '@/hooks/useAdaptiveLoader';
 
 interface AdaptiveCheckboxProps {
   checked: boolean;
@@ -10,8 +11,6 @@ interface AdaptiveCheckboxProps {
   className?: string;
 }
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
 export function AdaptiveCheckbox({
   checked,
   onChange,
@@ -19,20 +18,9 @@ export function AdaptiveCheckbox({
   description,
   className = '',
 }: AdaptiveCheckboxProps) {
-  const [TDSCheckbox, setTDSCheckbox] = useState<any>(null);
+  const [isToss, TDSCheckbox] = useAdaptiveLoader(() => require('@toss/tds-mobile').Checkbox);
 
-  useEffect(() => {
-    if (IS_TOSS) {
-      try {
-        setTDSCheckbox(() => require('@toss/tds-mobile').Checkbox);
-      } catch {
-        // Fallback to web version
-      }
-    }
-  }, []);
-
-  if (IS_TOSS && TDSCheckbox) {
-    // TDS Checkbox: isChecked + onChangeChecked
+  if (isToss && TDSCheckbox) {
     return (
       <TDSCheckbox
         isChecked={checked}
@@ -44,8 +32,7 @@ export function AdaptiveCheckbox({
     );
   }
 
-  if (IS_TOSS && !TDSCheckbox) {
-    return (
+  if (isToss) return (
       <label className={`flex items-start gap-3 cursor-pointer ${className}`}>
         <span
           role="checkbox"
@@ -69,7 +56,6 @@ export function AdaptiveCheckbox({
         </div>
       </label>
     );
-  }
 
   // Web: custom dark-theme checkbox
   return (

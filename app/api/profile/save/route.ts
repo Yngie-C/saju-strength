@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
+import { isValidProfileSaveBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const { sessionId, email, sajuResult, psaResult, combinedResult } = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!sessionId) {
+    if (!isValidProfileSaveBody(body)) {
       return NextResponse.json({ error: 'sessionId가 필요합니다.' }, { status: 400 });
     }
+
+    const { sessionId, email, sajuResult, psaResult, combinedResult } = body;
 
     // slug: sessionId 앞 8자리
     const slug = String(sessionId).substring(0, 8);

@@ -3,22 +3,27 @@ import { CombinedAnalyzerAgent } from '@/agents/combined-analyzer';
 import { SajuAnalysis } from '@/types/saju';
 import { BriefAnalysis } from '@/types/survey';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { isValidCombinedAnalyzeBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { sessionId, sajuResult, psaResult } = body as {
-      sessionId: string;
-      sajuResult: SajuAnalysis;
-      psaResult: BriefAnalysis;
-    };
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!sessionId || !sajuResult || !psaResult) {
+    if (!isValidCombinedAnalyzeBody(body)) {
       return NextResponse.json(
         { error: '필수 데이터가 누락되었습니다. sessionId, sajuResult, psaResult가 필요합니다.' },
         { status: 400 }
       );
     }
+
+    const { sessionId } = body;
+    const sajuResult = body.sajuResult as unknown as SajuAnalysis;
+    const psaResult = body.psaResult as unknown as BriefAnalysis;
 
     const agent = new CombinedAnalyzerAgent();
     const result = await agent.process(

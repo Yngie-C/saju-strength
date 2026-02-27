@@ -1,14 +1,22 @@
 import { NextResponse } from 'next/server';
 import { mtlsFetch } from '@/lib/mtls';
 import { decryptTossUserData } from '@/lib/crypto';
+import { isValidTossTokenBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const { authorizationCode, referrer } = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!authorizationCode) {
+    if (!isValidTossTokenBody(body)) {
       return NextResponse.json({ error: 'authorizationCode가 필요합니다.' }, { status: 400 });
     }
+
+    const { authorizationCode, referrer } = body;
 
     // 개발 환경 mock 응답
     if (process.env.NODE_ENV === 'development' || !process.env.TOSS_MTLS_CERT) {

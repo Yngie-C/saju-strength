@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import { useAdaptiveLoader } from '@/hooks/useAdaptiveLoader';
 
 interface AdaptiveProgressBarProps {
   progress: number; // 0-100
@@ -10,27 +11,14 @@ interface AdaptiveProgressBarProps {
   milestoneMessage?: string;
 }
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
 export function AdaptiveProgressBar({
   progress,
   className = '',
   milestoneMessage,
 }: AdaptiveProgressBarProps) {
-  const [TDSProgressBar, setTDSProgressBar] = useState<any>(null);
+  const [isToss, TDSProgressBar] = useAdaptiveLoader(() => require('@toss/tds-mobile').ProgressBar);
 
-  useEffect(() => {
-    if (IS_TOSS) {
-      try {
-        setTDSProgressBar(() => require('@toss/tds-mobile').ProgressBar);
-      } catch {
-        // Fallback to web version
-      }
-    }
-  }, []);
-
-  if (IS_TOSS && TDSProgressBar) {
-    // TDS ProgressBar: value is 0-100
+  if (isToss && TDSProgressBar) {
     return (
       <div className={className}>
         <TDSProgressBar value={progress} />
@@ -43,8 +31,7 @@ export function AdaptiveProgressBar({
     );
   }
 
-  if (IS_TOSS && !TDSProgressBar) {
-    return (
+  if (isToss) return (
       <div className={className}>
         <div className="h-1 bg-tds-grey-200 rounded-full overflow-hidden">
           <div
@@ -59,7 +46,6 @@ export function AdaptiveProgressBar({
         )}
       </div>
     );
-  }
 
   // Web: primary progress bar
   return (

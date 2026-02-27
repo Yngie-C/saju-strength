@@ -1,13 +1,21 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { isValidStateSaveBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const { sessionId, key, data } = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!sessionId || !key || data === undefined) {
+    if (!isValidStateSaveBody(body)) {
       return NextResponse.json({ error: '필수 파라미터 누락' }, { status: 400 });
     }
+
+    const { sessionId, key, data } = body;
 
     const supabase = getSupabaseAdmin();
 

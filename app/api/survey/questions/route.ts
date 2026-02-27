@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
-import { SURVEY_QUESTIONS, BASIC_QUESTIONS, PREMIUM_QUESTIONS } from '@/lib/survey-questions';
+import { SURVEY_QUESTIONS, BASIC_QUESTIONS, PREMIUM_QUESTIONS } from '@/lib/survey/questions';
 
 export async function GET(request: NextRequest) {
   const tier = request.nextUrl.searchParams.get('tier');

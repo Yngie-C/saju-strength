@@ -5,24 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
-const formStyles = IS_TOSS ? {
-  label: 'text-t6 font-semibold text-tds-grey-700 mb-2',
-  input: 'w-full px-4 py-3 rounded-[14px] border border-tds-grey-200 bg-tds-grey-50 text-tds-grey-900 text-st8 placeholder:text-tds-grey-500 focus:outline-none focus:border-tds-blue-500 focus:ring-1 focus:ring-tds-blue-500',
-  select: 'w-full px-4 py-3 rounded-[14px] border border-tds-grey-200 bg-tds-grey-50 text-tds-grey-900 text-st8',
-  helper: 'text-st11 text-tds-grey-500 mt-1',
-  sectionTitle: 'text-t5 font-semibold text-tds-grey-900',
-  divider: 'border-t border-tds-grey-200',
-} : {
-  label: 'text-sm font-medium text-foreground mb-2',
-  input: 'w-full px-4 py-3 rounded-xl border border-border bg-secondary text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50',
-  select: 'w-full px-4 py-3 rounded-xl border border-border bg-secondary text-foreground',
-  helper: 'text-xs text-muted-foreground/50 mt-1',
-  sectionTitle: 'text-lg font-semibold text-foreground',
-  divider: 'border-t border-border',
-} as const;
+import { designTokens } from '@/lib/design-tokens';
 
 interface BirthInfoFormProps {
   onSubmit: (data: {
@@ -115,7 +98,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             "flex-1 py-2 rounded-lg text-sm font-medium transition-colors",
             !isLunar
               ? "bg-primary text-white"
-              : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+              : designTokens.toggleInactive
           )}
         >
           양력
@@ -127,7 +110,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             "flex-1 py-2 rounded-lg text-sm font-medium transition-colors",
             isLunar
               ? "bg-primary text-white"
-              : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+              : designTokens.toggleInactive
           )}
         >
           음력
@@ -137,7 +120,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
       {/* 년 / 월 / 일 */}
       <motion.div variants={itemVariants} className="grid grid-cols-3 gap-3">
         <div className="space-y-1">
-          <label className={formStyles.label}>년</label>
+          <label className={designTokens.formLabel}>년</label>
           <Input
             type="number"
             placeholder="1990"
@@ -145,12 +128,12 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             onChange={(e) => setYear(e.target.value)}
             min={1900}
             max={2050}
-            className={IS_TOSS ? formStyles.input : "bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary"}
+            className={designTokens.inputToss}
           />
-          {errors.year && <p className={formStyles.helper}>{errors.year}</p>}
+          {errors.year && <p className={designTokens.formHelper}>{errors.year}</p>}
         </div>
         <div className="space-y-1">
-          <label className={formStyles.label}>월</label>
+          <label className={designTokens.formLabel}>월</label>
           <Input
             type="number"
             placeholder="1"
@@ -158,12 +141,12 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             onChange={(e) => setMonth(e.target.value)}
             min={1}
             max={12}
-            className={IS_TOSS ? formStyles.input : "bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary"}
+            className={designTokens.inputToss}
           />
-          {errors.month && <p className={formStyles.helper}>{errors.month}</p>}
+          {errors.month && <p className={designTokens.formHelper}>{errors.month}</p>}
         </div>
         <div className="space-y-1">
-          <label className={formStyles.label}>일</label>
+          <label className={designTokens.formLabel}>일</label>
           <Input
             type="number"
             placeholder="1"
@@ -171,15 +154,15 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             onChange={(e) => setDay(e.target.value)}
             min={1}
             max={31}
-            className={IS_TOSS ? formStyles.input : "bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary"}
+            className={designTokens.inputToss}
           />
-          {errors.day && <p className={formStyles.helper}>{errors.day}</p>}
+          {errors.day && <p className={designTokens.formHelper}>{errors.day}</p>}
         </div>
       </motion.div>
 
       {/* 시진 선택 */}
       <motion.div variants={itemVariants} className="space-y-1">
-        <label className={formStyles.label}>시진 (태어난 시간)</label>
+        <label className={designTokens.formLabel}>시진 (태어난 시간)</label>
         <select
           value={hour === "" ? "" : hour === null ? "null" : String(hour)}
           onChange={(e) => {
@@ -188,27 +171,27 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
             else if (v === "null") setHour(null);
             else setHour(Number(v));
           }}
-          className={IS_TOSS ? formStyles.select : "w-full h-10 rounded-md bg-secondary border border-border text-foreground text-sm px-3 focus:outline-none focus:ring-2 focus:ring-primary"}
+          className={designTokens.selectToss}
         >
-          <option value="" disabled className={IS_TOSS ? "bg-white" : "bg-background"}>
+          <option value="" disabled className={designTokens.optionBg}>
             시진을 선택하세요
           </option>
           {SIJU_OPTIONS.map((opt) => (
             <option
               key={opt.label}
               value={opt.value === null ? "null" : String(opt.value)}
-              className={IS_TOSS ? "bg-white" : "bg-background"}
+              className={designTokens.optionBg}
             >
               {opt.label}
             </option>
           ))}
         </select>
-        {errors.hour && <p className={formStyles.helper}>{errors.hour}</p>}
+        {errors.hour && <p className={designTokens.formHelper}>{errors.hour}</p>}
       </motion.div>
 
       {/* 성별 */}
       <motion.div variants={itemVariants} className="space-y-2">
-        <label className={formStyles.label}>성별</label>
+        <label className={designTokens.formLabel}>성별</label>
         <div className="flex gap-2">
           <button
             type="button"
@@ -217,7 +200,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
               "flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors",
               gender === "male"
                 ? "bg-blue-600 text-white"
-                : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                : designTokens.toggleInactive
             )}
           >
             남성
@@ -229,7 +212,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
               "flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors",
               gender === "female"
                 ? "bg-pink-600 text-white"
-                : IS_TOSS ? "bg-tds-grey-100 text-tds-grey-500 hover:bg-tds-grey-200" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                : designTokens.toggleInactive
             )}
           >
             여성

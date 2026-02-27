@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { showRewarded, preloadRewarded, isAdSupported } from '@/lib/ads/toss-ads';
+import { designTokens } from '@/lib/design-tokens';
 
 const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
 
@@ -63,13 +64,13 @@ export function RewardedAdButton({
 
   return (
     <div className={className} data-testid="rewarded-ad-button">
-      <p className="text-st10 text-tds-grey-500 mb-3 text-center">
+      <p className={`text-st10 mb-3 text-center ${designTokens.textMuted}`}>
         {rewardDescription}
       </p>
       <button
         onClick={handleClick}
         disabled={loading || !adReady}
-        className="w-full py-3.5 rounded-[14px] font-semibold text-sm text-white bg-tds-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+        className={`w-full py-3.5 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity ${designTokens.primaryButton}`}
       >
         {loading ? '광고 로딩 중...' : !adReady ? '광고 준비 중...' : buttonText}
       </button>

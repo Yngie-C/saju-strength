@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useAdaptiveLoader } from '@/hooks/useAdaptiveLoader';
 
 interface AdaptiveTextFieldProps {
   value: string;
@@ -12,8 +13,6 @@ interface AdaptiveTextFieldProps {
   className?: string;
 }
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
 export function AdaptiveTextField({
   value,
   onChange,
@@ -23,20 +22,9 @@ export function AdaptiveTextField({
   disabled,
   className = '',
 }: AdaptiveTextFieldProps) {
-  const [TDSTextField, setTDSTextField] = useState<any>(null);
+  const [isToss, TDSTextField] = useAdaptiveLoader(() => require('@toss/tds-mobile').TextField);
 
-  useEffect(() => {
-    if (IS_TOSS) {
-      try {
-        setTDSTextField(() => require('@toss/tds-mobile').TextField);
-      } catch {
-        // Fallback to web version
-      }
-    }
-  }, []);
-
-  if (IS_TOSS && TDSTextField) {
-    // TDS TextField: onChange receives the string value directly
+  if (isToss && TDSTextField) {
     return (
       <TDSTextField
         label={label}
@@ -50,8 +38,7 @@ export function AdaptiveTextField({
     );
   }
 
-  if (IS_TOSS && !TDSTextField) {
-    return (
+  if (isToss) return (
       <div className={className}>
         {label && (
           <label className="block text-st10 font-medium text-tds-grey-700 mb-1.5">{label}</label>
@@ -66,7 +53,6 @@ export function AdaptiveTextField({
         />
       </div>
     );
-  }
 
   // Web: styled input
   return (

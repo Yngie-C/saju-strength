@@ -1,21 +1,22 @@
 import { NextResponse } from 'next/server';
 import { SajuAnalyzerAgent } from '@/agents/saju-analyzer';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { isValidSajuCalculateBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
+
+    if (!isValidSajuCalculateBody(body)) {
+      return NextResponse.json({ error: '필수 입력값이 누락되었거나 유효하지 않습니다. (year: 1900~2050, month: 1~12, day: 1~31, gender 필수)' }, { status: 400 });
+    }
+
     const { year, month, day, hour, gender, isLunar, sessionId: clientSessionId } = body;
-
-    // 입력 검증
-    if (!year || !month || !day || !gender) {
-      return NextResponse.json({ error: '필수 입력값이 누락되었습니다.' }, { status: 400 });
-    }
-
-    // 범위 검증
-    if (year < 1900 || year > 2050) {
-      return NextResponse.json({ error: '1900~2050년 사이만 지원됩니다.' }, { status: 400 });
-    }
 
     // 클라이언트에서 전달된 sessionId 사용, 없으면 신규 생성
     const sessionId = clientSessionId || crypto.randomUUID();

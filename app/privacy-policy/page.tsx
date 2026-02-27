@@ -1,23 +1,8 @@
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { designTokens } from '@/lib/design-tokens';
-
-const styles = IS_TOSS ? {
-  page: 'min-h-screen bg-white',
-  container: 'px-6 py-8',
-  title: 'text-t2 font-bold text-tds-grey-900',
-  body: 'text-st8 text-tds-grey-700 leading-relaxed',
-  heading: 'text-t5 font-semibold text-tds-grey-900',
-} : {
-  page: 'min-h-screen bg-background',
-  container: 'px-4 py-12 max-w-2xl mx-auto',
-  title: 'text-3xl font-bold text-foreground',
-  body: 'text-sm text-muted-foreground leading-relaxed',
-  heading: 'text-lg font-semibold text-foreground',
-} as const;
+import { designTokens, IS_TOSS } from '@/lib/design-tokens';
+import { privacyPolicyStyles as styles } from '@/lib/section-styles';
 
 export const metadata: Metadata = {
   title: '개인정보 처리방침 - 사주강점',
@@ -26,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className={`${styles.page} ${IS_TOSS ? 'text-tds-grey-900' : 'text-foreground'}`}>
+    <main className={`${styles.page} ${designTokens.textPrimary}`}>
       <div className={`${styles.container} space-y-8`}>
         {/* 뒤로가기 — 토스에서는 네이티브 네비바가 제공하므로 숨김 */}
         {!IS_TOSS && (
@@ -42,7 +27,7 @@ export default function PrivacyPolicyPage() {
         {/* 제목 */}
         <div className="space-y-2">
           <h1 className={styles.title}>개인정보 처리방침</h1>
-          <p className={`text-sm ${IS_TOSS ? 'text-tds-grey-400' : 'text-muted-foreground/40'}`}>시행일: 2026년 2월 24일</p>
+          <p className={`text-sm ${designTokens.privacyDate}`}>시행일: 2026년 2월 24일</p>
         </div>
 
         {/* 본문 */}
@@ -99,7 +84,7 @@ export default function PrivacyPolicyPage() {
             <p>
               개인정보 보호책임자에게 문의사항이 있으시면 아래 연락처로 문의해 주세요.
             </p>
-            <p className={IS_TOSS ? 'text-tds-grey-500' : 'text-muted-foreground/50'}>이메일: privacy@saju-strength.com</p>
+            <p className={designTokens.privacyContact}>이메일: privacy@saju-strength.com</p>
           </section>
 
           <section className="space-y-3">

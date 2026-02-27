@@ -7,47 +7,7 @@ import {
   Radar,
   ResponsiveContainer,
 } from "recharts";
-import { IS_TOSS, designTokens } from "@/lib/design-tokens";
-
-const styles = IS_TOSS ? {
-  sectionLabel: 'text-xs font-semibold tracking-widest text-tds-blue-400 uppercase',
-  sectionTitle: 'text-t3 font-bold text-tds-grey-900',
-  sectionSubtitle: 'text-tds-grey-400 font-normal text-lg',
-  card: 'rounded-2xl border border-tds-grey-200 bg-white p-6',
-  cardTitle: 'text-sm font-semibold text-tds-grey-500 mb-2',
-  personaCard: 'rounded-2xl border border-tds-grey-200 bg-white p-6 space-y-4',
-  personaCardTitle: 'text-sm font-semibold text-tds-grey-500',
-  personaTitle: 'text-2xl font-bold text-tds-blue-600',
-  personaTagline: 'text-sm text-tds-grey-500 mt-1 italic',
-  strengthsSummary: 'text-sm text-tds-grey-600 leading-relaxed',
-  scoreCard: 'rounded-2xl border border-tds-grey-200 bg-white p-6 space-y-4',
-  scoreCardTitle: 'text-sm font-semibold text-tds-grey-500',
-  scoreLabel: 'text-sm text-tds-grey-600 w-20 flex-shrink-0',
-  scoreBar: 'flex-1 h-2 rounded-full bg-tds-grey-100 overflow-hidden',
-} : {
-  sectionLabel: 'text-xs font-semibold tracking-widest text-primary/70 uppercase',
-  sectionTitle: 'text-2xl font-bold text-foreground',
-  sectionSubtitle: 'text-muted-foreground/50 font-normal text-lg',
-  card: 'rounded-2xl border border-border p-6',
-  cardTitle: 'text-sm font-semibold text-muted-foreground/80 mb-2',
-  personaCard: 'rounded-2xl border border-primary/20 p-6 space-y-4',
-  personaCardTitle: 'text-sm font-semibold text-muted-foreground/80',
-  personaTitle: 'text-2xl font-bold text-primary',
-  personaTagline: 'text-sm text-muted-foreground/70 mt-1 italic',
-  strengthsSummary: 'text-sm text-muted-foreground leading-relaxed',
-  scoreCard: 'rounded-2xl border border-border p-6 space-y-4',
-  scoreCardTitle: 'text-sm font-semibold text-muted-foreground/80',
-  scoreLabel: 'text-sm text-muted-foreground w-20 flex-shrink-0',
-  scoreBar: 'flex-1 h-2 rounded-full bg-secondary overflow-hidden',
-} as const;
-
-const chartStyles = IS_TOSS ? {
-  radarGridStroke: 'rgba(0,0,0,0.08)',
-  radarTickFill: '#6B7280',
-} : {
-  radarGridStroke: 'hsl(var(--border))',
-  radarTickFill: 'hsl(var(--muted-foreground))',
-};
+import { psaProfileStyles as styles } from "@/lib/section-styles";
 
 interface CategoryScore {
   category: string;
@@ -101,16 +61,16 @@ export function PsaProfileSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Radar Chart */}
-        <div className={`${styles.card} ${IS_TOSS ? '' : 'bg-card'}`}>
+        <div className={`${styles.card} ${styles.cardFill}`}>
           <h3 className={styles.cardTitle}>
             5차원 강점 레이더
           </h3>
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart cx="50%" cy="50%" outerRadius={90} data={radarData}>
-              <PolarGrid stroke={chartStyles.radarGridStroke} />
+              <PolarGrid stroke={styles.radarGridStroke} />
               <PolarAngleAxis
                 dataKey="category"
-                tick={{ fill: chartStyles.radarTickFill, fontSize: 11 }}
+                tick={{ fill: styles.radarTickFill, fontSize: 11 }}
               />
               <Radar
                 name="PSA 점수"
@@ -126,10 +86,7 @@ export function PsaProfileSection({
         {/* Persona Card */}
         <div
           className={styles.personaCard}
-          style={IS_TOSS ? undefined : {
-            background:
-              "linear-gradient(160deg, rgba(6,182,212,0.08) 0%, rgba(6,182,212,0.02) 100%)",
-          }}
+          style={styles.personaBgStyle}
         >
           <h3 className={styles.personaCardTitle}>나의 페르소나</h3>
           <div>
@@ -148,7 +105,7 @@ export function PsaProfileSection({
       </div>
 
       {/* Category Score Bars */}
-      <div className={`${styles.scoreCard} ${IS_TOSS ? '' : 'bg-card'}`}>
+      <div className={`${styles.scoreCard} ${styles.cardFill}`}>
         <h3 className={styles.scoreCardTitle}>카테고리별 점수</h3>
         <div className="space-y-3">
           {sorted.map((cs, i) => {

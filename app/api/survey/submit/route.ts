@@ -1,24 +1,27 @@
 import { NextResponse } from 'next/server';
 import { SurveyAnalyzerAgent } from '@/agents/survey-analyzer';
-import { SURVEY_QUESTIONS, BASIC_QUESTIONS } from '@/lib/survey-questions';
+import { SURVEY_QUESTIONS, BASIC_QUESTIONS } from '@/lib/survey/questions';
 import { SurveyAnswer, SurveyResponse } from '@/types/survey';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { isValidSurveySubmitBody } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { sessionId, answers, completionTimeSeconds } = body as {
-      sessionId: string;
-      answers: SurveyAnswer[];
-      completionTimeSeconds?: number;
-    };
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: '유효하지 않은 요청 본문입니다.' }, { status: 400 });
+    }
 
-    if (!sessionId || !answers || !Array.isArray(answers)) {
+    if (!isValidSurveySubmitBody(body)) {
       return NextResponse.json(
         { error: '필수 데이터가 누락되었습니다.' },
         { status: 400 }
       );
     }
+
+    const { sessionId, answers, completionTimeSeconds } = body;
 
     const validCounts = [30, 60];
     if (!validCounts.includes(answers.length)) {
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
 
     const surveyResponse: SurveyResponse = {
       sessionId,
-      answers,
+      answers: answers as unknown as SurveyAnswer[],
       completedAt: new Date(),
       completionTimeSeconds,
     };

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { designTokens } from '@/lib/design-tokens';
 
 interface AdaptiveCardProps {
   children: React.ReactNode;
@@ -8,26 +9,22 @@ interface AdaptiveCardProps {
   className?: string;
 }
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
-
-const tossStyles = {
-  default: 'bg-white border border-tds-grey-200 rounded-xl',
-  outlined: 'bg-white border border-tds-grey-200 rounded-xl',
-  elevated: 'bg-white rounded-xl shadow-sm',
-} as const;
-
-const webStyles = {
-  default: 'bg-card border border-border rounded-xl',
-  outlined: 'bg-transparent border border-border rounded-xl',
-  elevated: 'bg-card border border-border rounded-xl shadow-lg shadow-black/20',
-} as const;
+// variant → designToken mapping
+// 'default'  uses cardBg   (bg + border, both platforms)
+// 'outlined' uses cardBgAlt (subdued bg + border, both platforms)
+// 'elevated' uses glassBg  (shadow on toss, border on web)
+const variantToken = {
+  default: 'cardBg',
+  outlined: 'cardBgAlt',
+  elevated: 'glassBg',
+} as const satisfies Record<string, keyof typeof designTokens>;
 
 export function AdaptiveCard({
   children,
   variant = 'default',
   className = '',
 }: AdaptiveCardProps) {
-  const baseStyle = IS_TOSS ? tossStyles[variant] : webStyles[variant];
+  const baseStyle = `${designTokens[variantToken[variant]]} ${designTokens.cardRadius}`;
 
   return (
     <div className={`${baseStyle} ${className}`}>

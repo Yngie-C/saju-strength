@@ -7,37 +7,10 @@ import { BirthInfoForm } from "@/components/saju/BirthInfoForm";
 import { apiUrl } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
 import { getPendingAnalysis, clearPendingAnalysis } from '@/lib/pending-analysis';
-import { designTokens, IS_TOSS } from '@/lib/design-tokens';
+import { designTokens } from '@/lib/design-tokens';
+import { birthInfoStyles as styles } from '@/lib/section-styles';
 import Link from 'next/link';
 import { preloadInterstitial, showInterstitial } from '@/lib/ads/toss-ads';
-
-const styles = IS_TOSS ? {
-  page: 'min-h-screen bg-white',
-  container: 'px-6 py-6 pb-[calc(100px+env(safe-area-inset-bottom))]',
-  title: 'text-t3 font-bold text-tds-grey-900',
-  subtitle: 'text-st8 text-tds-grey-700',
-  card: 'bg-white border border-tds-grey-200 rounded-xl p-6',
-  stepActive: 'w-8 h-8 rounded-full bg-tds-blue-500 text-white flex items-center justify-center text-t7 font-bold',
-  stepInactive: 'w-8 h-8 rounded-full border-2 border-tds-grey-300 text-tds-grey-500 flex items-center justify-center text-t7',
-  stepLine: 'h-0.5 flex-1 bg-tds-grey-200',
-  stepLineActive: 'h-0.5 flex-1 bg-tds-blue-500',
-  stepLabel: 'text-st11 text-tds-blue-500 font-medium',
-  stepLabelInactive: 'text-st11 text-tds-grey-500',
-  error: 'text-st10 text-tds-red-500',
-} : {
-  page: 'min-h-screen bg-background',
-  container: 'px-4 py-8 max-w-2xl mx-auto pb-32',
-  title: 'text-2xl font-bold text-foreground',
-  subtitle: 'text-sm text-muted-foreground',
-  card: 'bg-card border border-border rounded-2xl p-6',
-  stepActive: 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold',
-  stepInactive: 'w-8 h-8 rounded-full border-2 border-border text-muted-foreground/50 flex items-center justify-center text-xs',
-  stepLine: 'h-0.5 flex-1 bg-border',
-  stepLineActive: 'h-0.5 flex-1 bg-primary',
-  stepLabel: 'text-xs text-primary font-medium',
-  stepLabelInactive: 'text-xs text-muted-foreground/50',
-  error: 'text-sm text-destructive',
-} as const;
 
 export default function BirthInfoPage() {
   const router = useRouter();
@@ -122,7 +95,7 @@ export default function BirthInfoPage() {
   }
 
   return (
-    <main className={`min-h-screen ${IS_TOSS ? 'bg-white' : 'bg-background'} flex flex-col items-center justify-center ${IS_TOSS ? 'px-6' : 'px-4'} py-12`}>
+    <main className={`min-h-screen ${styles.mainBg} flex flex-col items-center justify-center ${styles.mainPx} py-12`}>
       {/* 단계 표시 */}
       <motion.div
         initial={{ opacity: 0, y: -16 }}
@@ -151,7 +124,7 @@ export default function BirthInfoPage() {
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className={`w-full max-w-md rounded-2xl p-8 ${IS_TOSS ? 'border border-tds-grey-200 bg-white' : 'bg-card border border-border'}`}
+        className={`w-full max-w-md rounded-2xl p-8 ${designTokens.formCard}`}
       >
         {/* 제목 */}
         <div className="mb-8 text-center">
@@ -165,7 +138,7 @@ export default function BirthInfoPage() {
         </div>
 
         {/* 개인정보 수집 동의 */}
-        <div className={`mb-6 rounded-xl p-4 ${IS_TOSS ? 'border border-tds-grey-200 bg-tds-grey-50' : 'border border-border bg-card'}`}>
+        <div className={`mb-6 rounded-xl p-4 ${designTokens.consentBox}`}>
           <div className="flex items-start gap-3">
             <button
               type="button"
@@ -173,7 +146,7 @@ export default function BirthInfoPage() {
               className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                 hasConsented
                   ? 'bg-primary border-primary'
-                  : IS_TOSS ? 'border-tds-grey-300 hover:border-tds-grey-500' : 'border-border hover:border-muted-foreground'
+                  : designTokens.checkboxUnchecked
               }`}
             >
               {hasConsented && (
