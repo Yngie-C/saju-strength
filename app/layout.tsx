@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { cn } from '@/lib/utils';
 import "./globals.css";
 import { TDSProvider } from '@/components/adaptive/TDSProvider';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 export const viewport: Viewport = {
   width: 'device-width',

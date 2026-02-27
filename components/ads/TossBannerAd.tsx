@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { attachBannerAd, isAdSupported } from '@/lib/ads/toss-ads';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 interface TossBannerAdProps {
   className?: string;

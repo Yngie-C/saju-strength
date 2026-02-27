@@ -3,7 +3,7 @@
  * @granite-js/plugin-sentry 기반, 앱인토스 환경 최적화
  */
 
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 export async function initSentry(): Promise<void> {
   if (!IS_TOSS) return;

@@ -1,4 +1,4 @@
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 /** IS_TOSS 분기에 따른 Tailwind 클래스 디자인 상수 */
 export const designTokens = {

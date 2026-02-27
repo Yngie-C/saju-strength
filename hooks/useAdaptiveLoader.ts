@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 /**
  * Adaptive component loader — toss 빌드에서만 TDS SDK 컴포넌트를 동적 로드

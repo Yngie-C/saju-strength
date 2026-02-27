@@ -4,8 +4,7 @@ import { ReactNode, useEffect, useState, ComponentType } from 'react';
 import { initTossApp } from '@/lib/toss';
 import { initSentry } from '@/lib/sentry';
 import { initializeAds } from '@/lib/ads/toss-ads';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 export function TDSProvider({ children }: { children: ReactNode }) {
   const [Provider, setProvider] = useState<ComponentType<{ children: ReactNode }> | null>(null);

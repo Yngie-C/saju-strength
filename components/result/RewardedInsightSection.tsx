@@ -7,8 +7,7 @@ import { PremiumReport, DetailedAxisAnalysis, StrengthScenario } from '@/types/p
 import { generatePremiumReport } from '@/lib/premium/analyzer';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import { motion } from 'framer-motion';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 interface Props {
   sessionId: string;

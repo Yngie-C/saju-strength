@@ -8,8 +8,7 @@
  */
 
 import { AD_GROUP_IDS, AD_COOLDOWN, type AdType } from './config';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 let adsInitialized = false;
 let adsSdk: Record<string, unknown> | null = null;

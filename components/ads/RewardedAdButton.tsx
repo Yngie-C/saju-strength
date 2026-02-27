@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { showRewarded, preloadRewarded, isAdSupported } from '@/lib/ads/toss-ads';
 import { designTokens } from '@/lib/design-tokens';
-
-const IS_TOSS = process.env.NEXT_PUBLIC_BUILD_TARGET === 'toss';
+import { IS_TOSS } from '@/lib/platform';
 
 interface RewardedAdButtonProps {
   onRewardEarned: (reward: { unitType?: string; unitAmount?: number }) => void;
