@@ -22,10 +22,10 @@ export default function SurveyError({
       <div className={`w-full ${designTokens.maxWidth} mx-auto text-center`}>
         <p className="text-4xl mb-4">⚠️</p>
         <h1 className={`text-xl font-bold mb-2 ${designTokens.textPrimary}`}>
-          설문 중 문제가 발생했습니다
+          설문 중 문제가 생겼어요
         </h1>
         <p className={`text-sm mb-8 ${designTokens.textSecondary}`}>
-          답변 내용은 자동 저장되었을 수 있습니다. 다시 시도해 주세요.
+          답변 내용은 자동 저장되었을 수 있어요. 다시 시도해 볼까요?
         </p>
         <div className="flex flex-col gap-3">
           <button

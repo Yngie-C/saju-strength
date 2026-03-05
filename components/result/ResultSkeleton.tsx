@@ -21,7 +21,7 @@ export function ResultSkeleton() {
             <span className="text-sm font-medium">교차 분석 중...</span>
           </div>
           <p className={resultStyles.caption}>
-            사주 오행과 PSA 강점을 비교 분석하고 있습니다
+            사주 오행과 PSA 강점을 비교 분석하고 있어요
           </p>
         </div>
         <SkeletonBlock h="h-56" />

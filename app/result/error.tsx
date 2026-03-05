@@ -22,7 +22,7 @@ export default function ResultError({
       <div className={`w-full ${designTokens.maxWidth} mx-auto text-center`}>
         <p className="text-4xl mb-4">⚠️</p>
         <h1 className={`text-xl font-bold mb-2 ${designTokens.textPrimary}`}>
-          결과를 불러오는 중 문제가 발생했습니다
+          결과를 불러오는 중 문제가 생겼어요
         </h1>
         <p className={`text-sm mb-8 ${designTokens.textSecondary}`}>
           잠시 후 다시 시도해 주세요.

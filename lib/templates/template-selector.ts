@@ -139,14 +139,14 @@ export function generateShadowSides(
 
   // If no low scores, just mention complementary partners
   if (!lowScoreCategories || lowScoreCategories.length === 0) {
-    return `당신의 강점을 보완할 수 있는 파트너는: ${partners}입니다.`;
+    return `당신의 강점을 보완할 수 있는 파트너는: ${partners}예요.`;
   }
 
   const reframedLabels = lowScoreCategories
     .map((c) => c.reframedLabel)
     .join(', ');
 
-  return `당신의 강점을 보완할 수 있는 파트너는: ${partners}입니다.\n\n특히 "${reframedLabels}" 스타일과 상반되는 강점을 가진 동료와 협업하면 시너지가 극대화됩니다.`;
+  return `당신의 강점을 보완할 수 있는 파트너는: ${partners}예요.\n\n특히 "${reframedLabels}" 스타일과 상반되는 강점을 가진 동료와 협업하면 시너지가 극대화돼요.`;
 }
 
 // ==========================================

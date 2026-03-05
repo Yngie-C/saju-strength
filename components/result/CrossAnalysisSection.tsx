@@ -113,7 +113,7 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
           </span>
         </h2>
         <p className={styles.sectionDesc}>
-          사주 오행(타고난 기질)과 PSA 강점(현재 강점)을 겹쳐 분석합니다
+          사주 오행(타고난 기질)과 PSA 강점(현재 강점)을 겹쳐 분석해요
         </p>
       </div>
 

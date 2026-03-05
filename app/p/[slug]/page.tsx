@@ -56,7 +56,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               </div>
               <div>
                 <p className="text-white font-bold text-lg">— 일간 아키타입</p>
-                <p className="text-white/45 text-sm">분석 결과가 여기에 표시됩니다</p>
+                <p className="text-white/45 text-sm">분석 결과가 여기에 표시돼요</p>
               </div>
             </div>
             {/* 오행 분포 placeholder */}
@@ -92,7 +92,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             </div>
             <div>
               <p className="text-white font-bold text-lg">— 강점 페르소나</p>
-              <p className="text-white/45 text-sm">설문 결과가 여기에 표시됩니다</p>
+              <p className="text-white/45 text-sm">설문 결과가 여기에 표시돼요</p>
             </div>
           </div>
           {/* 레이더 차트 placeholder */}
@@ -115,7 +115,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                 <span className="text-xs font-bold text-amber-300 uppercase tracking-wide">일치 강점</span>
               </div>
               <p className="text-white/80 text-sm">타고난 재능이 현재도 빛나는 영역</p>
-              <p className="text-white/35 text-xs">분석 결과가 여기에 표시됩니다</p>
+              <p className="text-white/35 text-xs">분석 결과가 여기에 표시돼요</p>
             </div>
             {/* 잠재력 영역 */}
             <div
@@ -127,7 +127,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                 <span className="text-xs font-bold text-purple-300 uppercase tracking-wide">잠재력</span>
               </div>
               <p className="text-white/80 text-sm">아직 발현되지 않은 숨은 보석</p>
-              <p className="text-white/35 text-xs">분석 결과가 여기에 표시됩니다</p>
+              <p className="text-white/35 text-xs">분석 결과가 여기에 표시돼요</p>
             </div>
           </div>
         </section>
