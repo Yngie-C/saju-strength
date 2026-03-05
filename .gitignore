@@ -35,3 +35,7 @@ next-env.d.ts
 
 # omc
 .omc/
+
+# AI tools
+.granite/
+*.ait
