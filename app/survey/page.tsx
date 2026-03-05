@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock } from 'lucide-react';
@@ -12,6 +13,7 @@ import { useSurveyScroll } from '@/hooks/useSurveyScroll';
 import { useSurveySubmit } from '@/hooks/useSurveySubmit';
 import { SurveyQuestionCard } from '@/components/survey/SurveyQuestionCard';
 import { SurveyNavigation } from '@/components/survey/SurveyNavigation';
+import { trackScreen, trackClick } from '@/lib/analytics';
 
 export default function SurveyPage() {
   const router = useRouter();
@@ -35,7 +37,16 @@ export default function SurveyPage() {
   } = useSurveyState();
 
   const { currentPageRefs, getFirstUnansweredIndex } = useSurveyScroll(answers, currentPage, lastAnsweredRef);
-  const { handleSubmit, isSubmitting } = useSurveySubmit(answers, startTime, router);
+  const { handleSubmit: submitSurvey, isSubmitting } = useSurveySubmit(answers, startTime, router);
+
+  useEffect(() => {
+    trackScreen('survey');
+  }, []);
+
+  function handleSubmit() {
+    trackClick('survey', 'submit');
+    submitSurvey();
+  }
 
   const currentQuestions = BASIC_QUESTIONS.slice(
     currentPage * BASIC_QUESTIONS_PER_PAGE,

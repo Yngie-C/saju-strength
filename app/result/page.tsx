@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { AxisAnalysis } from "@/types/saju";
 import { IS_TOSS, designTokens } from '@/lib/design-tokens';
@@ -13,6 +14,8 @@ import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { TossBannerAd } from '@/components/ads/TossBannerAd';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { trackScreen, trackClick, trackImpression } from '@/lib/analytics';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -33,6 +36,12 @@ function SectionDivider() {
 
 export default function ResultPage() {
   const { sajuResult, psaResult, combined, loading, error, shareStatus, handleShare } = useResultData();
+
+  useEffect(() => {
+    if (!loading && sajuResult && psaResult && combined) {
+      trackScreen('result');
+    }
+  }, [loading, sajuResult, psaResult, combined]);
 
   if (loading) return <ResultSkeleton />;
   if (error) return <ResultError error={error} />;
@@ -56,50 +65,58 @@ export default function ResultPage() {
           <p className={resultStyles.subtitle}>사주 오행 × PSA 강점 — 선천과 후천의 교차</p>
         </motion.div>
 
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
-          <SajuProfileSection
-            fourPillars={sajuResult.fourPillars}
-            dayMaster={{ name: sajuResult.dayMaster.name, element: sajuResult.dayMaster.element, keywords: sajuResult.dayMaster.keywords, description: sajuResult.dayMaster.description, image: sajuResult.dayMaster.image }}
-            elementDistribution={sajuResult.elementDistribution}
-            dominantElement={sajuResult.dominantElement}
-          />
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'saju_profile')} viewport={{ once: true, margin: "-60px" }}>
+          <ErrorBoundary>
+            <SajuProfileSection
+              fourPillars={sajuResult.fourPillars}
+              dayMaster={{ name: sajuResult.dayMaster.name, element: sajuResult.dayMaster.element, keywords: sajuResult.dayMaster.keywords, description: sajuResult.dayMaster.description, image: sajuResult.dayMaster.image }}
+              elementDistribution={sajuResult.elementDistribution}
+              dominantElement={sajuResult.dominantElement}
+            />
+          </ErrorBoundary>
         </motion.div>
 
         <SectionDivider />
 
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
-          <PsaProfileSection
-            categoryScores={psaResult.categoryScores.map((cs) => ({ category: cs.category, normalizedScore: cs.normalizedScore, rank: cs.rank }))}
-            persona={{ type: psaResult.persona.type, title: psaResult.persona.title, tagline: psaResult.persona.tagline }}
-            radarData={radarData}
-            strengthsSummary={psaResult.strengthsSummary}
-          />
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'psa_profile')} viewport={{ once: true, margin: "-60px" }}>
+          <ErrorBoundary>
+            <PsaProfileSection
+              categoryScores={psaResult.categoryScores.map((cs) => ({ category: cs.category, normalizedScore: cs.normalizedScore, rank: cs.rank }))}
+              persona={{ type: psaResult.persona.type, title: psaResult.persona.title, tagline: psaResult.persona.tagline }}
+              radarData={radarData}
+              strengthsSummary={psaResult.strengthsSummary}
+            />
+          </ErrorBoundary>
         </motion.div>
 
         <SectionDivider />
 
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
-          <CrossAnalysisSection axes={combined.axes as AxisAnalysis[]} />
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'cross_analysis')} viewport={{ once: true, margin: "-60px" }}>
+          <ErrorBoundary>
+            <CrossAnalysisSection axes={combined.axes as AxisAnalysis[]} />
+          </ErrorBoundary>
         </motion.div>
 
         <SectionDivider />
 
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
-          <GrowthGuideSection guide={growthGuide} strengthTips={strengthTips} brandingMessages={brandingMessages} />
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'growth_guide')} viewport={{ once: true, margin: "-60px" }}>
+          <ErrorBoundary>
+            <GrowthGuideSection guide={growthGuide} strengthTips={strengthTips} brandingMessages={brandingMessages} />
+          </ErrorBoundary>
         </motion.div>
 
         <SectionDivider />
 
         <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
-            onClick={handleShare}
+            onClick={() => { trackClick('result', 'share'); handleShare(); }}
             className={`flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${designTokens.shareButtonInline}`}
           >
             {shareStatus === "copied" ? "링크 복사됨!" : shareStatus === "shared" ? "공유 완료!" : "결과 공유하기"}
           </button>
           {!IS_TOSS && (
             <button
-              onClick={() => (window.location.href = "/p")}
+              onClick={() => { trackClick('result', 'web_profile'); window.location.href = "/p"; }}
               className="flex-1 py-3.5 rounded-xl border border-border text-muted-foreground font-semibold text-sm hover:bg-muted transition-all duration-200"
             >
               웹 프로필 만들기
@@ -110,7 +127,7 @@ export default function ResultPage() {
         <TossBannerAd theme="light" variant="card" className="my-4" />
 
         <p className={`text-center leading-relaxed pb-8 ${designTokens.disclaimer}`}>
-          이 서비스는 재미와 자기 이해를 위한 도구이며, 의학적/심리학적 진단을 대체하지 않습니다.
+          이 서비스는 재미와 자기 이해를 위한 도구이며, 의학적/심리학적 진단을 대체하지 않아요.
         </p>
       </div>
     </div>

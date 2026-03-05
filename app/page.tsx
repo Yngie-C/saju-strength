@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useInView } from "framer-motion";
 import { Star, Diamond, TrendingUp, Circle, Sparkles, BarChart3, GitMerge, ArrowRight } from "lucide-react";
 import { designTokens, IS_TOSS } from '@/lib/design-tokens';
+import { trackScreen, trackClick } from '@/lib/analytics';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -29,6 +30,10 @@ function SectionReveal({ children, className }: { children: React.ReactNode; cla
 
 export default function LandingPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    trackScreen('landing');
+  }, []);
 
   return (
     <main className={`${designTokens.pageMinHeight} ${designTokens.textPrimary} overflow-x-hidden`}>
@@ -71,14 +76,14 @@ export default function LandingPage() {
 
           {/* 설명 */}
           <p className={`leading-relaxed max-w-md whitespace-pre-line ${designTokens.textCaption}`}>
-            {"사주 오행 분석과 Big5 기반 강점 설문으로\n선천적 기질과 후천적 강점을 교차 분석합니다."}
+            {"사주 오행 분석과 Big5 기반 강점 설문으로\n선천적 기질과 후천적 강점을 교차 분석해요."}
           </p>
 
           {/* CTA */}
           <motion.button
             whileHover={designTokens.hoverScale}
             whileTap={{ scale: 0.97 }}
-            onClick={() => router.push("/survey")}
+            onClick={() => { trackClick('landing', 'start'); router.push("/survey"); }}
             className={`mt-2 inline-flex items-center gap-2 ${designTokens.primaryButton} px-8 py-4 font-bold text-lg shadow-lg shadow-primary/30 hover:opacity-90 transition-opacity`}
           >
             무료로 시작하기
@@ -154,28 +159,28 @@ export default function LandingPage() {
                 badge: "★ 일치",
                 badgeColor: "bg-amber-500/15 text-amber-300 border-amber-500/30",
                 title: "타고난 재능이 현재도 빛나는 영역",
-                desc: "선천적 기질과 후천적 강점이 모두 높은 당신의 핵심 강점입니다.",
+                desc: "선천적 기질과 후천적 강점이 모두 높은 당신의 핵심 강점이에요.",
               },
               {
                 icon: <Diamond size={22} className="text-primary" />,
                 badge: "◆ 잠재력",
                 badgeColor: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
                 title: "아직 발현되지 않은 숨은 보석",
-                desc: "타고난 기질은 강하지만 아직 충분히 쓰이지 않은 잠재 영역입니다.",
+                desc: "타고난 기질은 강하지만 아직 충분히 쓰이지 않은 잠재 영역이에요.",
               },
               {
                 icon: <TrendingUp size={22} className="text-green-400" />,
                 badge: "▲ 후천 개발",
                 badgeColor: "bg-green-500/15 text-green-300 border-green-500/30",
                 title: "노력으로 만들어낸 강점",
-                desc: "타고난 기질 이상으로 현재 발현된 후천적 성장의 증거입니다.",
+                desc: "타고난 기질 이상으로 현재 발현된 후천적 성장의 증거예요.",
               },
               {
                 icon: <Circle size={22} className="text-blue-400" />,
                 badge: "○ 미발현",
                 badgeColor: "bg-blue-500/15 text-blue-300 border-blue-500/30",
                 title: "앞으로의 성장 기회",
-                desc: "아직 개발되지 않은 영역으로 선택적 성장을 위한 기회입니다.",
+                desc: "아직 개발되지 않은 영역으로 선택적 성장을 위한 기회예요.",
               },
             ].map((item, i) => (
               <SectionReveal key={i}>
@@ -207,7 +212,7 @@ export default function LandingPage() {
             <motion.button
               whileHover={designTokens.hoverScale}
               whileTap={{ scale: 0.97 }}
-              onClick={() => router.push("/survey")}
+              onClick={() => { trackClick('landing', 'start'); router.push("/survey"); }}
               className={`inline-flex items-center gap-2 ${designTokens.primaryButton} px-8 py-4 font-bold text-lg shadow-lg shadow-primary/30`}
             >
               무료로 시작하기
@@ -221,7 +226,7 @@ export default function LandingPage() {
       {/* Footer 면책 고지 */}
       <footer className={`${designTokens.pagePadding} py-10 border-t ${designTokens.borderDefault}`}>
         <p className={`max-w-2xl mx-auto text-center leading-relaxed ${designTokens.textCaption}`}>
-          이 서비스는 동양 전통 기질 분석과 현대 강점 진단의 융합 서비스이며, 의학적/심리학적 진단을 대체하지 않습니다.
+          이 서비스는 동양 전통 기질 분석과 현대 강점 진단의 융합 서비스이며, 의학적/심리학적 진단을 대체하지 않아요.
         </p>
       </footer>
     </main>

@@ -11,6 +11,7 @@ import { designTokens } from '@/lib/design-tokens';
 import { birthInfoStyles as styles } from '@/lib/section-styles';
 import Link from 'next/link';
 import { preloadInterstitial, showInterstitial } from '@/lib/ads/toss-ads';
+import { trackScreen, trackClick } from '@/lib/analytics';
 
 export default function BirthInfoPage() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function BirthInfoPage() {
 
   // 전면형 광고 사전 로드 (토스 환경에서만)
   useEffect(() => {
+    trackScreen('birth_info');
     preloadInterstitial();
   }, []);
 
@@ -42,6 +44,7 @@ export default function BirthInfoPage() {
   }) {
     setIsLoading(true);
     setError(null);
+    trackClick('birth_info', 'submit');
 
     try {
       // 사주 계산 API 호출
@@ -66,12 +69,12 @@ export default function BirthInfoPage() {
       // 설문 분석 결과 확인 (백그라운드에서 실패했을 수 있음)
       const psaResult = sessionStorage.getItem('psaResult');
       if (!psaResult) {
-        throw new Error('설문 분석 결과를 불러오지 못했습니다. 다시 시도해 주세요.');
+        throw new Error('설문 분석 결과를 불러오지 못했어요. 다시 시도해 볼까요?');
       }
 
       if (!sajuRes.ok) {
         const body = await sajuRes.json().catch(() => ({}));
-        throw new Error(body?.error ?? "분석 중 오류가 발생했습니다.");
+        throw new Error(body?.error ?? "분석 중 문제가 생겼어요.");
       }
 
       const json = await sajuRes.json();
@@ -88,7 +91,7 @@ export default function BirthInfoPage() {
       await showInterstitial();
       router.push("/result");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
+      setError(err instanceof Error ? err.message : "알 수 없는 문제가 생겼어요.");
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +160,7 @@ export default function BirthInfoPage() {
             </button>
             <div className="flex-1">
               <p className={`text-sm leading-relaxed ${designTokens.textPrimary}`}>
-                <span className="font-medium">개인정보 수집 및 이용에 동의합니다.</span>
+                <span className="font-medium">개인정보 수집 및 이용에 동의해요.</span>
               </p>
               <p className={`mt-1.5 text-xs leading-relaxed ${designTokens.textCaption}`}>
                 수집 항목: 생년월일시, 성별, 양음력 여부 · 수집 목적: 사주 분석 서비스 제공 · 보유 기간: 서비스 탈퇴 시까지
@@ -194,7 +197,7 @@ export default function BirthInfoPage() {
         transition={{ delay: 0.6 }}
         className={`mt-6 text-xs text-center max-w-xs ${designTokens.textCaption}`}
       >
-        입력하신 정보는 사주 분석 서비스 제공 외 다른 목적으로 사용되지 않습니다.
+        입력하신 정보는 사주 분석 서비스 제공 외 다른 목적으로 사용하지 않아요.
       </motion.p>
     </main>
   );
