@@ -7,7 +7,7 @@ export const SUPPORTIVE_BACKBONE_BRANDING: BrandingMessageTemplate[] = [
     variant: 'balanced',
     selfIntro: '팀을 지지하고 갈등을 풀어내는 중재자',
     linkedinHeadline: '회복탄력적 중재자 | 어려울 때 팀을 하나로 묶어요',
-    elevatorPitch: '팀이 힘들 때 옆에서 지지하고, 갈등이 생기면 중재해요. 회복력과 포용력으로 팀의 결속을 만들어요.',
+    elevatorPitch: '팀이 힘들 때 옆에서 지지하고, 갈등이 생기면 중재해요. 양쪽의 입장을 모두 이해하고, 공감을 바탕으로 해결책을 찾아요. 회복력과 포용력으로 팀의 결속을 만들고, 함께 앞으로 나아갈 수 있는 힘을 불어넣어요.',
     hashtags: ['중재자', '팀서포터', '회복력', '포용', '갈등해결'],
   },
   {
@@ -15,7 +15,7 @@ export const SUPPORTIVE_BACKBONE_BRANDING: BrandingMessageTemplate[] = [
     variant: 'spiked',
     selfIntro: '무너진 팀을 다시 일으켜 세우는 사람',
     linkedinHeadline: '회복탄력적 중재자 | 팀의 위기를 극복하고 관계를 재건해요',
-    elevatorPitch: '팀이 가장 어려울 때 저의 역할이 시작돼요. 흩어진 마음을 모으고, 다시 함께 나아갈 수 있도록 도와요.',
+    elevatorPitch: '팀이 가장 어려울 때 저의 역할이 시작돼요. 무너진 신뢰를 회복하고, 흩어진 마음을 다시 하나로 모으는 것이 제가 잘하는 일이에요. 위기를 함께 극복한 경험이 팀을 더 단단하게 만든다고 믿고, 그 과정을 이끌어요.',
     hashtags: ['팀재건', '갈등중재', '관계회복', '위기극복'],
   },
   {
@@ -23,7 +23,7 @@ export const SUPPORTIVE_BACKBONE_BRANDING: BrandingMessageTemplate[] = [
     variant: 'mixed',
     selfIntro: '팀의 화합을 이끄는 서포터',
     linkedinHeadline: '회복탄력적 중재자 | 협업과 회복력으로 팀을 지원해요',
-    elevatorPitch: '팀원들을 지지하고 협업을 촉진해요. 어려운 상황에서도 긍정적인 분위기를 유지하며 팀의 화합을 이끌어요.',
+    elevatorPitch: '팀원들을 지지하고 협업을 촉진해요. 누군가 힘들어할 때 가장 먼저 다가가고, 함께 해결 방법을 찾아요. 어려운 상황에서도 긍정적인 분위기를 유지하며 팀의 화합을 이끌어내는 것이 저의 강점이에요.',
     hashtags: ['팀화합', '서포터', '협업', '긍정에너지'],
   },
 ];

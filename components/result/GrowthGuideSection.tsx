@@ -122,24 +122,12 @@ export function GrowthGuideSection({
         <div className="space-y-4">
           <h3 className={styles.brandingTitle}>퍼스널 브랜딩</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Self Intro */}
-            <div className={`${styles.brandingCard} ${styles.cardFill}`}>
-              <p className={styles.brandingLabel}>한 줄 자기소개</p>
-              <p className={styles.brandingText}>
-                {brandingMessages.selfIntro}
-              </p>
-            </div>
-
-            {/* LinkedIn */}
-            <div className={`${styles.brandingCard} ${styles.cardFill}`}>
-              <p className={styles.brandingLabel}>
-                LinkedIn 헤드라인
-              </p>
-              <p className={styles.brandingText}>
-                {brandingMessages.linkedinHeadline}
-              </p>
-            </div>
+          {/* Self Intro */}
+          <div className={`${styles.brandingCard} ${styles.cardFill}`}>
+            <p className={styles.brandingLabel}>한 줄 자기소개</p>
+            <p className={styles.brandingText}>
+              {brandingMessages.selfIntro}
+            </p>
           </div>
 
           {/* Elevator Pitch */}
@@ -148,7 +136,7 @@ export function GrowthGuideSection({
             style={styles.pitchBgStyle}
           >
             <p className={styles.pitchLabel}>
-              엘리베이터 피치
+              강점 브랜딩 요소
             </p>
             <p className={styles.pitchText}>
               {brandingMessages.elevatorPitch}

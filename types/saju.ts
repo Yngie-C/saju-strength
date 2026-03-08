@@ -50,7 +50,7 @@ export interface DayMasterArchetype {
   stem: HeavenlyStem;
   element: FiveElement;
   yinYang: YinYang;
-  name: string;       // e.g., "선구자"
+  name: string;       // e.g., "개척자"
   nameEn: string;     // e.g., "Pioneer"
   keywords: string[];
   description: string;

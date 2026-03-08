@@ -69,7 +69,7 @@ export default function ResultPage() {
           <ErrorBoundary>
             <SajuProfileSection
               fourPillars={sajuResult.fourPillars}
-              dayMaster={{ name: sajuResult.dayMaster.name, element: sajuResult.dayMaster.element, keywords: sajuResult.dayMaster.keywords, description: sajuResult.dayMaster.description, image: sajuResult.dayMaster.image }}
+              dayMaster={{ name: sajuResult.dayMaster.name, nameEn: sajuResult.dayMaster.nameEn, element: sajuResult.dayMaster.element, keywords: sajuResult.dayMaster.keywords, description: sajuResult.dayMaster.description, image: sajuResult.dayMaster.image }}
               elementDistribution={sajuResult.elementDistribution}
               dominantElement={sajuResult.dominantElement}
             />

@@ -9,6 +9,7 @@ import { sajuProfileStyles as styles } from "@/lib/section-styles";
 
 interface DayMasterInfo {
   name: string;
+  nameEn: string;
   element: string;
   keywords: string[];
   description: string;
@@ -36,10 +37,10 @@ export function SajuProfileSection({
   dominantElement,
 }: SajuProfileSectionProps) {
   const pillars: Array<{ label: string; pillar: Pillar | null }> = [
-    { label: PILLAR_LABELS[0], pillar: fourPillars.year },
-    { label: PILLAR_LABELS[1], pillar: fourPillars.month },
-    { label: PILLAR_LABELS[2], pillar: fourPillars.day },
     { label: PILLAR_LABELS[3], pillar: fourPillars.hour },
+    { label: PILLAR_LABELS[2], pillar: fourPillars.day },
+    { label: PILLAR_LABELS[1], pillar: fourPillars.month },
+    { label: PILLAR_LABELS[0], pillar: fourPillars.year },
   ];
 
   const dominantColor = ELEMENT_COLORS[dominantElement] ?? "#fff";
@@ -79,7 +80,7 @@ export function SajuProfileSection({
               branch={pillar.branch}
               stemElement={pillar.stemElement}
               branchElement={pillar.branchElement}
-              isHighlighted={i === 2}
+              isHighlighted={i === 1}
             />
           );
         })}
@@ -112,7 +113,7 @@ export function SajuProfileSection({
                 className={styles.dayMasterName}
                 style={{ color: dominantColor }}
               >
-                {dayMaster.name}
+                {dayMaster.name} <span className="opacity-60 font-normal">{dayMaster.nameEn}</span>
               </p>
               <p className={styles.dayMasterSub}>{dayMaster.image}</p>
             </div>
