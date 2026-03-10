@@ -8,12 +8,12 @@
     "start": "next start",
     "lint": "next lint",
     "build:web": "NEXT_PUBLIC_BUILD_TARGET=web next build",
-    "build:toss": "bash -c 'mv app/p app/_p_web_only; mv app/api app/_api_web_only; trap \"mv app/_p_web_only app/p; mv app/_api_web_only app/api\" EXIT; NEXT_PUBLIC_BUILD_TARGET=toss npx granite build'",
+    "build:toss": "bash -c 'mv app/p app/_p_web_only; mv app/api app/_api_web_only; trap \"mv app/_p_web_only app/p; mv app/_api_web_only app/api\" EXIT; NEXT_PUBLIC_BUILD_TARGET=toss npx ait build'",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@apps-in-toss/web-framework": "latest",
+    "@apps-in-toss/web-framework": "2.0.1",
     "@emotion/react": "^11.14.0",
     "@fullstackfamily/manseryeok": "^1.0.6",
     "@granite-js/plugin-sentry": "latest",

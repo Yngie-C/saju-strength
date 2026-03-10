@@ -16,14 +16,7 @@ export function isTossEnvironment(): boolean {
 
 /** 토스 앱 초기화 */
 export async function initTossApp(): Promise<void> {
-  if (!isTossEnvironment()) return;
-
-  try {
-    const { AppsInToss } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
-    AppsInToss.registerApp({ appName: 'saju-strength' });
-  } catch (error) {
-    console.warn('[Toss] App initialization failed:', error);
-  }
+  // AppsInToss.registerApp removed in SDK 2.0.1
 }
 
 /** 토스 로그인 (OAuth2 authorizationCode 반환) */
@@ -44,16 +37,14 @@ export async function tossLogin(): Promise<{
 
 /** 토스 공유 링크 생성 */
 export async function createTossShareLink(
-  path: string,
-  ogImageUrl?: string
+  path: string
 ): Promise<string | null> {
   if (!isTossEnvironment()) return null;
 
   try {
     const { getTossShareLink } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
     return await getTossShareLink(
-      `intoss://saju-strength${path}`,
-      ogImageUrl
+      `intoss://saju-strength${path}`
     );
   } catch (error) {
     console.warn('[Toss] Share link creation failed:', error);

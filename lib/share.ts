@@ -23,8 +23,7 @@ export async function shareResult(data: ShareData): Promise<ShareResult> {
   if (isTossEnvironment()) {
     try {
       const shareLink = await createTossShareLink(
-        path || '/result',
-        imageUrl
+        path || '/result'
       );
 
       if (shareLink) {
