@@ -1,7 +1,6 @@
 'use client';
 
 import { apiUrl } from '@/lib/config';
-import { isTossEnvironment } from '@/lib/toss';
 
 // Storage keys
 const KEYS = {
@@ -18,7 +17,7 @@ class StateManager {
   private useDB: boolean;
 
   constructor() {
-    this.useDB = isTossEnvironment();
+    this.useDB = false; // 토스: 클라이언트 직접 분석, DB 불필요 / 웹: API가 DB 저장
   }
 
   /** 현재 세션 ID 가져오기 (없으면 생성) */
@@ -103,26 +102,28 @@ class StateManager {
       }
     }
 
-    // 3. Try DB (for toss environment or when sessionStorage lost)
-    try {
-      const sessionId = this.getSessionId();
-      const response = await fetch(
-        apiUrl(`/api/state/load?sessionId=${sessionId}&key=${key}`)
-      );
-      if (response.ok) {
-        const result = await response.json();
-        if (result.data) {
-          // Re-cache in sessionStorage
-          try {
-            sessionStorage.setItem(storageKey, JSON.stringify(result.data));
-          } catch {
-            // ignore
+    // 3. Try DB (only when useDB is enabled)
+    if (this.useDB) {
+      try {
+        const sessionId = this.getSessionId();
+        const response = await fetch(
+          apiUrl(`/api/state/load?sessionId=${sessionId}&key=${key}`)
+        );
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) {
+            // Re-cache in sessionStorage
+            try {
+              sessionStorage.setItem(storageKey, JSON.stringify(result.data));
+            } catch {
+              // ignore
+            }
+            return result.data as T;
           }
-          return result.data as T;
         }
+      } catch {
+        // DB load failed
       }
-    } catch {
-      // DB load failed
     }
 
     return null;

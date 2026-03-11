@@ -12,6 +12,8 @@ import { birthInfoStyles as styles } from '@/lib/section-styles';
 import Link from 'next/link';
 import { preloadInterstitial, showInterstitial } from '@/lib/ads/toss-ads';
 import { trackScreen, trackClick } from '@/lib/analytics';
+import { IS_TOSS } from '@/lib/platform';
+import { SajuAnalyzerAgent } from '@/agents/saju-analyzer';
 
 export default function BirthInfoPage() {
   const router = useRouter();
@@ -47,49 +49,81 @@ export default function BirthInfoPage() {
     trackClick('birth_info', 'submit');
 
     try {
-      // 사주 계산 API 호출
       const existingSessionId = sessionStorage.getItem('saju-session-id');
-      const sajuPromise = fetch(apiUrl("/api/saju/calculate"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, sessionId: existingSessionId }),
-      });
 
-      // 백그라운드 설문 분석이 아직 진행 중이면 함께 대기
-      const pendingAnalysis = getPendingAnalysis();
-      const [sajuRes] = await Promise.all([
-        sajuPromise,
-        // 설문 분석이 이미 완료(sessionStorage에 저장됨)되었거나 없으면 즉시 resolve
-        pendingAnalysis ?? Promise.resolve(null),
-      ]);
+      if (IS_TOSS) {
+        // 클라이언트 직접 분석 (API 호출 없음)
+        const agent = new SajuAnalyzerAgent();
+        const birthInput = {
+          year: data.year,
+          month: data.month,
+          day: data.day,
+          hour: data.hour ?? null,
+          gender: data.gender,
+          isLunar: data.isLunar,
+        };
+        const result = await agent.process(birthInput, {
+          sessionId: existingSessionId || crypto.randomUUID(),
+          data: {},
+        });
+        if (!result.success || !result.data) {
+          throw new Error(result.error || '사주 분석 중 문제가 생겼어요. 입력 정보를 확인해주세요.');
+        }
+        // analyzedAt Date → ISO string 직렬화
+        const serializedResult = {
+          ...result.data,
+          analyzedAt: result.data.analyzedAt instanceof Date
+            ? result.data.analyzedAt.toISOString()
+            : result.data.analyzedAt,
+        };
+        sessionStorage.setItem("sajuResult", JSON.stringify(serializedResult));
+        sessionStorage.setItem("saju-session-id", serializedResult.sessionId);
+        const sm = getStateManager();
+        sm.setSessionId(serializedResult.sessionId);
+        await sm.save('sajuResult', serializedResult);
+        // 전면형 광고 표시 후 결과 페이지로 이동
+        await showInterstitial();
+        router.push("/result");
+      } else {
+        // 기존 API 호출 (웹 빌드)
+        const sajuPromise = fetch(apiUrl("/api/saju/calculate"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...data, sessionId: existingSessionId }),
+        });
 
-      // 백그라운드 분석 Promise 정리
-      clearPendingAnalysis();
+        // 백그라운드 설문 분석이 아직 진행 중이면 함께 대기
+        const pendingAnalysis = getPendingAnalysis();
+        const [sajuRes] = await Promise.all([
+          sajuPromise,
+          pendingAnalysis ?? Promise.resolve(null),
+        ]);
 
-      // 설문 분석 결과 확인 (백그라운드에서 실패했을 수 있음)
-      const psaResult = sessionStorage.getItem('psaResult');
-      if (!psaResult) {
-        throw new Error('설문 분석 결과를 불러오지 못했어요. 다시 시도해 볼까요?');
+        // 백그라운드 분석 Promise 정리
+        clearPendingAnalysis();
+
+        // 설문 분석 결과 확인
+        const psaResult = sessionStorage.getItem('psaResult');
+        if (!psaResult) {
+          throw new Error('설문 분석 결과를 불러오지 못했어요. 다시 시도해 볼까요?');
+        }
+
+        if (!sajuRes.ok) {
+          const body = await sajuRes.json().catch(() => ({}));
+          throw new Error(body?.error ?? "분석 중 문제가 생겼어요.");
+        }
+
+        const json = await sajuRes.json();
+        const result = json?.data ?? json;
+
+        sessionStorage.setItem("sajuResult", JSON.stringify(result));
+        sessionStorage.setItem("saju-session-id", result.sessionId);
+        const sm = getStateManager();
+        sm.setSessionId(result.sessionId);
+        await sm.save('sajuResult', result);
+        await showInterstitial();
+        router.push("/result");
       }
-
-      if (!sajuRes.ok) {
-        const body = await sajuRes.json().catch(() => ({}));
-        throw new Error(body?.error ?? "분석 중 문제가 생겼어요.");
-      }
-
-      const json = await sajuRes.json();
-      const result = json?.data ?? json;
-
-      sessionStorage.setItem("sajuResult", JSON.stringify(result));
-      sessionStorage.setItem("saju-session-id", result.sessionId);
-      // Persist to DB for toss environment
-      const sm = getStateManager();
-      sm.setSessionId(result.sessionId);
-      await sm.save('sajuResult', result);
-      // 전면형 광고 표시 후 결과 페이지로 이동 (토스 환경)
-      // 광고 실패/미지원 시 즉시 이동
-      await showInterstitial();
-      router.push("/result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 문제가 생겼어요.");
     } finally {

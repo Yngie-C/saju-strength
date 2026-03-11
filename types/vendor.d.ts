@@ -12,19 +12,12 @@ declare module 'node-fetch' {
 declare module '@apps-in-toss/web-framework' {
   export interface AppLoginResult {
     authorizationCode: string;
-    referrer: string;
+    referrer: 'DEFAULT' | 'SANDBOX';
   }
 
   export function appLogin(): Promise<AppLoginResult>;
 
-  export const AppsInToss: {
-    registerApp(options: { appName: string }): void;
-  };
-
-  export function getTossShareLink(
-    deepLink: string,
-    ogImageUrl?: string
-  ): Promise<string>;
+  export function getTossShareLink(path: string): Promise<string>;
 
   export function share(options: { message: string }): Promise<void>;
 
@@ -40,9 +33,30 @@ declare module '@apps-in-toss/web-framework' {
     ): () => void;
   };
 
-  export function getProductItemList(): Promise<unknown[]>;
+  // TossAds
+  export const TossAds: {
+    initialize: ((options?: { callbacks?: { onInitialized?: () => void; onInitializationFailed?: (error: Error) => void } }) => void) & { isSupported: () => boolean };
+    attachBanner: ((adGroupId: string, target: string | HTMLElement, options?: { theme?: 'auto' | 'light' | 'dark'; variant?: 'card' | 'expanded' }) => { destroy: () => void }) & { isSupported: () => boolean };
+    destroy: ((slotId: string) => void) & { isSupported: () => boolean };
+    destroyAll: (() => void) & { isSupported: () => boolean };
+  };
 
-  export function createOneTimePurchaseOrder(options: {
-    productId: string;
-  }): Promise<unknown>;
+  // Full screen ads
+  export const loadFullScreenAd: ((args: {
+    onEvent: (data: unknown) => void;
+    onError: (error: Error) => void;
+    options?: { adGroupId: string };
+  }) => () => void) & { isSupported: () => boolean };
+
+  export const showFullScreenAd: ((args: {
+    onEvent: (data: { type: string; data?: { unitType: string; unitAmount: number } }) => void;
+    onError: (error: Error) => void;
+    options?: { adGroupId: string };
+  }) => () => void) & { isSupported: () => boolean };
+
+  // IAP namespace
+  export const IAP: {
+    createOneTimePurchaseOrder: (params: unknown) => () => void;
+    getProductItemList: () => Promise<{ products: unknown[] }>;
+  };
 }

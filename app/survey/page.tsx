@@ -127,6 +127,9 @@ export default function SurveyPage() {
         <p className={`text-center mt-4 ${surveyStyles.caption}`}>
           좌우로 스와이프하거나 버튼을 눌러 이동하세요
         </p>
+
+        {/* 하단 네비게이션 영역만큼 여백 확보 */}
+        <div className="h-28" />
       </div>
 
       <SurveyNavigation

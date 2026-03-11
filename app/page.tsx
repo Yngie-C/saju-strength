@@ -76,7 +76,7 @@ export default function LandingPage() {
 
           {/* 설명 */}
           <p className={`leading-relaxed max-w-md whitespace-pre-line ${designTokens.textCaption}`}>
-            {"사주 오행 분석과 Big5 기반 강점 설문으로\n선천적 기질과 후천적 강점을 교차 분석해요."}
+            {"사주 오행 분석과 PSA 강점 설문으로\n선천적 기질과 후천적 강점을 교차 분석해요."}
           </p>
 
           {/* CTA */}
@@ -109,7 +109,7 @@ export default function LandingPage() {
               {
                 icon: <BarChart3 size={28} className="text-primary" />,
                 step: "01",
-                title: "Big5 강점 설문",
+                title: "PSA 강점 설문",
                 desc: "30문항으로 현재 발현 중인 강점 측정",
               },
               {

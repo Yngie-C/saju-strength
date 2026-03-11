@@ -57,7 +57,7 @@ export async function initializeAds(): Promise<boolean> {
     const TossAds = sdk.TossAds as {
       initialize?: {
         isSupported?: () => boolean;
-        (...args: unknown[]): Promise<void>;
+        (options?: { callbacks?: { onInitialized?: () => void; onInitializationFailed?: (error: Error) => void } }): void;
       };
     } | undefined;
 
@@ -71,7 +71,7 @@ export async function initializeAds(): Promise<boolean> {
       return false;
     }
 
-    await TossAds.initialize();
+    await TossAds.initialize({});
     adsInitialized = true;
     return true;
   } catch (err) {
@@ -94,19 +94,21 @@ export async function attachBannerAd(
     const TossAds = sdk.TossAds as {
       attachBanner?: {
         isSupported?: () => boolean;
-        (params: unknown): { destroy: () => void };
+        (adGroupId: string, target: HTMLElement, options?: Record<string, unknown>): { destroy: () => void };
       };
     } | undefined;
 
     if (!TossAds?.attachBanner) return null;
     if (TossAds.attachBanner.isSupported && !TossAds.attachBanner.isSupported()) return null;
 
-    const banner = TossAds.attachBanner({
-      adGroupId: AD_GROUP_IDS.banner,
+    const banner = TossAds.attachBanner(
+      AD_GROUP_IDS.banner,
       target,
-      theme: options?.theme ?? 'auto',
-      variant: options?.variant ?? 'card',
-    });
+      {
+        theme: options?.theme ?? 'auto',
+        variant: options?.variant ?? 'card',
+      }
+    );
 
     return () => banner.destroy();
   } catch (err) {
@@ -135,14 +137,19 @@ export async function preloadFullScreenAd(type: FullScreenAdType): Promise<boole
 
     const loadFn = sdk.loadFullScreenAd as {
       isSupported?: () => boolean;
-      (params: unknown): Promise<unknown>;
+      (args: { onEvent: (data: unknown) => void; onError: (error: Error) => void; options?: { adGroupId: string } }): () => void;
     } | undefined;
 
     if (!loadFn) return false;
     if (loadFn.isSupported && !loadFn.isSupported()) return false;
 
-    await loadFn({ adGroupId: AD_GROUP_IDS[type] });
-    return true;
+    return new Promise<boolean>((resolve) => {
+      loadFn({
+        options: { adGroupId: AD_GROUP_IDS[type] },
+        onEvent: () => resolve(true),
+        onError: () => resolve(false),
+      });
+    });
   } catch (err) {
     console.warn(`[TossAds] ${type} preload failed:`, err);
     return false;
@@ -160,19 +167,30 @@ async function showFullScreenAdInternal(type: FullScreenAdType): Promise<FullScr
 
     const showFn = sdk.showFullScreenAd as {
       isSupported?: () => boolean;
-      (params: unknown): Promise<{ isCompleted: boolean; reward?: { unitType: string; unitAmount: number } }>;
+      (args: { onEvent: (data: { type: string; data?: { unitType: string; unitAmount: number } }) => void; onError: (error: Error) => void; options?: { adGroupId: string } }): () => void;
     } | undefined;
 
     if (!showFn) return { isCompleted: false };
     if (showFn.isSupported && !showFn.isSupported()) return { isCompleted: false };
 
-    const result = await showFn({ adGroupId: AD_GROUP_IDS[type] });
-    setCooldown(type);
-
-    return {
-      isCompleted: result.isCompleted,
-      isRewarded: type === 'rewarded' ? result.isCompleted && !!result.reward : undefined,
-    };
+    return new Promise<FullScreenAdResult>((resolve) => {
+      showFn({
+        options: { adGroupId: AD_GROUP_IDS[type] },
+        onEvent: (event) => {
+          if (event.type === 'dismissed') {
+            setCooldown(type);
+            resolve({ isCompleted: true });
+          } else if (event.type === 'userEarnedReward' && type === 'rewarded') {
+            setCooldown(type);
+            resolve({
+              isCompleted: true,
+              isRewarded: true,
+            });
+          }
+        },
+        onError: () => resolve({ isCompleted: false }),
+      });
+    });
   } catch (err) {
     console.warn(`[TossAds] ${type} show failed:`, err);
     return { isCompleted: false };
@@ -212,23 +230,31 @@ export async function showRewarded(): Promise<{
 
     const showFn = sdk.showFullScreenAd as {
       isSupported?: () => boolean;
-      (params: unknown): Promise<{ isCompleted: boolean; reward?: { unitType: string; unitAmount: number } }>;
+      (args: { onEvent: (data: { type: string; data?: { unitType: string; unitAmount: number } }) => void; onError: (error: Error) => void; options?: { adGroupId: string } }): () => void;
     } | undefined;
 
     if (!showFn) return { rewarded: false };
     if (showFn.isSupported && !showFn.isSupported()) return { rewarded: false };
 
-    const result = await showFn({ adGroupId: AD_GROUP_IDS.rewarded });
-    setCooldown('rewarded');
-
-    if (result.isCompleted && result.reward) {
-      return {
-        rewarded: true,
-        unitType: result.reward.unitType,
-        unitAmount: result.reward.unitAmount,
-      };
-    }
-    return { rewarded: false };
+    return new Promise((resolve) => {
+      showFn({
+        options: { adGroupId: AD_GROUP_IDS.rewarded },
+        onEvent: (event) => {
+          if (event.type === 'userEarnedReward' && event.data) {
+            setCooldown('rewarded');
+            resolve({
+              rewarded: true,
+              unitType: event.data.unitType,
+              unitAmount: event.data.unitAmount,
+            });
+          } else if (event.type === 'dismissed') {
+            setCooldown('rewarded');
+            resolve({ rewarded: false });
+          }
+        },
+        onError: () => resolve({ rewarded: false }),
+      });
+    });
   } catch (err) {
     console.warn('[TossAds] Rewarded show failed:', err);
     return { rewarded: false };

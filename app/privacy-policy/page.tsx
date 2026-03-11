@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
             <p>수집한 개인정보는 다음의 목적으로만 이용됩니다.</p>
             <ul className="list-disc list-inside space-y-1 pl-2">
               <li>사주 오행 분석 서비스 제공</li>
-              <li>Big5 기반 강점 분석 및 교차 분석 리포트 생성</li>
+              <li>PSA 기반 강점 분석 및 교차 분석 리포트 생성</li>
               <li>서비스 개선 및 통계 분석 (비식별화 처리 후)</li>
             </ul>
           </section>

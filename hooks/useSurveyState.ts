@@ -101,7 +101,7 @@ export function useSurveyState(): SurveyStateReturn {
       if (newPage < 0 || newPage >= BASIC_TOTAL_PAGES) return;
       setDirection(newPage > currentPage ? 1 : -1);
       setCurrentPage(newPage);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
     },
     [currentPage]
   );

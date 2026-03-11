@@ -20,11 +20,11 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
 ];
 
 /** @deprecated 하위 호환용 — 새 코드에서는 BASIC_QUESTIONS_PER_PAGE 사용 */
-export const QUESTIONS_PER_PAGE = 6;
+export const QUESTIONS_PER_PAGE = 10;
 /** @deprecated 하위 호환용 — 새 코드에서는 BASIC_TOTAL_PAGES 사용 */
-export const TOTAL_PAGES = 10;
+export const TOTAL_PAGES = 3;
 
 export const BASIC_QUESTIONS: SurveyQuestion[] = SURVEY_QUESTIONS.filter(q => q.tier === 'basic');
 export const PREMIUM_QUESTIONS: SurveyQuestion[] = SURVEY_QUESTIONS.filter(q => q.tier === 'premium');
-export const BASIC_QUESTIONS_PER_PAGE = 6;
-export const BASIC_TOTAL_PAGES = 5;
+export const BASIC_QUESTIONS_PER_PAGE = 10;
+export const BASIC_TOTAL_PAGES = 3;

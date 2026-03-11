@@ -6,6 +6,9 @@ import { BriefAnalysis } from "@/types/survey";
 import { apiUrl } from "@/lib/config";
 import { shareResult } from '@/lib/share';
 import { getStateManager } from '@/lib/state-manager';
+import { buildShareUrl, type SharePayload } from '@/lib/share-encoder';
+import { IS_TOSS } from '@/lib/platform';
+import { CombinedAnalyzerAgent } from '@/agents/combined-analyzer';
 
 export interface ResultData {
   sajuResult: SajuAnalysis | null;
@@ -14,8 +17,9 @@ export interface ResultData {
   loading: boolean;
   error: string | null;
   sessionId: string;
-  shareStatus: "idle" | "copied" | "shared";
+  shareStatus: "idle" | "copied" | "shared" | "failed";
   handleShare: () => Promise<void>;
+  resetShareStatus: () => void;
 }
 
 export function useResultData(): ResultData {
@@ -24,7 +28,7 @@ export function useResultData(): ResultData {
   const [combined, setCombined] = useState<CombinedAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "shared">("idle");
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "shared" | "failed">("idle");
   const [sessionId, setSessionId] = useState<string>('');
 
   useEffect(() => {
@@ -69,45 +73,104 @@ export function useResultData(): ResultData {
       const sid = parsedSaju.sessionId ?? crypto.randomUUID();
       setSessionId(sid);
 
-      fetch(apiUrl("/api/combined/analyze"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: sid, sajuResult: parsedSaju, psaResult: parsedPsa }),
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            const body = await res.json().catch(() => ({}));
-            throw new Error((body as { error?: string }).error ?? "교차 분석 실패");
+      if (IS_TOSS) {
+        // 클라이언트 직접 분석 (API 호출 없음)
+        try {
+          const agent = new CombinedAnalyzerAgent();
+          const result = await agent.process(
+            { saju: parsedSaju, psa: parsedPsa },
+            { sessionId: sid, data: {} }
+          );
+          if (!result.success || !result.data) {
+            throw new Error(result.error || '교차 분석 실패');
           }
-          return res.json() as Promise<CombinedAnalysis>;
-        })
-        .then((data) => {
-          setCombined(data);
+          // analyzedAt Date → ISO string 직렬화
+          const serialized = {
+            ...result.data,
+            analyzedAt: result.data.analyzedAt instanceof Date
+              ? result.data.analyzedAt.toISOString()
+              : result.data.analyzedAt,
+          } as unknown as CombinedAnalysis;
+          setCombined(serialized);
           setLoading(false);
-        })
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : "알 수 없는 오류";
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : '결과를 불러오는 중 문제가 생겼어요. 다시 시도해 볼까요?';
           setError(msg);
           setLoading(false);
-        });
+        }
+      } else {
+        // 기존 API 호출 (웹 빌드)
+        fetch(apiUrl("/api/combined/analyze"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: sid, sajuResult: parsedSaju, psaResult: parsedPsa }),
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const body = await res.json().catch(() => ({}));
+              throw new Error((body as { error?: string }).error ?? "교차 분석 실패");
+            }
+            return res.json() as Promise<CombinedAnalysis>;
+          })
+          .then((data) => {
+            setCombined(data);
+            setLoading(false);
+          })
+          .catch((err: unknown) => {
+            const msg = err instanceof Error ? err.message : "알 수 없는 오류";
+            setError(msg);
+            setLoading(false);
+          });
+      }
     })();
   }, []);
 
   const handleShare = async () => {
     const personaTitle = psaResult?.persona?.title || '강점 분석';
+    const personaType = psaResult?.persona?.type || '';
+    const personaTagline = psaResult?.persona?.tagline || '';
+    const dominantElement = sajuResult?.dominantElement || '';
+    const dayMasterName = sajuResult?.dayMaster?.name || '';
+
+    // Top 2 categories by score
+    const topCategories: [string, number][] = (psaResult?.categoryScores || [])
+      .slice()
+      .sort((a, b) => b.normalizedScore - a.normalizedScore)
+      .slice(0, 2)
+      .map((cs) => [cs.category, cs.normalizedScore]);
+
+    const payload: SharePayload = {
+      v: 1,
+      pt: personaType,
+      tt: personaTitle,
+      tg: personaTagline,
+      de: dominantElement,
+      dm: dayMasterName,
+      tc: topCategories,
+    };
+
+    const shareUrl = buildShareUrl(payload);
+    const sharePath = shareUrl.replace(
+      typeof window !== 'undefined' ? window.location.origin : '',
+      ''
+    );
+
     const result = await shareResult({
       title: `사주강점 - ${personaTitle}`,
-      description: '나의 사주-강점 교차 분석 결과를 확인해보세요!',
-      path: '/result',
+      description: `나는 ${personaTitle}! 사주강점 분석 결과를 확인해보세요`,
+      path: sharePath,
     });
 
     if (result === 'copied') {
       setShareStatus('copied');
-      setTimeout(() => setShareStatus('idle'), 2000);
     } else if (result === 'shared') {
       setShareStatus('shared');
+    } else if (result === 'failed') {
+      setShareStatus('failed');
     }
   };
 
-  return { sajuResult, psaResult, combined, loading, error, sessionId, shareStatus, handleShare };
+  const resetShareStatus = () => setShareStatus('idle');
+
+  return { sajuResult, psaResult, combined, loading, error, sessionId, shareStatus, handleShare, resetShareStatus };
 }

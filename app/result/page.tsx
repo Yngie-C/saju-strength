@@ -14,6 +14,7 @@ import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { TossBannerAd } from '@/components/ads/TossBannerAd';
+import { Toast } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackScreen, trackClick, trackImpression } from '@/lib/analytics';
 
@@ -35,7 +36,7 @@ function SectionDivider() {
 }
 
 export default function ResultPage() {
-  const { sajuResult, psaResult, combined, loading, error, shareStatus, handleShare } = useResultData();
+  const { sajuResult, psaResult, combined, loading, error, shareStatus, handleShare, resetShareStatus } = useResultData();
 
   useEffect(() => {
     if (!loading && sajuResult && psaResult && combined) {
@@ -69,7 +70,7 @@ export default function ResultPage() {
           <ErrorBoundary>
             <SajuProfileSection
               fourPillars={sajuResult.fourPillars}
-              dayMaster={{ name: sajuResult.dayMaster.name, element: sajuResult.dayMaster.element, keywords: sajuResult.dayMaster.keywords, description: sajuResult.dayMaster.description, image: sajuResult.dayMaster.image }}
+              dayMaster={{ name: sajuResult.dayMaster.name, nameEn: sajuResult.dayMaster.nameEn, element: sajuResult.dayMaster.element, keywords: sajuResult.dayMaster.keywords, description: sajuResult.dayMaster.description, image: sajuResult.dayMaster.image }}
               elementDistribution={sajuResult.elementDistribution}
               dominantElement={sajuResult.dominantElement}
             />
@@ -107,22 +108,21 @@ export default function ResultPage() {
 
         <SectionDivider />
 
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="flex flex-col sm:flex-row gap-3 pt-4">
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="pt-4">
           <button
             onClick={() => { trackClick('result', 'share'); handleShare(); }}
-            className={`flex-1 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${designTokens.shareButtonInline}`}
+            className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${designTokens.shareButtonInline}`}
           >
-            {shareStatus === "copied" ? "링크 복사됨!" : shareStatus === "shared" ? "공유 완료!" : "결과 공유하기"}
+            내 결과 공유하기
           </button>
-          {!IS_TOSS && (
-            <button
-              onClick={() => { trackClick('result', 'web_profile'); window.location.href = "/p"; }}
-              className="flex-1 py-3.5 rounded-xl border border-border text-muted-foreground font-semibold text-sm hover:bg-muted transition-all duration-200"
-            >
-              웹 프로필 만들기
-            </button>
-          )}
         </motion.div>
+
+        <Toast
+          message={shareStatus === 'copied' ? '링크가 복사되었어요!' : shareStatus === 'shared' ? '공유 완료!' : '공유에 실패했어요. 다시 시도해주세요.'}
+          type={shareStatus === 'failed' ? 'error' : 'success'}
+          visible={shareStatus !== 'idle'}
+          onClose={resetShareStatus}
+        />
 
         <TossBannerAd theme="light" variant="card" className="my-4" />
 

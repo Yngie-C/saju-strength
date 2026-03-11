@@ -84,7 +84,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
           className="rounded-2xl border border-white/10 p-6 flex flex-col gap-4"
           style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)' }}
         >
-          <h2 className="text-base font-bold text-white/80 tracking-wide uppercase text-xs">Big5 강점 설문</h2>
+          <h2 className="text-base font-bold text-white/80 tracking-wide uppercase text-xs">PSA 강점 설문</h2>
           {/* 페르소나 placeholder */}
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-2xl">
