@@ -47,7 +47,7 @@ describe('share-encoder', () => {
     it('전체 URL 길이가 300자 이내', () => {
       // origin 시뮬레이션
       const encoded = encodeShareData(samplePayload);
-      const url = `https://saju-strength.vercel.app/shared?d=${encoded}`;
+      const url = `https://saju-strength-zifl.vercel.app/shared?d=${encoded}`;
 
       expect(url.length).toBeLessThan(300);
     });

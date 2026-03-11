@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const ALLOWED_ORIGINS = [
-  process.env.NEXT_PUBLIC_TOSS_ORIGIN || 'https://saju-strength.apps.tossmini.com',
-];
+  'https://saju-strength.apps.tossmini.com',
+  'https://saju-strength.private-apps.tossmini.com',
+  process.env.NEXT_PUBLIC_TOSS_ORIGIN,
+].filter(Boolean) as string[];
 
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin') || '';

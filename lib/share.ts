@@ -81,16 +81,16 @@ export function buildKakaoShareCard(data: {
       description: data.personaTagline,
       imageUrl: '', // TODO: OG image generation
       link: {
-        mobileWebUrl: data.profileUrl || 'https://saju-strength.vercel.app',
-        webUrl: data.profileUrl || 'https://saju-strength.vercel.app',
+        mobileWebUrl: data.profileUrl || 'https://saju-strength-zifl.vercel.app',
+        webUrl: data.profileUrl || 'https://saju-strength-zifl.vercel.app',
       },
     },
     buttons: [
       {
         title: '나도 분석받기',
         link: {
-          mobileWebUrl: 'https://saju-strength.vercel.app',
-          webUrl: 'https://saju-strength.vercel.app',
+          mobileWebUrl: 'https://saju-strength-zifl.vercel.app',
+          webUrl: 'https://saju-strength-zifl.vercel.app',
         },
       },
     ],
