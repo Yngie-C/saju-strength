@@ -67,12 +67,14 @@ function ShareBottomSheet({
             <div className="w-10 h-1 bg-tds-grey-300 rounded-full mx-auto mb-4" />
             <p className="text-base font-semibold text-tds-grey-900 mb-4">공유 방법을 선택해주세요</p>
             <div className="space-y-3">
+              {/* TODO: getTossShareLink 공유 실패 원인 해결 후 주석 해제
               <button
                 onClick={() => { onShareToss(); onClose(); }}
                 className="w-full py-4 rounded-[14px] font-bold text-white bg-tds-blue-500 active:bg-tds-blue-600 transition-colors"
               >
                 토스 친구에게 공유
               </button>
+              */}
               {/* TODO: 외부 공유 활성화 시 주석 해제
               <button
                 onClick={() => { onShareExternal(); onClose(); }}
