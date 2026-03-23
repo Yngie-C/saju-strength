@@ -174,6 +174,7 @@ export default function ResultPage() {
 
         <SectionDivider />
 
+        {/* TODO: 공유 기능 수정 후 주석 해제 (SUN-78)
         <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="pt-4">
           <button
             onClick={onShareClick}
@@ -182,6 +183,7 @@ export default function ResultPage() {
             내 결과 공유하기
           </button>
         </motion.div>
+        */}
 
         {IS_TOSS && (
           <ShareBottomSheet
