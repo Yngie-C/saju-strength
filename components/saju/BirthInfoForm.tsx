@@ -54,10 +54,11 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    // 시진 경계가 x:30 → 분이 30 이상이면 다음 시간으로 보정
+    // 전통 시진 경계(x:30)와 만세력 라이브러리(정시 기준) 차이 보정
+    // 입력 시각에서 30분을 빼서 라이브러리의 정시 경계와 정렬
     const h = Number(inputHour);
     const m = Number(inputMinute);
-    const hour = unknownTime ? null : (m >= 30 ? (h + 1) % 24 : h);
+    const hour = unknownTime ? null : (m < 30 ? (h - 1 + 24) % 24 : h);
     onSubmit({
       year: Number(year),
       month: Number(month),
