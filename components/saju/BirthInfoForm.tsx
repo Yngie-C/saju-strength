@@ -19,27 +19,23 @@ interface BirthInfoFormProps {
   isLoading?: boolean;
 }
 
-const SIJU_OPTIONS = [
-  { label: "모름", value: null },
-  { label: "자시 (23:30–01:30)", value: 0 },
-  { label: "축시 (01:30–03:30)", value: 2 },
-  { label: "인시 (03:30–05:30)", value: 4 },
-  { label: "묘시 (05:30–07:30)", value: 6 },
-  { label: "진시 (07:30–09:30)", value: 8 },
-  { label: "사시 (09:30–11:30)", value: 10 },
-  { label: "오시 (11:30–13:30)", value: 12 },
-  { label: "미시 (13:30–15:30)", value: 14 },
-  { label: "신시 (15:30–17:30)", value: 16 },
-  { label: "유시 (17:30–19:30)", value: 18 },
-  { label: "술시 (19:30–21:30)", value: 20 },
-  { label: "해시 (21:30–23:30)", value: 22 },
-];
+type Period = "am" | "pm";
+
+function toHour24(period: Period, h: number, m: number): number {
+  let h24 = period === "am" ? (h === 12 ? 0 : h) : (h === 12 ? 12 : h + 12);
+  // 분이 30 이상이면 반올림하여 다음 시간으로 (사주 시진 경계가 x:30)
+  if (m >= 30) h24 = (h24 + 1) % 24;
+  return h24;
+}
 
 export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProps) {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
-  const [hour, setHour] = useState<number | null | "">("");
+  const [unknownTime, setUnknownTime] = useState(false);
+  const [period, setPeriod] = useState<Period>("am");
+  const [inputHour, setInputHour] = useState("");
+  const [inputMinute, setInputMinute] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
   const [isLunar, setIsLunar] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -53,7 +49,12 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
     if (!year || y < 1900 || y > 2050) errs.year = "1900~2050 사이 연도를 입력하세요.";
     if (!month || m < 1 || m > 12) errs.month = "1~12월을 입력하세요.";
     if (!day || d < 1 || d > 31) errs.day = "1~31일을 입력하세요.";
-    if (hour === "") errs.hour = "시진을 선택하세요.";
+    if (!unknownTime) {
+      const h = Number(inputHour);
+      const min = Number(inputMinute);
+      if (inputHour === "" || h < 0 || h > 12) errs.hour = "0~12 사이 시간을 입력하세요.";
+      if (inputMinute === "" || min < 0 || min > 59) errs.minute = "0~59 사이 분을 입력하세요.";
+    }
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -62,11 +63,12 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
+    const hour = unknownTime ? null : toHour24(period, Number(inputHour), Number(inputMinute));
     onSubmit({
       year: Number(year),
       month: Number(month),
       day: Number(day),
-      hour: hour === null ? null : (hour as number),
+      hour,
       gender,
       isLunar,
     });
@@ -160,33 +162,92 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
         </div>
       </motion.div>
 
-      {/* 시진 선택 */}
-      <motion.div variants={itemVariants} className="space-y-1">
-        <label className={designTokens.formLabel}>시진 (태어난 시간)</label>
-        <select
-          value={hour === "" ? "" : hour === null ? "null" : String(hour)}
-          onChange={(e) => {
-            const v = e.target.value;
-            if (v === "") setHour("");
-            else if (v === "null") setHour(null);
-            else setHour(Number(v));
-          }}
-          className={designTokens.selectToss}
-        >
-          <option value="" disabled className={designTokens.optionBg}>
-            시진을 선택하세요
-          </option>
-          {SIJU_OPTIONS.map((opt) => (
-            <option
-              key={opt.label}
-              value={opt.value === null ? "null" : String(opt.value)}
-              className={designTokens.optionBg}
-            >
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        {errors.hour && <p className={designTokens.formHelper}>{errors.hour}</p>}
+      {/* 태어난 시간 */}
+      <motion.div variants={itemVariants} className="space-y-3">
+        <label className={designTokens.formLabel}>태어난 시간</label>
+
+        {/* 모름 체크박스 */}
+        <label className="flex items-center gap-2 cursor-pointer">
+          <button
+            type="button"
+            onClick={() => setUnknownTime(!unknownTime)}
+            className={cn(
+              "w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0",
+              unknownTime
+                ? "bg-primary border-primary"
+                : designTokens.checkboxUnchecked
+            )}
+          >
+            {unknownTime && (
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+          <span className={`text-sm ${designTokens.textPrimary}`}>태어난 시간을 몰라요</span>
+        </label>
+
+        {!unknownTime && (
+          <>
+            {/* 오전/오후 라디오 */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setPeriod("am")}
+                className={cn(
+                  "flex-1 py-2 rounded-lg text-sm font-medium transition-colors",
+                  period === "am"
+                    ? "bg-primary text-white"
+                    : designTokens.toggleInactive
+                )}
+              >
+                오전 (AM)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPeriod("pm")}
+                className={cn(
+                  "flex-1 py-2 rounded-lg text-sm font-medium transition-colors",
+                  period === "pm"
+                    ? "bg-primary text-white"
+                    : designTokens.toggleInactive
+                )}
+              >
+                오후 (PM)
+              </button>
+            </div>
+
+            {/* 시 / 분 입력 */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className={designTokens.formLabel}>시</label>
+                <Input
+                  type="number"
+                  placeholder="12"
+                  value={inputHour}
+                  onChange={(e) => setInputHour(e.target.value)}
+                  min={0}
+                  max={12}
+                  className={designTokens.inputToss}
+                />
+                {errors.hour && <p className={designTokens.formHelper}>{errors.hour}</p>}
+              </div>
+              <div className="space-y-1">
+                <label className={designTokens.formLabel}>분</label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={inputMinute}
+                  onChange={(e) => setInputMinute(e.target.value)}
+                  min={0}
+                  max={59}
+                  className={designTokens.inputToss}
+                />
+                {errors.minute && <p className={designTokens.formHelper}>{errors.minute}</p>}
+              </div>
+            </div>
+          </>
+        )}
       </motion.div>
 
       {/* 성별 */}
