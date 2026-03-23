@@ -35,15 +35,17 @@ export async function tossLogin(): Promise<{
   }
 }
 
-/** 토스 앱 내부 공유 (intoss:// 스킴 URL을 네이티브 공유 시트로 전달) */
+/** 토스 앱 내부 공유 (intoss:// 스킴 URL → getTossShareLink 변환 → share) */
 export async function tossShareInternal(
-  message: string
+  schemeUrl: string,
+  displayText: string
 ): Promise<boolean> {
   if (!isTossEnvironment()) return false;
 
   try {
-    const { share } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
-    await share({ message });
+    const { getTossShareLink, share } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
+    const tossLink = await getTossShareLink(schemeUrl);
+    await share({ message: `${displayText}\n${tossLink}` });
     return true;
   } catch (error) {
     console.warn('[Toss] Internal share failed:', error);

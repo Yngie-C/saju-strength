@@ -64,10 +64,10 @@ export async function shareResult(data: ShareData): Promise<ShareResult> {
 export async function shareToToss(data: ShareData): Promise<ShareResult> {
   const { title, description, path } = data;
   const schemeUrl = `intoss://saju-strength${path || '/result'}`;
-  const message = `${title}\n${description}\n${schemeUrl}`;
+  const displayText = `${title}\n${description}`;
 
   try {
-    const success = await tossShareInternal(message);
+    const success = await tossShareInternal(schemeUrl, displayText);
     return success ? 'shared' : 'failed';
   } catch {
     console.warn('[Share] Toss internal share failed');
