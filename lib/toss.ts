@@ -35,20 +35,19 @@ export async function tossLogin(): Promise<{
   }
 }
 
-/** 토스 공유 링크 생성 */
-export async function createTossShareLink(
-  path: string
-): Promise<string | null> {
-  if (!isTossEnvironment()) return null;
+/** 토스 앱 내부 공유 (intoss:// 스킴 URL을 네이티브 공유 시트로 전달) */
+export async function tossShareInternal(
+  message: string
+): Promise<boolean> {
+  if (!isTossEnvironment()) return false;
 
   try {
-    const { getTossShareLink } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
-    return await getTossShareLink(
-      `intoss://saju-strength${path}`
-    );
+    const { share } = await import(/* webpackIgnore: true */ '@apps-in-toss/web-framework');
+    await share({ message });
+    return true;
   } catch (error) {
-    console.warn('[Toss] Share link creation failed:', error);
-    return null;
+    console.warn('[Toss] Internal share failed:', error);
+    return false;
   }
 }
 

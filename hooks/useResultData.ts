@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { SajuAnalysis, CombinedAnalysis } from "@/types/saju";
 import { BriefAnalysis } from "@/types/survey";
 import { apiUrl } from "@/lib/config";
-import { shareResult } from '@/lib/share';
+import { shareResult, shareToToss } from '@/lib/share';
+import { WEB_ORIGIN } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
 import { buildShareUrl, type SharePayload } from '@/lib/share-encoder';
 import { IS_TOSS } from '@/lib/platform';
@@ -19,6 +20,7 @@ export interface ResultData {
   sessionId: string;
   shareStatus: "idle" | "copied" | "shared" | "failed";
   handleShare: () => Promise<void>;
+  handleShareToToss: () => Promise<void>;
   resetShareStatus: () => void;
 }
 
@@ -150,10 +152,7 @@ export function useResultData(): ResultData {
     };
 
     const shareUrl = buildShareUrl(payload);
-    const sharePath = shareUrl.replace(
-      typeof window !== 'undefined' ? window.location.origin : '',
-      ''
-    );
+    const sharePath = shareUrl.replace(WEB_ORIGIN, '');
 
     const result = await shareResult({
       title: `사주강점 - ${personaTitle}`,
@@ -170,7 +169,46 @@ export function useResultData(): ResultData {
     }
   };
 
+  const handleShareToToss = async () => {
+    const personaTitle = psaResult?.persona?.title || '강점 분석';
+    const personaType = psaResult?.persona?.type || '';
+    const personaTagline = psaResult?.persona?.tagline || '';
+    const dominantElement = sajuResult?.dominantElement || '';
+    const dayMasterName = sajuResult?.dayMaster?.name || '';
+
+    const topCategories: [string, number][] = (psaResult?.categoryScores || [])
+      .slice()
+      .sort((a, b) => b.normalizedScore - a.normalizedScore)
+      .slice(0, 2)
+      .map((cs) => [cs.category, cs.normalizedScore]);
+
+    const payload: SharePayload = {
+      v: 1,
+      pt: personaType,
+      tt: personaTitle,
+      tg: personaTagline,
+      de: dominantElement,
+      dm: dayMasterName,
+      tc: topCategories,
+    };
+
+    const shareUrl = buildShareUrl(payload);
+    const sharePath = shareUrl.replace(WEB_ORIGIN, '');
+
+    const result = await shareToToss({
+      title: `사주강점 - ${personaTitle}`,
+      description: `나는 ${personaTitle}! 사주강점 분석 결과를 확인해보세요`,
+      path: sharePath,
+    });
+
+    if (result === 'shared') {
+      setShareStatus('shared');
+    } else if (result === 'failed') {
+      setShareStatus('failed');
+    }
+  };
+
   const resetShareStatus = () => setShareStatus('idle');
 
-  return { sajuResult, psaResult, combined, loading, error, sessionId, shareStatus, handleShare, resetShareStatus };
+  return { sajuResult, psaResult, combined, loading, error, sessionId, shareStatus, handleShare, handleShareToToss, resetShareStatus };
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { isTossEnvironment, createTossShareLink, tossShare } from '@/lib/toss';
+import { isTossEnvironment, tossShareInternal, tossShare } from '@/lib/toss';
+import { WEB_ORIGIN } from '@/lib/config';
 
 export interface ShareData {
   title: string;
@@ -12,37 +13,29 @@ export interface ShareData {
 export type ShareResult = 'shared' | 'copied' | 'failed' | 'cancelled';
 
 /**
- * 결과 공유 통합 서비스
- * - 토스 환경: Toss native share
+ * 외부 공유 (네이티브 공유 시트 → Web Share API → clipboard)
+ * - 토스 환경: tossShare() + 웹 URL (누구나 접근 가능)
  * - 웹 환경: Web Share API → clipboard fallback
  */
 export async function shareResult(data: ShareData): Promise<ShareResult> {
-  const { title, description, path, imageUrl } = data;
+  const { title, description, path } = data;
+  const webUrl = `${WEB_ORIGIN}${path || '/result'}`;
+  const message = `${title}\n${description}\n${webUrl}`;
 
-  // 토스 환경: native share
+  // 토스 환경: native share sheet + 웹 URL
   if (isTossEnvironment()) {
     try {
-      const shareLink = await createTossShareLink(
-        path || '/result'
-      );
-
-      if (shareLink) {
-        const success = await tossShare(`${title}\n${description}\n${shareLink}`);
-        return success ? 'shared' : 'failed';
-      }
+      const success = await tossShare(message);
+      return success ? 'shared' : 'failed';
     } catch {
       console.warn('[Share] Toss share failed, falling back');
     }
   }
 
   // 웹 환경: Web Share API
-  const url = typeof window !== 'undefined'
-    ? `${window.location.origin}${path || '/result'}`
-    : '';
-
   if (typeof navigator !== 'undefined' && navigator.share) {
     try {
-      await navigator.share({ title, text: description, url });
+      await navigator.share({ title, text: description, url: webUrl });
       return 'shared';
     } catch (error) {
       // User cancelled or share failed
@@ -55,7 +48,7 @@ export async function shareResult(data: ShareData): Promise<ShareResult> {
   // Fallback: clipboard
   if (typeof navigator !== 'undefined' && navigator.clipboard) {
     try {
-      await navigator.clipboard.writeText(`${title}\n${description}\n${url}`);
+      await navigator.clipboard.writeText(message);
       return 'copied';
     } catch {
       // clipboard failed
@@ -63,6 +56,23 @@ export async function shareResult(data: ShareData): Promise<ShareResult> {
   }
 
   return 'failed';
+}
+
+/**
+ * 토스 내부 공유 (intoss:// 스킴 URL — 토스 사용자끼리 미니앱 직접 열기)
+ */
+export async function shareToToss(data: ShareData): Promise<ShareResult> {
+  const { title, description, path } = data;
+  const schemeUrl = `intoss://saju-strength${path || '/result'}`;
+  const message = `${title}\n${description}\n${schemeUrl}`;
+
+  try {
+    const success = await tossShareInternal(message);
+    return success ? 'shared' : 'failed';
+  } catch {
+    console.warn('[Share] Toss internal share failed');
+    return 'failed';
+  }
 }
 
 /**
@@ -81,16 +91,16 @@ export function buildKakaoShareCard(data: {
       description: data.personaTagline,
       imageUrl: '', // TODO: OG image generation
       link: {
-        mobileWebUrl: data.profileUrl || 'https://saju-strength-zifl.vercel.app',
-        webUrl: data.profileUrl || 'https://saju-strength-zifl.vercel.app',
+        mobileWebUrl: data.profileUrl || WEB_ORIGIN,
+        webUrl: data.profileUrl || WEB_ORIGIN,
       },
     },
     buttons: [
       {
         title: '나도 분석받기',
         link: {
-          mobileWebUrl: 'https://saju-strength-zifl.vercel.app',
-          webUrl: 'https://saju-strength-zifl.vercel.app',
+          mobileWebUrl: WEB_ORIGIN,
+          webUrl: WEB_ORIGIN,
         },
       },
     ],

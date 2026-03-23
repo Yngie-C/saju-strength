@@ -4,6 +4,7 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from 'lz-string';
+import { WEB_ORIGIN } from '@/lib/config';
 
 /**
  * 공유 URL에 인코딩할 최소 페이로드
@@ -69,6 +70,5 @@ export function decodeShareData(encoded: string): SharePayload | null {
  */
 export function buildShareUrl(payload: SharePayload): string {
   const encoded = encodeShareData(payload);
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  return `${origin}/shared?d=${encoded}`;
+  return `${WEB_ORIGIN}/shared?d=${encoded}`;
 }
