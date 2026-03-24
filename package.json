@@ -8,12 +8,12 @@
     "start": "next start",
     "lint": "next lint",
     "build:web": "NEXT_PUBLIC_BUILD_TARGET=web next build",
-    "build:toss": "bash -c 'mv app/p app/_p_web_only; mv app/api app/_api_web_only; trap \"mv app/_p_web_only app/p; mv app/_api_web_only app/api\" EXIT; NEXT_PUBLIC_BUILD_TARGET=toss NEXT_PUBLIC_API_BASE_URL=https://saju-strength-zifl.vercel.app npx ait build'",
+    "build:toss": "bash -c 'mv app/p app/_p_web_only; mv app/api app/_api_web_only; trap \"mv app/_p_web_only app/p; mv app/_api_web_only app/api\" EXIT; NEXT_PUBLIC_BUILD_TARGET=toss NEXT_PUBLIC_API_BASE_URL=https://saju-strength-zifl.vercel.app NEXT_PUBLIC_AD_BANNER_ID=ait.v2.live.26e1e84dd83a4eff NEXT_PUBLIC_AD_INTERSTITIAL_ID=ait.v2.live.52b188b4054f4224 npx ait build'",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@apps-in-toss/web-framework": "2.0.1",
+    "@apps-in-toss/web-framework": "2.0.5",
     "@emotion/react": "^11.14.0",
     "@fullstackfamily/manseryeok": "^1.0.6",
     "@granite-js/plugin-sentry": "latest",
