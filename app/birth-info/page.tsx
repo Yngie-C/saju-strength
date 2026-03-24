@@ -19,7 +19,7 @@ export default function BirthInfoPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasConsented, setHasConsented] = useState(false);
+  const [hasConsented, setHasConsented] = useState(IS_TOSS);
 
   // 설문 미완료 가드: psaResult도 없고 백그라운드 분석도 없으면 /survey로 리디렉트
   useEffect(() => {
@@ -174,40 +174,46 @@ export default function BirthInfoPage() {
           </p>
         </div>
 
-        {/* 개인정보 수집 동의 */}
-        <div className={`mb-6 rounded-xl p-4 ${designTokens.consentBox}`}>
-          <div className="flex items-start gap-3">
-            <button
-              type="button"
-              onClick={() => setHasConsented(!hasConsented)}
-              className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                hasConsented
-                  ? 'bg-primary border-primary'
-                  : designTokens.checkboxUnchecked
-              }`}
-            >
-              {hasConsented && (
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </button>
-            <div className="flex-1">
-              <p className={`text-sm leading-relaxed ${designTokens.textPrimary}`}>
-                <span className="font-medium">개인정보 수집 및 이용에 동의해요.</span>
-              </p>
-              <p className={`mt-1.5 text-xs leading-relaxed ${designTokens.textCaption}`}>
-                수집 항목: 생년월일시, 성별, 양음력 여부 · 수집 목적: 사주 분석 서비스 제공 · 보유 기간: 서비스 탈퇴 시까지
-              </p>
-              <Link
-                href="/privacy-policy"
-                className="mt-2 inline-block text-xs text-primary/70 hover:text-primary underline underline-offset-2"
+        {/* 개인정보 안내 */}
+        {IS_TOSS ? (
+          <p className={`mb-6 text-xs text-center leading-relaxed ${designTokens.textCaption}`}>
+            입력하신 생년월일 정보는 분석 목적으로만 사용되며, 별도로 저장되지 않습니다.
+          </p>
+        ) : (
+          <div className={`mb-6 rounded-xl p-4 ${designTokens.consentBox}`}>
+            <div className="flex items-start gap-3">
+              <button
+                type="button"
+                onClick={() => setHasConsented(!hasConsented)}
+                className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                  hasConsented
+                    ? 'bg-primary border-primary'
+                    : designTokens.checkboxUnchecked
+                }`}
               >
-                개인정보 처리방침 전문 보기
-              </Link>
+                {hasConsented && (
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
+              <div className="flex-1">
+                <p className={`text-sm leading-relaxed ${designTokens.textPrimary}`}>
+                  <span className="font-medium">개인정보 수집 및 이용에 동의해요.</span>
+                </p>
+                <p className={`mt-1.5 text-xs leading-relaxed ${designTokens.textCaption}`}>
+                  수집 항목: 생년월일시, 성별, 양음력 여부 · 수집 목적: 사주 분석 서비스 제공 · 보유 기간: 서비스 탈퇴 시까지
+                </p>
+                <Link
+                  href="/privacy-policy"
+                  className="mt-2 inline-block text-xs text-primary/70 hover:text-primary underline underline-offset-2"
+                >
+                  개인정보 처리방침 전문 보기
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* 폼 */}
         <BirthInfoForm onSubmit={handleSubmit} isLoading={isLoading || !hasConsented} />
@@ -224,15 +230,17 @@ export default function BirthInfoPage() {
         )}
       </motion.div>
 
-      {/* 안내 문구 */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className={`mt-6 text-xs text-center max-w-xs ${designTokens.textCaption}`}
-      >
-        입력하신 정보는 사주 분석 서비스 제공 외 다른 목적으로 사용하지 않아요.
-      </motion.p>
+      {/* 안내 문구 (웹 전용) */}
+      {!IS_TOSS && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className={`mt-6 text-xs text-center max-w-xs ${designTokens.textCaption}`}
+        >
+          입력하신 정보는 사주 분석 서비스 제공 외 다른 목적으로 사용하지 않아요.
+        </motion.p>
+      )}
     </main>
   );
 }
