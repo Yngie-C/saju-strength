@@ -45,14 +45,14 @@ export function DualRadarChart({ elementData, psaData }: DualRadarChartProps) {
           dataKey="element"
           stroke="#3182f6"
           fill="#3182f6"
-          fillOpacity={0.3}
+          fillOpacity={0.25}
         />
         <Radar
           name="PSA 강점 (후천)"
           dataKey="psa"
-          stroke="#06b6d4"
-          fill="#06b6d4"
-          fillOpacity={0.3}
+          stroke="#fe9800"
+          fill="#fe9800"
+          fillOpacity={0.25}
         />
         <Legend
           wrapperStyle={{

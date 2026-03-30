@@ -125,100 +125,66 @@ export function CrossAnalysisSection({ axes }: CrossAnalysisSectionProps) {
         <DualRadarChart elementData={elementData} psaData={psaData} />
       </div>
 
-      {/* 2x2 Matrix */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Unified Type Cards */}
+      <div className="space-y-4">
         {matrixTypes.map((type) => {
           const cfg = TYPE_CONFIG[type];
           const items = grouped[type] ?? [];
+          if (items.length === 0) return null;
           return (
             <div
               key={type}
-              className="rounded-2xl border p-5 space-y-3"
+              className="rounded-2xl border p-5 space-y-4"
               style={{
                 borderColor: `${cfg.color}30`,
                 background: `${cfg.color}06`,
               }}
             >
+              {/* Type Header */}
               <div className="flex items-center gap-2">
                 <span
-                  className="text-lg"
+                  className="text-t5"
                   style={{ color: cfg.color }}
                 >
                   {cfg.icon}
                 </span>
                 <div>
                   <p
-                    className="text-sm font-bold"
+                    className="text-t5 font-semibold"
                     style={{ color: cfg.color }}
                   >
                     {cfg.label}
                   </p>
-                  <p className={styles.matrixDesc}>{cfg.description}</p>
+                  <p className="text-st10 text-tds-grey-400">{cfg.description}</p>
                 </div>
               </div>
-              {items.length === 0 ? (
-                <p className={styles.matrixEmpty}>해당 없음</p>
-              ) : (
-                <div className="space-y-2">
-                  {items.map((ax, i) => (
-                    <div
-                      key={i}
-                      className={styles.matrixItem}
-                    >
-                      <span
-                        className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{
-                          background: ELEMENT_COLORS[ax.element],
-                        }}
-                      />
-                      <span>{ELEMENT_TO_AXIS[ax.element]}</span>
+              {/* Axis Insights */}
+              <div className="space-y-3">
+                {items.map((ax, i) => {
+                  const axisLabel = ELEMENT_TO_AXIS[ax.element];
+                  return (
+                    <div key={i} className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{
+                            background: ELEMENT_COLORS[ax.element],
+                          }}
+                        />
+                        <span
+                          className="text-st8 font-semibold"
+                          style={{ color: ELEMENT_COLORS[ax.element] }}
+                        >
+                          {axisLabel}
+                        </span>
+                      </div>
+                      <p className="text-st8 text-tds-grey-600 leading-relaxed">
+                        {ax.insight}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Insight Cards */}
-      <div className="space-y-3">
-        <h3 className={styles.insightTitle}>축별 인사이트</h3>
-        {axes.map((ax, i) => {
-          const cfg = TYPE_CONFIG[ax.type];
-          const axisLabel = ELEMENT_TO_AXIS[ax.element];
-          return (
-            <div
-              key={i}
-              className="rounded-xl border p-4 space-y-1.5"
-              style={{
-                borderColor: `${cfg.color}25`,
-                background: `${cfg.color}05`,
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <span style={{ color: cfg.color }} className="text-sm">
-                  {cfg.icon}
-                </span>
-                <span
-                  className="text-sm font-semibold"
-                  style={{ color: ELEMENT_COLORS[ax.element] }}
-                >
-                  {axisLabel}
-                </span>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full font-medium"
-                  style={{
-                    background: `${cfg.color}20`,
-                    color: cfg.color,
-                  }}
-                >
-                  {cfg.label}
-                </span>
+                  );
+                })}
               </div>
-              <p className={styles.insightText}>
-                {ax.insight}
-              </p>
             </div>
           );
         })}
