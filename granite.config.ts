@@ -15,6 +15,9 @@ export default defineConfig({
     },
   },
   outdir: './out',
+  webViewProps: {
+    type: 'partner',
+  },
   permissions: [],
   navigationBar: {
     withBackButton: true,

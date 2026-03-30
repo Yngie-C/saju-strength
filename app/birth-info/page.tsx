@@ -33,7 +33,9 @@ export default function BirthInfoPage() {
   // 전면형 광고 사전 로드 (토스 환경에서만)
   useEffect(() => {
     trackScreen('birth_info');
-    preloadInterstitial();
+    if (IS_TOSS) {
+      preloadInterstitial();
+    }
   }, []);
 
   async function handleSubmit(data: {

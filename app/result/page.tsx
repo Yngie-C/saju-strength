@@ -14,6 +14,9 @@ import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { TossBannerAd } from '@/components/ads/TossBannerAd';
+import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
+import { preloadRewarded } from '@/lib/ads/toss-ads';
+import { growthGuideStyles } from '@/lib/section-styles';
 import { Toast } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackScreen, trackClick, trackImpression } from '@/lib/analytics';
@@ -94,6 +97,16 @@ function ShareBottomSheet({
 export default function ResultPage() {
   const { sajuResult, psaResult, combined, loading, error, shareStatus, handleShare, handleShareToToss, resetShareStatus } = useResultData();
   const [showShareSheet, setShowShareSheet] = useState(false);
+  const [growthUnlocked, setGrowthUnlocked] = useState(false);
+  const [adSupported, setAdSupported] = useState(IS_TOSS);
+
+  const handleGrowthUnlock = useCallback(() => {
+    setGrowthUnlocked(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('growth-guide-unlocked', 'true');
+    }
+    trackClick('result', 'rewarded_ad_growth_unlocked');
+  }, []);
 
   const onShareClick = useCallback(() => {
     trackClick('result', 'share');
@@ -109,6 +122,15 @@ export default function ResultPage() {
       trackScreen('result');
     }
   }, [loading, sajuResult, psaResult, combined]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const unlocked = sessionStorage.getItem('growth-guide-unlocked') === 'true';
+      if (unlocked) setGrowthUnlocked(true);
+    }
+    if (!IS_TOSS) return;
+    preloadRewarded();
+  }, []);
 
   if (loading) return <ResultSkeleton />;
   if (error) return <ResultError error={error} />;
@@ -166,11 +188,59 @@ export default function ResultPage() {
 
         <SectionDivider />
 
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'growth_guide')} viewport={{ once: true, margin: "-60px" }}>
-          <ErrorBoundary>
-            <GrowthGuideSection guide={growthGuide} strengthTips={strengthTips} brandingMessages={brandingMessages} />
-          </ErrorBoundary>
-        </motion.div>
+        {IS_TOSS && !growthUnlocked && adSupported ? (
+          <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
+            <div className="space-y-8">
+              <div className="space-y-1">
+                <p className={growthGuideStyles.sectionLabel}>Section D</p>
+                <h2 className={growthGuideStyles.sectionTitle}>성장 가이드</h2>
+              </div>
+              <div className="relative">
+                <div className="filter blur-[6px] pointer-events-none select-none opacity-60">
+                  <div className="rounded-2xl border border-tds-grey-200 bg-tds-grey-50 p-5 space-y-3">
+                    <div className="h-4 bg-tds-grey-200 rounded w-1/3" />
+                    <div className="h-3 bg-tds-grey-100 rounded w-full" />
+                    <div className="h-3 bg-tds-grey-100 rounded w-4/5" />
+                    <div className="h-3 bg-tds-grey-100 rounded w-2/3" />
+                  </div>
+                  <div className="mt-3 rounded-2xl border border-tds-grey-200 bg-tds-grey-50 p-5 space-y-3">
+                    <div className="h-4 bg-tds-grey-200 rounded w-1/4" />
+                    <div className="h-3 bg-tds-grey-100 rounded w-full" />
+                    <div className="h-3 bg-tds-grey-100 rounded w-3/4" />
+                  </div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="rounded-xl border border-tds-grey-200 bg-white p-6 space-y-4 shadow-lg max-w-[320px] w-full mx-4">
+                    <div className="text-center space-y-2">
+                      <div className="w-12 h-12 rounded-full bg-tds-blue-50 flex items-center justify-center mx-auto mb-3">
+                        <span className="text-xl">🔒</span>
+                      </div>
+                      <h3 className="text-base font-bold text-tds-grey-900">성장 가이드 확인하기</h3>
+                      <p className="text-sm text-tds-grey-600">맞춤 성장 전략과 실천 가이드를 무료로 확인하세요</p>
+                    </div>
+                    <ul className="space-y-2 text-sm text-tds-grey-700">
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>종합 성장 가이드</span></li>
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>집중 영역 분석</span></li>
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>일상 실천 방법</span></li>
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>퍼스널 브랜딩</span></li>
+                    </ul>
+                    <RewardedAdButton
+                      onRewardEarned={handleGrowthUnlock}
+                      buttonText="광고 보고 무료로 잠금 해제"
+                      rewardDescription="30초 광고를 시청하면 성장 가이드를 확인할 수 있어요"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'growth_guide')} viewport={{ once: true, margin: "-60px" }}>
+            <ErrorBoundary>
+              <GrowthGuideSection guide={growthGuide} strengthTips={strengthTips} brandingMessages={brandingMessages} />
+            </ErrorBoundary>
+          </motion.div>
+        )}
 
         <SectionDivider />
 

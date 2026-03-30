@@ -23,7 +23,7 @@ export function TossBannerAd({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!IS_TOSS || !isAdSupported() || !containerRef.current) {
+    if (!IS_TOSS || !containerRef.current) {
       onNoFill?.();
       return;
     }
