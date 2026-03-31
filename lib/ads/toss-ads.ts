@@ -215,10 +215,13 @@ export async function showRewarded(): Promise<{
     if (typeof shower.isSupported === 'function' && !shower.isSupported()) return { rewarded: false };
 
     return new Promise((resolve) => {
+      let rewardEarned = false;
+
       shower({
         options: { adGroupId: AD_GROUP_IDS.rewarded },
         onEvent: (event) => {
           if (event.type === 'userEarnedReward' && event.data) {
+            rewardEarned = true;
             setCooldown('rewarded');
             resolve({
               rewarded: true,
@@ -227,7 +230,13 @@ export async function showRewarded(): Promise<{
             });
           } else if (event.type === 'dismissed') {
             setCooldown('rewarded');
-            resolve({ rewarded: false });
+            // dismissed가 userEarnedReward보다 먼저 도착할 수 있으므로
+            // 500ms 대기 후 reward가 없을 때만 resolve
+            setTimeout(() => {
+              if (!rewardEarned) {
+                resolve({ rewarded: false });
+              }
+            }, 500);
           }
         },
         onError: () => resolve({ rewarded: false }),

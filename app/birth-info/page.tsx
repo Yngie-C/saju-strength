@@ -140,22 +140,9 @@ export default function BirthInfoPage() {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-8 flex items-center gap-2"
+        className="mb-8"
       >
-        {[1, 2, 3].map((step) => (
-          <div key={step} className="flex items-center gap-2">
-            <div
-              className={
-                step <= 2
-                  ? styles.stepActive
-                  : styles.stepInactive
-              }
-            >
-              {step}
-            </div>
-            {step < 3 && <div className={step <= 1 ? styles.stepLineActive : styles.stepLine} />}
-          </div>
-        ))}
+        <span className={styles.stepLabel}>2 / 3 단계</span>
       </motion.div>
 
       {/* 글래스 카드 */}
