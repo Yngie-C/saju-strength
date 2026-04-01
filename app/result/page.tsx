@@ -211,15 +211,11 @@ export default function ResultPage() {
           <ShareCard
             userName={userName}
             personaTitle={psaResult.persona.title}
-            personaTagline={psaResult.persona.tagline}
+            selfIntro={psaResult.brandingMessages?.selfIntro ?? psaResult.persona.tagline}
             dayMasterName={sajuResult.dayMaster.name}
             dominantElement={sajuResult.dominantElement}
-            weakestElement={sajuResult.weakestElement}
-            topCategories={psaResult.categoryScores
-              .slice()
-              .sort((a, b) => b.normalizedScore - a.normalizedScore)
-              .slice(0, 2)
-              .map((cs) => ({ name: cs.category, score: cs.normalizedScore }))}
+            elementDistribution={sajuResult.elementDistribution}
+            dayMasterKeywords={sajuResult.dayMaster.keywords}
             allCategories={psaResult.categoryScores.map((cs) => ({ name: cs.category, score: cs.normalizedScore }))}
             onSaved={() => resetShareStatus()}
           />
