@@ -5,5 +5,5 @@ declare module 'qrcode' {
     color?: { dark?: string; light?: string };
   }
   function toDataURL(text: string, options?: QRCodeToDataURLOptions): Promise<string>;
-  export default { toDataURL };
+  export { toDataURL };
 }

@@ -91,15 +91,13 @@ export function ShareCard({
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    import('qrcode').then((mod: any) => {
-      const QRCode = mod.default ?? mod;
-      return QRCode.toDataURL(TOSS_MINION_URL, {
+    import('qrcode').then(({ toDataURL }) =>
+      toDataURL(TOSS_MINION_URL, {
         width: 240,
         margin: 1,
         color: { dark: '#000000', light: '#FFFFFF' },
-      });
-    }).then((url: string) => setQrDataUrl(url)).catch(() => {});
+      })
+    ).then((url) => setQrDataUrl(url)).catch(() => {});
   }, []);
 
   const handleSaveImage = useCallback(async () => {
