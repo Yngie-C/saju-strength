@@ -6,11 +6,11 @@ import { BriefAnalysis } from "@/types/survey";
 import { apiUrl } from "@/lib/config";
 import { WEB_ORIGIN } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
-import { buildShareUrl, type SharePayload } from '@/lib/share-encoder';
+import { buildShareUrl, encodeShareData, type SharePayload } from '@/lib/share-encoder';
 import { IS_TOSS } from '@/lib/platform';
 import { CombinedAnalyzerAgent } from '@/agents/combined-analyzer';
 import { saveResultToHistory } from '@/lib/result-history';
-import { tossShare } from '@/lib/toss';
+import { tossShare, tossShareInternal } from '@/lib/toss';
 import { shareResult } from '@/lib/share';
 
 export interface ResultData {
@@ -182,21 +182,6 @@ export function useResultData(): ResultData {
       .slice(0, 2)
       .map((cs) => [cs.category, cs.normalizedScore]);
 
-    if (IS_TOSS) {
-      const namePrefix = userName ? `${userName}님의` : '나의';
-      const topStr = topCategories.map(([cat, score]) => `${cat} ${Math.round(score)}점`).join(', ');
-      const message = [
-        `${namePrefix} 사주강점: ${personaTitle}!`,
-        `일간: ${dayMasterName} | 주요 오행: ${dominantElement}`,
-        `Top 강점: ${topStr}`,
-        '',
-        '나도 분석받기 → https://minion.toss.im/B4th4OxD',
-      ].join('\n');
-      const success = await tossShare(message);
-      setShareStatus(success ? 'shared' : 'failed');
-      return;
-    }
-
     const payload: SharePayload = {
       v: 1,
       pt: personaType,
@@ -206,6 +191,34 @@ export function useResultData(): ResultData {
       dm: dayMasterName,
       tc: topCategories,
     };
+
+    if (IS_TOSS) {
+      const namePrefix = userName ? `${userName}님의` : '나의';
+      const topStr = topCategories.map(([cat, score]) => `${cat} ${Math.round(score)}점`).join(', ');
+      const displayText = [
+        `${namePrefix} 사주강점: ${personaTitle}!`,
+        `일간: ${dayMasterName} | 주요 오행: ${dominantElement}`,
+        `Top 강점: ${topStr}`,
+      ].join('\n');
+
+      const encoded = encodeShareData(payload);
+      const schemeUrl = `intoss://saju-strength/shared?d=${encoded}`;
+      const deepLinkSuccess = await tossShareInternal(schemeUrl, displayText);
+
+      if (!deepLinkSuccess) {
+        // 폴백: 텍스트 + 하드코딩 minion URL
+        const message = [
+          displayText,
+          '',
+          '나도 분석받기 → https://minion.toss.im/B4th4OxD',
+        ].join('\n');
+        const success = await tossShare(message);
+        setShareStatus(success ? 'shared' : 'failed');
+      } else {
+        setShareStatus('shared');
+      }
+      return;
+    }
 
     const shareUrl = buildShareUrl(payload);
     const sharePath = shareUrl.replace(WEB_ORIGIN, '');
