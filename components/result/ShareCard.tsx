@@ -213,48 +213,38 @@ export function ShareCard({
             </div>
           </div>
 
-          {/* ── Section 2: selfIntro 인용문 ── */}
+          {/* ── Section 2: selfIntro ── */}
           <div style={{
-            padding: '48px 100px 40px',
+            padding: '48px 80px 40px',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: 0,
+            gap: 16,
           }}>
             <div style={{
-              position: 'relative',
-              maxWidth: 820,
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: gradient.from,
+              opacity: 0.4,
+            }} />
+            <div style={{
+              fontSize: 34,
+              color: '#1F2937',
               textAlign: 'center',
+              lineHeight: 1.55,
+              fontWeight: 600,
+              maxWidth: 820,
             }}>
-              <span style={{
-                position: 'absolute',
-                top: -32,
-                left: -20,
-                fontSize: 64,
-                color: gradient.from,
-                opacity: 0.25,
-                lineHeight: 1,
-                fontFamily: 'Georgia, serif',
-              }}>&ldquo;</span>
-              <div style={{
-                fontSize: 28,
-                color: '#374151',
-                lineHeight: 1.6,
-                fontWeight: 500,
-              }}>
-                {selfIntro}
-              </div>
-              <span style={{
-                position: 'absolute',
-                bottom: -40,
-                right: -20,
-                fontSize: 64,
-                color: gradient.from,
-                opacity: 0.25,
-                lineHeight: 1,
-                fontFamily: 'Georgia, serif',
-              }}>&rdquo;</span>
+              {selfIntro}
             </div>
+            <div style={{
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: gradient.from,
+              opacity: 0.4,
+            }} />
           </div>
 
           {/* ── Section 3: 레이더(펜타곤) 차트 ── */}
