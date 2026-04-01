@@ -6,6 +6,7 @@ import { AxisAnalysis } from "@/types/saju";
 import { IS_TOSS, designTokens } from '@/lib/design-tokens';
 import { resultTokens as resultStyles } from '@/lib/section-styles';
 import { parseGrowthGuide } from '@/lib/combined/parse-growth-guide';
+import { generateWeaknessStrategy } from '@/lib/combined/growth-guide';
 import { useResultData } from '@/hooks/useResultData';
 import { ResultSkeleton } from "@/components/result/ResultSkeleton";
 import { ResultError } from "@/components/result/ResultError";
@@ -14,8 +15,7 @@ import { PsaProfileSection } from "@/components/result/PsaProfileSection";
 import { CrossAnalysisSection } from "@/components/result/CrossAnalysisSection";
 import { GrowthGuideSection } from "@/components/result/GrowthGuideSection";
 import { TossBannerAd } from '@/components/ads/TossBannerAd';
-import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
-import { preloadRewarded } from '@/lib/ads/toss-ads';
+import { preloadInterstitial, showInterstitial } from '@/lib/ads/toss-ads';
 import { growthGuideStyles } from '@/lib/section-styles';
 import { Toast } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -24,6 +24,10 @@ import { trackScreen, trackClick, trackImpression } from '@/lib/analytics';
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+};
+
+const ELEMENT_KOREAN: Record<string, string> = {
+  wood: '목(木)', fire: '화(火)', earth: '토(土)', metal: '금(金)', water: '수(水)',
 };
 
 const PSA_LABELS: Record<string, string> = {
@@ -105,7 +109,7 @@ export default function ResultPage() {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('growth-guide-unlocked', 'true');
     }
-    trackClick('result', 'rewarded_ad_growth_unlocked');
+    trackClick('result', 'interstitial_ad_growth_unlocked');
   }, []);
 
   const onShareClick = useCallback(() => {
@@ -129,7 +133,7 @@ export default function ResultPage() {
       if (unlocked) setGrowthUnlocked(true);
     }
     if (!IS_TOSS) return;
-    preloadRewarded();
+    preloadInterstitial({ cooldownKey: 'interstitial-result' });
   }, []);
 
   if (loading) return <ResultSkeleton />;
@@ -216,19 +220,25 @@ export default function ResultPage() {
                         <span className="text-xl">🔒</span>
                       </div>
                       <h3 className="text-base font-bold text-tds-grey-900">성장 가이드 확인하기</h3>
-                      <p className="text-sm text-tds-grey-600">맞춤 성장 전략과 실천 가이드를 무료로 확인하세요</p>
+                      <p className="text-sm text-tds-grey-600">{`${sajuResult.dayMaster.name} 유형 맞춤 성장 로드맵 — 최약 오행 [${ELEMENT_KOREAN[sajuResult.weakestElement] ?? sajuResult.weakestElement}] 보완 전략 포함`}</p>
                     </div>
                     <ul className="space-y-2 text-sm text-tds-grey-700">
-                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>종합 성장 가이드</span></li>
-                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>집중 영역 분석</span></li>
-                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>일상 실천 방법</span></li>
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>오행 밸런스 개선법</span></li>
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>실전 강점 시나리오</span></li>
+                      <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>약점 보완 전략</span></li>
                       <li className="flex items-start gap-2"><span className="text-tds-blue-500 mt-0.5">✓</span><span>퍼스널 브랜딩</span></li>
                     </ul>
-                    <RewardedAdButton
-                      onRewardEarned={handleGrowthUnlock}
-                      buttonText="광고 보고 무료로 잠금 해제"
-                      rewardDescription="30초 광고를 시청하면 성장 가이드를 확인할 수 있어요"
-                    />
+                    <button
+                      onClick={async () => {
+                        await showInterstitial(() => handleGrowthUnlock(), { cooldownKey: 'interstitial-result' });
+                      }}
+                      className={`w-full py-3.5 font-semibold text-sm transition-opacity ${designTokens.primaryButton}`}
+                    >
+                      광고 보고 무료로 잠금 해제
+                    </button>
+                    <p className="text-st10 text-center text-tds-grey-400 mt-2">
+                      짧은 광고 후 성장 가이드를 확인할 수 있어요
+                    </p>
                   </div>
                 </div>
               </div>
@@ -237,7 +247,20 @@ export default function ResultPage() {
         ) : (
           <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'growth_guide')} viewport={{ once: true, margin: "-60px" }}>
             <ErrorBoundary>
-              <GrowthGuideSection guide={growthGuide} strengthTips={strengthTips} brandingMessages={brandingMessages} />
+              <GrowthGuideSection
+                  guide={growthGuide}
+                  strengthTips={strengthTips}
+                  brandingMessages={brandingMessages}
+                  elementBalance={{
+                    weakestElement: sajuResult.weakestElement,
+                    elementDistribution: sajuResult.elementDistribution,
+                  }}
+                  scenarios={psaResult.strengthsScenarios}
+                  weaknessStrategies={sajuResult.dayMaster.weaknesses.map(w => ({
+                    weakness: w,
+                    strategy: generateWeaknessStrategy(w),
+                  }))}
+                />
             </ErrorBoundary>
           </motion.div>
         )}

@@ -8,12 +8,12 @@
  * - 각 광고 타입이 독립적으로 동작 (전역 게이트 없음)
  */
 
-import { AD_GROUP_IDS, AD_COOLDOWN } from './config';
+import { AD_GROUP_IDS, AD_COOLDOWN, AdCooldownKey } from './config';
 import { IS_TOSS } from '@/lib/platform';
 
 // --- 쿨다운 ---
 
-function isCooldownActive(type: 'interstitial' | 'rewarded'): boolean {
+function isCooldownActive(type: AdCooldownKey): boolean {
   if (typeof window === 'undefined') return true;
   const key = `ad-cooldown-${type}`;
   const last = localStorage.getItem(key);
@@ -21,7 +21,7 @@ function isCooldownActive(type: 'interstitial' | 'rewarded'): boolean {
   return Date.now() - parseInt(last, 10) < AD_COOLDOWN[type];
 }
 
-function setCooldown(type: 'interstitial' | 'rewarded'): void {
+function setCooldown(type: AdCooldownKey): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(`ad-cooldown-${type}`, String(Date.now()));
 }
@@ -93,9 +93,12 @@ export async function initializeAds(): Promise<boolean> {
 // --- 전면형 광고 ---
 
 /** 전면형 광고 사전 로드 */
-export async function preloadInterstitial(): Promise<boolean> {
+export async function preloadInterstitial(
+  options?: { cooldownKey?: AdCooldownKey }
+): Promise<boolean> {
   if (!IS_TOSS) return false;
-  if (isCooldownActive('interstitial')) return false;
+  const cooldownKey = options?.cooldownKey ?? 'interstitial';
+  if (isCooldownActive(cooldownKey)) return false;
 
   try {
     const bridge = await getWebBridge();
@@ -120,9 +123,13 @@ export async function preloadInterstitial(): Promise<boolean> {
 }
 
 /** 전면형 광고 표시. 닫힘/실패 시 onDone 콜백 호출. */
-export async function showInterstitial(onDone?: () => void): Promise<boolean> {
+export async function showInterstitial(
+  onDone?: () => void,
+  options?: { cooldownKey?: AdCooldownKey }
+): Promise<boolean> {
   if (!IS_TOSS) { onDone?.(); return false; }
-  if (isCooldownActive('interstitial')) { onDone?.(); return false; }
+  const cooldownKey = options?.cooldownKey ?? 'interstitial';
+  if (isCooldownActive(cooldownKey)) { onDone?.(); return false; }
 
   try {
     const bridge = await getWebBridge();
@@ -136,7 +143,7 @@ export async function showInterstitial(onDone?: () => void): Promise<boolean> {
     const finish = (completed: boolean) => {
       if (done) return;
       done = true;
-      setCooldown('interstitial');
+      setCooldown(cooldownKey);
       onDone?.();
       return completed;
     };

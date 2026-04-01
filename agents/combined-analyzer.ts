@@ -41,7 +41,10 @@ export class CombinedAnalyzerAgent extends BaseAgent<
       const undeveloped = axes.filter(a => a.type === 'undeveloped');
 
       // 3. 성장 가이드 생성
-      const growthGuideObj = generateGrowthGuide(axes, saju.dayMaster.name);
+      const growthGuideObj = generateGrowthGuide(axes, saju.dayMaster.name, {
+        keywords: saju.dayMaster.keywords,
+        weaknesses: saju.dayMaster.weaknesses,
+      });
 
       // CombinedAnalysis.growthGuide is a string — serialize the guide
       const growthGuide = [

@@ -26,7 +26,7 @@ describe('toss-ads', () => {
     it('웹 환경에서 false 반환', async () => {
       process.env.NEXT_PUBLIC_BUILD_TARGET = 'web';
       const { isAdSupported } = await import('@/lib/ads/toss-ads');
-      expect(isAdSupported()).toBe(false);
+      expect(await isAdSupported()).toBe(false);
     });
   });
 

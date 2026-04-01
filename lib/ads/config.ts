@@ -9,8 +9,10 @@ export const AD_GROUP_IDS = {
 } as const;
 
 export const AD_COOLDOWN = {
-  interstitial: 60_000,  // 전면형: 최소 60초 간격
-  rewarded: 30_000,      // 보상형: 최소 30초 간격
+  interstitial: 60_000,          // 전면형: 최소 60초 간격
+  'interstitial-result': 60_000, // 결과 페이지 전면형: 최소 60초 간격
+  rewarded: 30_000,              // 보상형: 최소 30초 간격
 } as const;
 
 export type AdType = keyof typeof AD_GROUP_IDS;
+export type AdCooldownKey = keyof typeof AD_COOLDOWN;
