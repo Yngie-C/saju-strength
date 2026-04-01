@@ -208,12 +208,6 @@ export default function ResultPage() {
         <SectionDivider />
 
         <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="pt-4 space-y-3">
-          <button
-            onClick={onShareClick}
-            className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${designTokens.shareButtonInline}`}
-          >
-            친구에게 공유하기
-          </button>
           <ShareCard
             userName={userName}
             personaTitle={psaResult.persona.title}

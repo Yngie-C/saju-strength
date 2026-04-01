@@ -214,7 +214,7 @@ export function ShareCard({
       {/* 저장 버튼 */}
       <button
         onClick={handleSaveImage}
-        className="w-full py-3.5 rounded-xl font-semibold text-sm bg-tds-grey-100 text-tds-grey-900 active:bg-tds-grey-200 transition-colors"
+        className="w-full py-3.5 rounded-xl font-semibold text-sm bg-tds-blue-500 text-white active:bg-tds-blue-600 transition-colors"
       >
         결과 이미지 저장하기
       </button>
