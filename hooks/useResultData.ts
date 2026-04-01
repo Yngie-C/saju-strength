@@ -205,17 +205,23 @@ export function useResultData(): ResultData {
       const schemeUrl = `intoss://saju-strength/shared?d=${encoded}`;
       const deepLinkSuccess = await tossShareInternal(schemeUrl, displayText);
 
-      if (!deepLinkSuccess) {
-        // 폴백: 텍스트 + 하드코딩 minion URL
-        const message = [
-          displayText,
-          '',
-          '나도 분석받기 → https://minion.toss.im/B4th4OxD',
-        ].join('\n');
-        const success = await tossShare(message);
-        setShareStatus(success ? 'shared' : 'failed');
-      } else {
+      if (deepLinkSuccess) {
         setShareStatus('shared');
+        return;
+      }
+
+      // 2차: shareResult 폴백 (tossShare → Web Share → clipboard 체인)
+      const result = await shareResult({
+        title: `사주강점 - ${personaTitle}`,
+        description: displayText,
+      });
+
+      if (result === 'copied') {
+        setShareStatus('copied');
+      } else if (result === 'shared') {
+        setShareStatus('shared');
+      } else {
+        setShareStatus('failed');
       }
       return;
     }

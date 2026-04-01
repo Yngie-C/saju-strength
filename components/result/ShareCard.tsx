@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { toPng } from 'html-to-image';
+import { IS_TOSS } from '@/lib/platform';
 
 interface ShareCardProps {
   userName: string | null;
@@ -49,6 +50,7 @@ export function ShareCard({
   onError,
 }: ShareCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
 
   const handleSaveImage = useCallback(async () => {
     if (!cardRef.current) return;
@@ -59,11 +61,16 @@ export function ShareCard({
         pixelRatio: 2,
         backgroundColor: '#FFFFFF',
       });
-      const link = document.createElement('a');
-      link.download = `saju-strength-${userName || 'result'}.png`;
-      link.href = dataUrl;
-      link.click();
-      onSaved?.();
+      if (IS_TOSS) {
+        setImageDataUrl(dataUrl);
+        onSaved?.();
+      } else {
+        const link = document.createElement('a');
+        link.download = `saju-strength-${userName || 'result'}.png`;
+        link.href = dataUrl;
+        link.click();
+        onSaved?.();
+      }
     } catch {
       onError?.();
     }
@@ -157,6 +164,32 @@ export function ShareCard({
       >
         결과 이미지 저장하기
       </button>
+
+      {/* 토스 WebView 이미지 저장 모달 (롱프레스로 저장) */}
+      {imageDataUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4"
+          onClick={() => setImageDataUrl(null)}
+        >
+          <div className="relative max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={imageDataUrl}
+              alt="사주강점 결과 카드"
+              className="w-full rounded-xl"
+              style={{ WebkitTouchCallout: 'default' }}
+            />
+            <p className="text-white text-center text-sm mt-4 opacity-80">
+              이미지를 꾹 눌러 저장하세요
+            </p>
+            <button
+              onClick={() => setImageDataUrl(null)}
+              className="mt-4 w-full py-3 rounded-xl bg-white/20 text-white font-semibold text-sm"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
