@@ -45,12 +45,26 @@ export default function BirthInfoPage() {
     hour: number | null;
     gender: "male" | "female";
     isLunar: boolean;
+    name?: string;
   }) {
     setIsLoading(true);
     setError(null);
     trackClick('birth_info', 'submit');
 
     try {
+      if (data.name) {
+        sessionStorage.setItem('userName', data.name);
+      } else {
+        sessionStorage.removeItem('userName');
+      }
+
+      // 생년월일 정보 저장 (결과 히스토리용)
+      sessionStorage.setItem('birthYear', String(data.year));
+      sessionStorage.setItem('birthMonth', String(data.month));
+      sessionStorage.setItem('birthDay', String(data.day));
+      sessionStorage.setItem('birthHour', data.hour !== null ? String(data.hour) : '');
+      sessionStorage.setItem('gender', data.gender);
+
       const existingSessionId = sessionStorage.getItem('saju-session-id');
 
       if (IS_TOSS) {
@@ -135,16 +149,6 @@ export default function BirthInfoPage() {
 
   return (
     <main className={`min-h-screen ${styles.mainBg} flex flex-col items-center justify-center ${styles.mainPx} py-12`}>
-      {/* 단계 표시 */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mb-8"
-      >
-        <span className={styles.stepLabel}>2 / 3 단계</span>
-      </motion.div>
-
       {/* 글래스 카드 */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}

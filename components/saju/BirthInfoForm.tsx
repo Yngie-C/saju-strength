@@ -15,12 +15,14 @@ interface BirthInfoFormProps {
     hour: number | null;
     gender: "male" | "female";
     isLunar: boolean;
+    name?: string;
   }) => void;
   isLoading?: boolean;
 }
 
 
 export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProps) {
+  const [name, setName] = useState("");
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
@@ -66,6 +68,7 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
       hour,
       gender,
       isLunar,
+      name: name.trim() || undefined,
     });
   }
 
@@ -86,6 +89,18 @@ export function BirthInfoForm({ onSubmit, isLoading = false }: BirthInfoFormProp
       animate="visible"
       className="space-y-6"
     >
+      {/* 이름 (선택) */}
+      <motion.div variants={itemVariants} className="space-y-1">
+        <label className={designTokens.formLabel}>이름 (선택)</label>
+        <Input
+          type="text"
+          placeholder="홍길동"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={designTokens.inputToss}
+        />
+      </motion.div>
+
       {/* 양력 / 음력 토글 */}
       <motion.div variants={itemVariants} className="flex gap-2">
         <button

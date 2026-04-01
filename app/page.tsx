@@ -1,11 +1,20 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useInView } from "framer-motion";
-import { Star, Diamond, TrendingUp, Circle, Sparkles, BarChart3, GitMerge, ArrowRight } from "lucide-react";
+import { Star, Diamond, TrendingUp, Circle, Sparkles, BarChart3, GitMerge, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { designTokens, IS_TOSS } from '@/lib/design-tokens';
 import { trackScreen, trackClick } from '@/lib/analytics';
+import { getResultHistory, ResultHistoryEntry } from '@/lib/result-history';
+
+const PSA_LABELS: Record<string, string> = {
+  innovation: '혁신 사고',
+  execution: '철저 실행',
+  influence: '대인 영향',
+  collaboration: '협업 공감',
+  resilience: '상황 회복',
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -30,9 +39,12 @@ function SectionReveal({ children, className }: { children: React.ReactNode; cla
 
 export default function LandingPage() {
   const router = useRouter();
+  const [history, setHistory] = useState<ResultHistoryEntry[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     trackScreen('landing');
+    setHistory(getResultHistory());
   }, []);
 
   return (
@@ -94,6 +106,55 @@ export default function LandingPage() {
           <p className={`tracking-wide ${designTokens.textCaption}`}>
             100% 무료 · 3분 소요 · 즉시 결과
           </p>
+
+          {/* 이전 결과 목록 */}
+          {history.length > 0 && (
+            <div className="mt-6 w-full max-w-md">
+              <p className={`text-sm font-medium mb-3 ${designTokens.textSecondary}`}>이전 분석 결과</p>
+              <div className="space-y-2">
+                {history.map((entry) => {
+                  const isExpanded = expandedId === entry.id;
+                  const savedDate = new Date(entry.savedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                  return (
+                    <div key={entry.id} className={`w-full rounded-xl ${designTokens.cardBg} overflow-hidden`}>
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : entry.id)}
+                        className="w-full text-left px-4 py-3 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className={`text-sm font-semibold ${designTokens.textPrimary}`}>
+                              {entry.name ? `${entry.name}` : entry.birthDate} · {entry.personaTitle}
+                            </p>
+                            <p className={`text-xs mt-0.5 ${designTokens.textCaption}`}>
+                              {entry.dayMasterName} · {entry.personaTagline}
+                            </p>
+                          </div>
+                          {isExpanded
+                            ? <ChevronUp size={16} className={designTokens.textCaption} />
+                            : <ChevronDown size={16} className={designTokens.textCaption} />
+                          }
+                        </div>
+                      </button>
+                      {isExpanded && (
+                        <div className={`px-4 pb-3 border-t ${designTokens.borderDefault}`}>
+                          <div className={`mt-2 space-y-1 text-xs ${designTokens.textSecondary}`}>
+                            {entry.topCategories.map(([key, score]) => (
+                              <div key={key} className="flex justify-between">
+                                <span>{PSA_LABELS[key] ?? key}</span>
+                                <span className={`font-semibold ${designTokens.textPrimary}`}>{score}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <p className={`mt-2 text-xs ${designTokens.textCaption}`}>{savedDate} 분석</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </motion.div>
       </section>
 

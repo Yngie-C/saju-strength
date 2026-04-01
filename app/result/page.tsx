@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { AxisAnalysis } from "@/types/saju";
 import { IS_TOSS, designTokens } from '@/lib/design-tokens';
 import { resultTokens as resultStyles } from '@/lib/section-styles';
@@ -20,6 +20,7 @@ import { growthGuideStyles } from '@/lib/section-styles';
 import { Toast } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackScreen, trackClick, trackImpression } from '@/lib/analytics';
+import { ShareCard } from '@/components/result/ShareCard';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -42,65 +43,8 @@ function SectionDivider() {
   return <div className={resultStyles.divider} />;
 }
 
-function ShareBottomSheet({
-  open,
-  onClose,
-  onShareExternal,
-  onShareToss,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onShareExternal: () => void;
-  onShareToss: () => void;
-}) {
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-50"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[16px] px-5 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3"
-          >
-            <div className="w-10 h-1 bg-tds-grey-300 rounded-full mx-auto mb-4" />
-            <p className="text-base font-semibold text-tds-grey-900 mb-4">공유 방법을 선택해주세요</p>
-            <div className="space-y-3">
-              {/* TODO: getTossShareLink 공유 실패 원인 해결 후 주석 해제
-              <button
-                onClick={() => { onShareToss(); onClose(); }}
-                className="w-full py-4 rounded-[14px] font-bold text-white bg-tds-blue-500 active:bg-tds-blue-600 transition-colors"
-              >
-                토스 친구에게 공유
-              </button>
-              */}
-              {/* TODO: 외부 공유 활성화 시 주석 해제
-              <button
-                onClick={() => { onShareExternal(); onClose(); }}
-                className="w-full py-4 rounded-[14px] font-bold bg-tds-grey-100 text-tds-grey-900 active:bg-tds-grey-200 transition-colors"
-              >
-                다른 앱으로 공유
-              </button>
-              */}
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
-
 export default function ResultPage() {
-  const { sajuResult, psaResult, combined, loading, error, shareStatus, handleShare, handleShareToToss, resetShareStatus } = useResultData();
-  const [showShareSheet, setShowShareSheet] = useState(false);
+  const { sajuResult, psaResult, combined, loading, error, userName, shareStatus, handleShare, resetShareStatus } = useResultData();
   const [growthUnlocked, setGrowthUnlocked] = useState(false);
   const [adSupported, setAdSupported] = useState(IS_TOSS);
 
@@ -114,11 +58,7 @@ export default function ResultPage() {
 
   const onShareClick = useCallback(() => {
     trackClick('result', 'share');
-    if (IS_TOSS) {
-      setShowShareSheet(true);
-    } else {
-      handleShare();
-    }
+    handleShare();
   }, [handleShare]);
 
   useEffect(() => {
@@ -154,7 +94,7 @@ export default function ResultPage() {
           transition={{ duration: 0.5 }}
           className="text-center space-y-2"
         >
-          <h1 className={resultStyles.title}>나의 강점 분석 리포트</h1>
+          <h1 className={resultStyles.title}>{userName ? `${userName}님의 강점 분석 리포트` : '나의 강점 분석 리포트'}</h1>
           <p className={resultStyles.subtitle}>사주 오행 × PSA 강점 — 선천과 후천의 교차</p>
         </motion.div>
 
@@ -267,25 +207,27 @@ export default function ResultPage() {
 
         <SectionDivider />
 
-        {/* TODO: 공유 기능 수정 후 주석 해제 (SUN-78)
-        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="pt-4">
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="pt-4 space-y-3">
           <button
             onClick={onShareClick}
             className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 ${designTokens.shareButtonInline}`}
           >
-            내 결과 공유하기
+            친구에게 공유하기
           </button>
-        </motion.div>
-        */}
-
-        {IS_TOSS && (
-          <ShareBottomSheet
-            open={showShareSheet}
-            onClose={() => setShowShareSheet(false)}
-            onShareExternal={handleShare}
-            onShareToss={handleShareToToss}
+          <ShareCard
+            userName={userName}
+            personaTitle={psaResult.persona.title}
+            personaTagline={psaResult.persona.tagline}
+            dayMasterName={sajuResult.dayMaster.name}
+            dominantElement={sajuResult.dominantElement}
+            topCategories={psaResult.categoryScores
+              .slice()
+              .sort((a, b) => b.normalizedScore - a.normalizedScore)
+              .slice(0, 2)
+              .map((cs) => ({ name: cs.category, score: cs.normalizedScore }))}
+            onSaved={() => resetShareStatus()}
           />
-        )}
+        </motion.div>
 
         <Toast
           message={shareStatus === 'copied' ? '링크가 복사되었어요!' : shareStatus === 'shared' ? '공유 완료!' : '공유에 실패했어요. 다시 시도해주세요.'}

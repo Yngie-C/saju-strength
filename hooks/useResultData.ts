@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SajuAnalysis, CombinedAnalysis } from "@/types/saju";
 import { BriefAnalysis } from "@/types/survey";
 import { apiUrl } from "@/lib/config";
-import { shareResult, shareToToss } from '@/lib/share';
 import { WEB_ORIGIN } from '@/lib/config';
 import { getStateManager } from '@/lib/state-manager';
 import { buildShareUrl, type SharePayload } from '@/lib/share-encoder';
 import { IS_TOSS } from '@/lib/platform';
 import { CombinedAnalyzerAgent } from '@/agents/combined-analyzer';
+import { saveResultToHistory } from '@/lib/result-history';
+import { tossShare } from '@/lib/toss';
+import { shareResult } from '@/lib/share';
 
 export interface ResultData {
   sajuResult: SajuAnalysis | null;
@@ -18,6 +20,7 @@ export interface ResultData {
   loading: boolean;
   error: string | null;
   sessionId: string;
+  userName: string | null;
   shareStatus: "idle" | "copied" | "shared" | "failed";
   handleShare: () => Promise<void>;
   handleShareToToss: () => Promise<void>;
@@ -32,6 +35,8 @@ export function useResultData(): ResultData {
   const [error, setError] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "shared" | "failed">("idle");
   const [sessionId, setSessionId] = useState<string>('');
+  const [userName, setUserName] = useState<string | null>(null);
+  const historySavedRef = useRef(false);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +76,42 @@ export function useResultData(): ResultData {
 
       setSajuResult(parsedSaju);
       setPsaResult(parsedPsa);
+
+      // userName 로드
+      const storedName = sessionStorage.getItem('userName');
+      setUserName(storedName);
+
+      // 결과 히스토리 저장 (중복 방지)
+      if (!historySavedRef.current) {
+        historySavedRef.current = true;
+        const birthYear = sessionStorage.getItem('birthYear') ?? '';
+        const birthMonth = sessionStorage.getItem('birthMonth') ?? '';
+        const birthDay = sessionStorage.getItem('birthDay') ?? '';
+        const birthHour = sessionStorage.getItem('birthHour');
+        const genderRaw = sessionStorage.getItem('gender');
+        const birthDate = birthYear && birthMonth && birthDay
+          ? `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`
+          : '';
+        const birthTime = birthHour ? birthHour.padStart(2, '0') + ':00' : null;
+        const gender = genderRaw === 'female' ? 'female' : 'male';
+        const topCategories: [string, number][] = (parsedPsa.categoryScores || [])
+          .slice()
+          .sort((a, b) => b.normalizedScore - a.normalizedScore)
+          .slice(0, 2)
+          .map((cs) => [cs.category, cs.normalizedScore]);
+        saveResultToHistory({
+          name: storedName,
+          birthDate,
+          birthTime,
+          gender,
+          personaType: parsedPsa.persona.type,
+          personaTitle: parsedPsa.persona.title,
+          personaTagline: parsedPsa.persona.tagline,
+          dominantElement: parsedSaju.dominantElement,
+          dayMasterName: parsedSaju.dayMaster.name,
+          topCategories,
+        });
+      }
 
       const sid = parsedSaju.sessionId ?? crypto.randomUUID();
       setSessionId(sid);
@@ -141,6 +182,21 @@ export function useResultData(): ResultData {
       .slice(0, 2)
       .map((cs) => [cs.category, cs.normalizedScore]);
 
+    if (IS_TOSS) {
+      const namePrefix = userName ? `${userName}님의` : '나의';
+      const topStr = topCategories.map(([cat, score]) => `${cat} ${Math.round(score)}점`).join(', ');
+      const message = [
+        `${namePrefix} 사주강점: ${personaTitle}!`,
+        `일간: ${dayMasterName} | 주요 오행: ${dominantElement}`,
+        `Top 강점: ${topStr}`,
+        '',
+        '나도 분석받기 → https://minion.toss.im/B4th4OxD',
+      ].join('\n');
+      const success = await tossShare(message);
+      setShareStatus(success ? 'shared' : 'failed');
+      return;
+    }
+
     const payload: SharePayload = {
       v: 1,
       pt: personaType,
@@ -170,45 +226,10 @@ export function useResultData(): ResultData {
   };
 
   const handleShareToToss = async () => {
-    const personaTitle = psaResult?.persona?.title || '강점 분석';
-    const personaType = psaResult?.persona?.type || '';
-    const personaTagline = psaResult?.persona?.tagline || '';
-    const dominantElement = sajuResult?.dominantElement || '';
-    const dayMasterName = sajuResult?.dayMaster?.name || '';
-
-    const topCategories: [string, number][] = (psaResult?.categoryScores || [])
-      .slice()
-      .sort((a, b) => b.normalizedScore - a.normalizedScore)
-      .slice(0, 2)
-      .map((cs) => [cs.category, cs.normalizedScore]);
-
-    const payload: SharePayload = {
-      v: 1,
-      pt: personaType,
-      tt: personaTitle,
-      tg: personaTagline,
-      de: dominantElement,
-      dm: dayMasterName,
-      tc: topCategories,
-    };
-
-    const shareUrl = buildShareUrl(payload);
-    const sharePath = shareUrl.replace(WEB_ORIGIN, '');
-
-    const result = await shareToToss({
-      title: `사주강점 - ${personaTitle}`,
-      description: `나는 ${personaTitle}! 사주강점 분석 결과를 확인해보세요`,
-      path: sharePath,
-    });
-
-    if (result === 'shared') {
-      setShareStatus('shared');
-    } else if (result === 'failed') {
-      setShareStatus('failed');
-    }
+    await handleShare();
   };
 
   const resetShareStatus = () => setShareStatus('idle');
 
-  return { sajuResult, psaResult, combined, loading, error, sessionId, shareStatus, handleShare, handleShareToToss, resetShareStatus };
+  return { sajuResult, psaResult, combined, loading, error, sessionId, userName, shareStatus, handleShare, handleShareToToss, resetShareStatus };
 }

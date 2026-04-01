@@ -12,18 +12,19 @@ export interface ShareData {
 
 export type ShareResult = 'shared' | 'copied' | 'failed' | 'cancelled';
 
+const TOSS_MINION_URL = 'https://minion.toss.im/B4th4OxD';
+
 /**
  * 외부 공유 (네이티브 공유 시트 → Web Share API → clipboard)
- * - 토스 환경: tossShare() + 웹 URL (누구나 접근 가능)
+ * - 토스 환경: tossShare() + minion URL
  * - 웹 환경: Web Share API → clipboard fallback
  */
 export async function shareResult(data: ShareData): Promise<ShareResult> {
   const { title, description, path } = data;
-  const webUrl = `${WEB_ORIGIN}${path || '/result'}`;
-  const message = `${title}\n${description}\n${webUrl}`;
 
-  // 토스 환경: native share sheet + 웹 URL
+  // 토스 환경: native share sheet + minion URL
   if (isTossEnvironment()) {
+    const message = `${title}\n${description}\n${TOSS_MINION_URL}`;
     try {
       const success = await tossShare(message);
       return success ? 'shared' : 'failed';
@@ -31,6 +32,9 @@ export async function shareResult(data: ShareData): Promise<ShareResult> {
       console.warn('[Share] Toss share failed, falling back');
     }
   }
+
+  const webUrl = `${WEB_ORIGIN}${path || '/result'}`;
+  const message = `${title}\n${description}\n${webUrl}`;
 
   // 웹 환경: Web Share API
   if (typeof navigator !== 'undefined' && navigator.share) {
