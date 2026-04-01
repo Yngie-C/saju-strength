@@ -49,13 +49,31 @@ export async function shareResult(data: ShareData): Promise<ShareResult> {
     }
   }
 
-  // Fallback: clipboard
+  // Fallback: clipboard API
   if (typeof navigator !== 'undefined' && navigator.clipboard) {
     try {
       await navigator.clipboard.writeText(message);
       return 'copied';
     } catch {
-      // clipboard failed
+      // clipboard API failed, try execCommand
+    }
+  }
+
+  // Last resort: execCommand('copy') — WebView 호환
+  if (typeof document !== 'undefined') {
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = message;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (success) return 'copied';
+    } catch {
+      // execCommand also failed
     }
   }
 

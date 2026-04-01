@@ -220,11 +220,13 @@ export default function ResultPage() {
             personaTagline={psaResult.persona.tagline}
             dayMasterName={sajuResult.dayMaster.name}
             dominantElement={sajuResult.dominantElement}
+            weakestElement={sajuResult.weakestElement}
             topCategories={psaResult.categoryScores
               .slice()
               .sort((a, b) => b.normalizedScore - a.normalizedScore)
               .slice(0, 2)
               .map((cs) => ({ name: cs.category, score: cs.normalizedScore }))}
+            allCategories={psaResult.categoryScores.map((cs) => ({ name: cs.category, score: cs.normalizedScore }))}
             onSaved={() => resetShareStatus()}
           />
         </motion.div>

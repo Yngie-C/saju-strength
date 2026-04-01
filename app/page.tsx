@@ -142,7 +142,7 @@ export default function LandingPage() {
                             {entry.topCategories.map(([key, score]) => (
                               <div key={key} className="flex justify-between">
                                 <span>{PSA_LABELS[key] ?? key}</span>
-                                <span className={`font-semibold ${designTokens.textPrimary}`}>{score}</span>
+                                <span className={`font-semibold ${designTokens.textPrimary}`}>{Math.round(score)}</span>
                               </div>
                             ))}
                           </div>
