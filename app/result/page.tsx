@@ -21,6 +21,11 @@ import { Toast } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackScreen, trackClick, trackImpression } from '@/lib/analytics';
 import { ShareCard } from '@/components/result/ShareCard';
+import { getFamousArchetypes } from '@/lib/premium/template-utils';
+import { FamousArchetypesCard } from '@/components/result/FamousArchetypesCard';
+import { PremiumContentSection } from '@/components/result/PremiumContentSection';
+import { getUnlockStatus } from '@/lib/premium/unlock-schedule';
+import { LoginCTA } from '@/components/result/LoginCTA';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -44,7 +49,7 @@ function SectionDivider() {
 }
 
 export default function ResultPage() {
-  const { sajuResult, psaResult, combined, loading, error, userName, shareStatus, handleShare, resetShareStatus } = useResultData();
+  const { sajuResult, psaResult, combined, loading, error, userName, shareStatus, handleShare, resetShareStatus, premiumData, handleLoginSuccess } = useResultData();
   const [growthUnlocked, setGrowthUnlocked] = useState(false);
   const [adSupported, setAdSupported] = useState(IS_TOSS);
 
@@ -120,6 +125,12 @@ export default function ResultPage() {
               strengthsSummary={psaResult.strengthsSummary}
             />
           </ErrorBoundary>
+        </motion.div>
+
+        <SectionDivider />
+
+        <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
+          <FamousArchetypesCard archetypes={getFamousArchetypes(psaResult.topCategories)} />
         </motion.div>
 
         <SectionDivider />
@@ -206,6 +217,40 @@ export default function ResultPage() {
         )}
 
         <SectionDivider />
+
+        {premiumData && (
+          <>
+            <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" onViewportEnter={() => trackImpression('result', 'premium_content')} viewport={{ once: true, margin: "-60px" }}>
+              <ErrorBoundary>
+                <PremiumContentSection
+                  hiddenStrengths={premiumData.personaDeepDive?.hiddenStrengths ?? []}
+                  blindSpots={premiumData.personaDeepDive?.blindSpots ?? []}
+                  brandingProfile={premiumData.brandingProfile ?? null}
+                  weeklyPlan={premiumData.growthRoadmap?.weeklyPlan ?? null}
+                  unlockStatus={getUnlockStatus(premiumData.analyzedAt)}
+                  analyzedAt={premiumData.analyzedAt}
+                />
+              </ErrorBoundary>
+            </motion.div>
+            <SectionDivider />
+            {IS_TOSS && (
+              <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
+                <LoginCTA onLoginSuccess={handleLoginSuccess} />
+              </motion.div>
+            )}
+          </>
+        )}
+
+        {IS_TOSS && (
+          <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="px-4">
+            <button
+              onClick={onShareClick}
+              className={`w-full py-3.5 font-semibold text-sm rounded-xl transition-opacity ${designTokens.primaryButton}`}
+            >
+              내 결과 공유하기
+            </button>
+          </motion.div>
+        )}
 
         <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} className="pt-4 space-y-3">
           <ShareCard

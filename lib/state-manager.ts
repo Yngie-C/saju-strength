@@ -9,9 +9,10 @@ const KEYS = {
   PSA_RESULT: 'psaResult',
   SURVEY_ANSWERS: 'saju-survey-answers',
   SURVEY_PAGE: 'saju-survey-page',
+  PREMIUM_DATA: 'saju-premium-data',
 } as const;
 
-type StateKey = 'sajuResult' | 'psaResult' | 'surveyAnswers' | 'surveyPage';
+type StateKey = 'sajuResult' | 'psaResult' | 'surveyAnswers' | 'surveyPage' | 'premiumData';
 
 class StateManager {
   private useDB: boolean;
@@ -51,7 +52,7 @@ class StateManager {
     }
 
     // Also save to localStorage for survey answers (persist across sessions)
-    if (key === 'surveyAnswers' || key === 'surveyPage') {
+    if (key === 'surveyAnswers' || key === 'surveyPage' || key === 'premiumData') {
       try {
         localStorage.setItem(storageKey, JSON.stringify(data));
       } catch {
@@ -93,7 +94,7 @@ class StateManager {
     }
 
     // 2. Try localStorage (for survey answers)
-    if (key === 'surveyAnswers' || key === 'surveyPage') {
+    if (key === 'surveyAnswers' || key === 'surveyPage' || key === 'premiumData') {
       try {
         const local = localStorage.getItem(storageKey);
         if (local) return JSON.parse(local) as T;
@@ -160,6 +161,7 @@ class StateManager {
       case 'psaResult': return KEYS.PSA_RESULT;
       case 'surveyAnswers': return KEYS.SURVEY_ANSWERS;
       case 'surveyPage': return KEYS.SURVEY_PAGE;
+      case 'premiumData': return KEYS.PREMIUM_DATA;
     }
   }
 }

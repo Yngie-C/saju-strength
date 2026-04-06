@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { SajuAnalysis, CombinedAnalysis } from "@/types/saju";
 import { BriefAnalysis } from "@/types/survey";
 import { apiUrl } from "@/lib/config";
@@ -25,6 +25,8 @@ export interface ResultData {
   handleShare: () => Promise<void>;
   handleShareToToss: () => Promise<void>;
   resetShareStatus: () => void;
+  premiumData: any | null;
+  handleLoginSuccess: () => Promise<void>;
 }
 
 export function useResultData(): ResultData {
@@ -36,12 +38,18 @@ export function useResultData(): ResultData {
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "shared" | "failed">("idle");
   const [sessionId, setSessionId] = useState<string>('');
   const [userName, setUserName] = useState<string | null>(null);
+  const [premiumData, setPremiumData] = useState<any | null>(null);
   const historySavedRef = useRef(false);
 
   useEffect(() => {
     (async () => {
       let rawSaju = sessionStorage.getItem("sajuResult");
       let rawPsa = sessionStorage.getItem("psaResult");
+
+      // 기존 premiumData 로드 시도 (재방문 시)
+      const sm = getStateManager();
+      const existingPremium = await sm.load('premiumData');
+      if (existingPremium) setPremiumData(existingPremium);
 
       // State manager fallback (toss WebView or lost sessionStorage)
       if (!rawSaju || !rawPsa) {
@@ -136,6 +144,23 @@ export function useResultData(): ResultData {
           } as unknown as CombinedAnalysis;
           setCombined(serialized);
           setLoading(false);
+          // 프리미엄 데이터 생성 및 localStorage 저장
+          try {
+            const { generatePremiumReport } = await import('@/lib/premium/analyzer');
+            const premiumReport = generatePremiumReport(sid, parsedSaju, parsedPsa, result.data.axes);
+            const smPremium = getStateManager();
+            const premiumPayload = {
+              analyzedAt: serialized.analyzedAt,
+              personaDeepDive: premiumReport.personaDeepDive,
+              brandingProfile: premiumReport.brandingProfile,
+              growthRoadmap: premiumReport.growthRoadmap,
+              strengthScenarios: premiumReport.strengthScenarios,
+            };
+            await smPremium.save('premiumData', premiumPayload);
+            setPremiumData(premiumPayload);
+          } catch {
+            // 프리미엄 데이터 생성 실패 시 무시 (핵심 기능 아님)
+          }
         } catch (err) {
           const msg = err instanceof Error ? err.message : '결과를 불러오는 중 문제가 생겼어요. 다시 시도해 볼까요?';
           setError(msg);
@@ -155,9 +180,26 @@ export function useResultData(): ResultData {
             }
             return res.json() as Promise<CombinedAnalysis>;
           })
-          .then((data) => {
+          .then(async (data) => {
             setCombined(data);
             setLoading(false);
+            // 웹도 프리미엄 데이터 저장
+            try {
+              const { generatePremiumReport } = await import('@/lib/premium/analyzer');
+              const premiumReport = generatePremiumReport(sid, parsedSaju, parsedPsa, data.axes);
+              const smPremium = getStateManager();
+              const premiumPayload = {
+                analyzedAt: data.analyzedAt,
+                personaDeepDive: premiumReport.personaDeepDive,
+                brandingProfile: premiumReport.brandingProfile,
+                growthRoadmap: premiumReport.growthRoadmap,
+                strengthScenarios: premiumReport.strengthScenarios,
+              };
+              await smPremium.save('premiumData', premiumPayload);
+              setPremiumData(premiumPayload);
+            } catch {
+              // ignore
+            }
           })
           .catch((err: unknown) => {
             const msg = err instanceof Error ? err.message : "알 수 없는 오류";
@@ -221,6 +263,16 @@ export function useResultData(): ResultData {
       } else if (result === 'shared') {
         setShareStatus('shared');
       } else {
+        // SUN-78 진단: 모든 공유 폴백 실패 시 Sentry 전송
+        if (typeof window !== 'undefined') {
+          (import('@granite-js/plugin-sentry') as any).then((mod: any) => {
+            if (typeof mod.captureException === 'function') {
+              mod.captureException(new Error('All share fallbacks failed'), {
+                extra: { step: 'handleShare_allFailed', personaTitle, schemeUrl },
+              });
+            }
+          }).catch(() => {});
+        }
         setShareStatus('failed');
       }
       return;
@@ -250,5 +302,31 @@ export function useResultData(): ResultData {
 
   const resetShareStatus = () => setShareStatus('idle');
 
-  return { sajuResult, psaResult, combined, loading, error, sessionId, userName, shareStatus, handleShare, handleShareToToss, resetShareStatus };
+  const handleLoginSuccess = useCallback(async () => {
+    if (!sajuResult || !psaResult || !combined) return;
+    try {
+      await fetch(apiUrl('/api/state/save'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          key: 'sajuResult',
+          data: sajuResult,
+        }),
+      });
+      await fetch(apiUrl('/api/state/save'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          key: 'psaResult',
+          data: psaResult,
+        }),
+      });
+    } catch {
+      console.warn('[LoginCTA] Server save failed');
+    }
+  }, [sajuResult, psaResult, combined, sessionId]);
+
+  return { sajuResult, psaResult, combined, loading, error, sessionId, userName, shareStatus, handleShare, handleShareToToss, resetShareStatus, premiumData, handleLoginSuccess };
 }

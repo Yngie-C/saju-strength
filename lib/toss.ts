@@ -49,6 +49,16 @@ export async function tossShareInternal(
     return true;
   } catch (error) {
     console.warn('[Toss] Internal share failed:', error);
+    // SUN-78 진단: Sentry에 실패 컨텍스트 전송
+    if (typeof window !== 'undefined') {
+      (import('@granite-js/plugin-sentry') as any).then((mod: any) => {
+        if (typeof mod.captureException === 'function') {
+          mod.captureException(error instanceof Error ? error : new Error(String(error)), {
+            extra: { schemeUrl, displayText, step: 'tossShareInternal' },
+          });
+        }
+      }).catch(() => {});
+    }
     return false;
   }
 }
